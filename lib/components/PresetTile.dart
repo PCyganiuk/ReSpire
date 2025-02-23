@@ -8,6 +8,7 @@ class PresetTile extends StatelessWidget
 
   final GestureTapCallback onClick;
   final Function(BuildContext)? deleteTile;
+  final Function(BuildContext)? editTile;
   final Color color;
   final PresetEntry values;
 
@@ -15,6 +16,7 @@ class PresetTile extends StatelessWidget
     super.key,
     required this.onClick,
     required this.deleteTile,
+    required this.editTile,
     required this.values,
     this.color = const Color.fromRGBO(0, 195, 255, 1)}
     );
@@ -22,6 +24,17 @@ class PresetTile extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return Slidable(
+      startActionPane: ActionPane(
+        extentRatio: 0.25, // delete button width (0< && <1)
+          motion: StretchMotion(), 
+          children: [
+            SlidableAction(
+            borderRadius: BorderRadius.circular(12),
+            autoClose: true,
+            onPressed: editTile,
+            icon: Icons.edit,
+            backgroundColor: const Color.fromARGB(255, 255, 208, 0),
+            )]),
       endActionPane: ActionPane(
         extentRatio: 0.25, // delete button width (0< && <1)
           motion: StretchMotion(), 
@@ -46,7 +59,7 @@ class PresetTile extends StatelessWidget
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 Text(
-                  "Breaths: ${values.breathCount}, Exhale time: ${values.exhaleTime}s, Inhale time: ${values.exhaleTime}s, Retention: ${values.retentionTime}s",
+                  "Breaths: ${values.breathCount}, Exhale time: ${values.exhaleTime}s, Inhale time: ${values.inhaleTime}s, Retention: ${values.retentionTime}s",
                   maxLines: 1,
                   style: TextStyle(fontSize: 12),)
               ],

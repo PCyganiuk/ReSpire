@@ -8,26 +8,25 @@ class DialogBox extends StatefulWidget
   final TextEditingController titleController;
   final TextEditingController descriptionController;
 
-  final int breathCount;
+  int breathCount;
   final int minBreaths;
   final int maxBreaths;
 
-  final double inhaleTime;
-  final double minInhaleTime;
-  final double maxInhaleTime;
+  final int inhaleTime;
+  final int minInhaleTime;
+  final int maxInhaleTime;
 
 
-  final double exhaleTime;
-  final double minExhaleTime;
-  final double maxExhaleTime;
+  final int exhaleTime;
+  final int minExhaleTime;
+  final int maxExhaleTime;
   
-  final double retentionTime;
-  final double minRetentionTime;
-  final double maxRetentionTime;
+  final int retentionTime;
+  final int minRetentionTime;
+  final int maxRetentionTime;
 
-  final VoidCallback savePreset;
 
-  const DialogBox({
+  DialogBox({
     super.key,
     required this.titleController,
     required this.descriptionController,
@@ -35,19 +34,18 @@ class DialogBox extends StatefulWidget
     required this.inhaleTime,
     required this.exhaleTime,
     required this.retentionTime,
-    required this.savePreset,
 
     this.minBreaths = 10,
     this.maxBreaths = 100,
     
-    this.minInhaleTime = 3.0,
-    this.maxInhaleTime = 20.0,
+    this.minInhaleTime = 3,
+    this.maxInhaleTime = 15,
 
-    this.minExhaleTime = 3.0,
-    this.maxExhaleTime = 20.0,
+    this.minExhaleTime = 3,
+    this.maxExhaleTime = 15,
     
-    this.minRetentionTime = 3.0,
-    this.maxRetentionTime = 20.0
+    this.minRetentionTime = 3,
+    this.maxRetentionTime = 15
     });
 
   @override
@@ -60,9 +58,9 @@ class _DialogBoxState extends State<DialogBox>
   final _formKey = GlobalKey<FormState>();
 
   int _currentBreathCount = 0;
-  double _currentInhaleTime = 0;
-  double _currentRetentionTime = 0;
-  double _currentExhaleTime = 0;
+  int _currentInhaleTime = 0;
+  int _currentRetentionTime = 0;
+  int _currentExhaleTime = 0;
 
   @override
   void initState() {
@@ -80,14 +78,23 @@ class _DialogBoxState extends State<DialogBox>
         TextButton(onPressed: ()
         {
           if (_formKey.currentState?.validate() ?? false) {
-              widget.savePreset();
+              
+            Navigator.pop(context, {
+              'title': widget.titleController.text,
+              'description': widget.descriptionController.text,
+              'breathCount': _currentBreathCount,
+              'inhaleTime': _currentInhaleTime,
+              'exhaleTime': _currentExhaleTime,
+              'retentionTime': _currentRetentionTime,
+            });
+    
             }
         }, child: Text("Save")),
         TextButton(onPressed: () => (Navigator.pop(context)), child: Text("Cancel"))
       ],
       content: Container(
         padding: EdgeInsets.all(10),
-        height: 550,
+        height: 630,
         child: Form(
           key: _formKey,
           child: Column(
@@ -108,7 +115,7 @@ class _DialogBoxState extends State<DialogBox>
 
               Text("Description"),
               TextFormField(
-                controller: widget.titleController,
+                controller: widget.descriptionController,
               ),
 
               SizedBox(height: 25),
@@ -131,126 +138,76 @@ class _DialogBoxState extends State<DialogBox>
                 onChanged: (int newValue) {
                 setState(() {
                   _currentBreathCount = newValue;
+                  widget.breathCount = newValue;
                 }); 
                 }),
 
               SizedBox(height: 25),
 
 
-              // TODO: Delete if you implement the dialog box
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //   children: [
-              //     Column(
-              //       children: [
-              //             Text("Inhale"),
-              //             NumberPicker(
-              //               value: _currentBreathCount,
-              //               minValue: widget.minBreaths,
-              //               maxValue: widget.maxBreaths,
-              //               axis: Axis.vertical,
-              //               decoration: BoxDecoration( //Optional selected item decoration
-              //                 borderRadius: BorderRadius.circular(15),
-              //                 border: Border.all(color: Colors.black, width: 3)
-              //               ),
-              //               itemCount: 3,
-              //               itemWidth: 50,
-              //               onChanged: (int newValue) {
-              //                 setState(() {
-              //                   _currentBreathCount = newValue;
-              //                 });
-              //               }
-              //             )
-              //       ],
-              //     ),
-              //     Column(
-              //       children: [
-              //             Text("Inhale"),
-              //             NumberPicker(
-              //               value: _currentBreathCount,
-              //               minValue: widget.minBreaths,
-              //               maxValue: widget.maxBreaths,
-              //               axis: Axis.vertical,
-              //               decoration: BoxDecoration( //Optional selected item decoration
-              //                 borderRadius: BorderRadius.circular(15),
-              //                 border: Border.all(color: Colors.black, width: 3)
-              //               ),
-              //               itemCount: 3,
-              //               itemWidth: 50,
-              //               onChanged: (int newValue) {
-              //                 setState(() {
-              //                   _currentBreathCount = newValue;
-              //                 });
-              //               }
-              //             )
-              //       ],
-              //     ),
-              //     Column(
-              //       children: [
-              //             Text("Inhale"),
-              //             NumberPicker(
-              //               value: _currentBreathCount,
-              //               minValue: widget.minBreaths,
-              //               maxValue: widget.maxBreaths,
-              //               axis: Axis.vertical,
-              //               decoration: BoxDecoration( //Optional selected item decoration
-              //                 borderRadius: BorderRadius.circular(15),
-              //                 border: Border.all(color: Colors.black, width: 3)
-              //               ),
-              //               itemCount: 3,
-              //               itemWidth: 50,
-              //               onChanged: (int newValue) {
-              //                 setState(() {
-              //                   _currentBreathCount = newValue;
-              //                 });
-              //               }
-              //             )
-              //       ],
-              //     )
-              //   ],
-              // ),
-
-              //Alternative for NumberPicker
-
-              Text("Inhale time"),
-              Slider(
-
+              Text("Inhale"),
+              SizedBox(height: 10),
+              NumberPicker(
                 value: _currentInhaleTime,
-                min: widget.minInhaleTime,
-                max: widget.maxInhaleTime,
-                divisions: widget.maxInhaleTime.toInt() - widget.minInhaleTime.toInt() + 1,
-                onChanged: (double newValue) {
-                setState(() {
-                  _currentInhaleTime = newValue;
-                }); 
-                },
+                minValue: widget.minInhaleTime,
+                maxValue: widget.maxInhaleTime,
+                axis: Axis.horizontal,
+                decoration: BoxDecoration( //Optional selected item decoration
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black, width: 3)
+                ),
+                itemCount: 5,
+                itemWidth: 50,
+                onChanged: (int newValue) {
+                  setState(() {
+                    _currentInhaleTime = newValue;
+                  });
+                }
+              ),
+
+              SizedBox(height: 25),
+              
+              Text("Exhale time"),
+              SizedBox(height: 10),
+              NumberPicker(
+                value: _currentExhaleTime,
+                minValue: widget.minExhaleTime,
+                maxValue: widget.maxExhaleTime,
+                axis: Axis.horizontal,
+                decoration: BoxDecoration( //Optional selected item decoration
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black, width: 3)
+                ),
+                itemCount: 5,
+                itemWidth: 50,
+                onChanged: (int newValue) {
+                  setState(() {
+                    _currentExhaleTime = newValue;
+                  });
+                }
               ),
               
-              // Text("Inhale time"),
-              // Slider(
+              SizedBox(height: 25),
 
-              //   value: _currentInhaleTime,
-              //   min: widget.minInhaleTime,
-              //   max: widget.maxInhaleTime,
-              //   divisions: widget.maxInhaleTime.toInt() - widget.minInhaleTime.toInt() + 1,
-              //   onChanged: (double newValue) {
-              //   setState(() {
-              //     _currentInhaleTime = newValue;
-              //   }); 
-              //   },
-              // ),Text("Inhale time"),
-              // Slider(
-
-              //   value: _currentInhaleTime,
-              //   min: widget.minInhaleTime,
-              //   max: widget.maxInhaleTime,
-              //   divisions: widget.maxInhaleTime.toInt() - widget.minInhaleTime.toInt() + 1,
-              //   onChanged: (double newValue) {
-              //   setState(() {
-              //     _currentInhaleTime = newValue;
-              //   }); 
-              //   },
-              // ),
+              Text("Retention time"),
+              SizedBox(height: 10),
+              NumberPicker(
+                value: _currentRetentionTime,
+                minValue: widget.minRetentionTime,
+                maxValue: widget.maxRetentionTime,
+                axis: Axis.horizontal,
+                decoration: BoxDecoration( //Optional selected item decoration
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black, width: 3)
+                ),
+                itemCount: 5,
+                itemWidth: 50,
+                onChanged: (int newValue) {
+                  setState(() {
+                    _currentRetentionTime = newValue;
+                  });
+                }
+              )
             ],
           ),
         )

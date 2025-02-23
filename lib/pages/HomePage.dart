@@ -16,25 +16,68 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage>
 {
-
   final List<PresetEntry>presetList = [
-    PresetEntry(title: "Breathing hard", breathCount: 30, inhaleTime: 3, exhaleTime: 3, retentionTime: 1),
-    PresetEntry(title: "Not breathing", breathCount: 1, inhaleTime: 10, exhaleTime: 0, retentionTime: 9999),
+    PresetEntry(title: "Breathing hard", description: "", breathCount: 30, inhaleTime: 3, exhaleTime: 3, retentionTime: 5),
+    PresetEntry(title: "Not breathing", description: "", breathCount: 10, inhaleTime: 3, exhaleTime: 3, retentionTime: 15),
   ];
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   int breathCount = 10;
-  double inhaleTime = 3;
-  double exhaleTime = 3;
-  double retentionTime = 5;
+  int inhaleTime = 3;
+  int exhaleTime = 3;
+  int retentionTime = 3;
+
+
+  void loadValues(int index)
+  {
+    PresetEntry entry = presetList[index];
+
+    titleController.text = entry.title;
+    descriptionController.text = entry.description;
+    breathCount = entry.breathCount;
+    inhaleTime = entry.inhaleTime;
+    exhaleTime = entry.exhaleTime;
+    retentionTime = entry.retentionTime;
+
+    print(entry.title);
+    print(entry.description);
+    print(entry.breathCount);
+    print(entry.inhaleTime);
+    print(entry.exhaleTime);
+    print(entry.retentionTime);
+  }
+
+  void clearValues()
+  {
+    titleController.text = "";
+    descriptionController.text = "";
+    breathCount = 10;
+    inhaleTime = 3;
+    exhaleTime = 3;
+    retentionTime = 3;
+  }
 
   void addPreset()
   {
+    presetList.add(PresetEntry(title: titleController.text, description: descriptionController.text, breathCount: breathCount, inhaleTime: inhaleTime, exhaleTime: exhaleTime, retentionTime: retentionTime));
+    setState(() {
+
+    });
+    clearValues();
     // Implement hive saving
   }
 
-  void deletePreset(index)
+  void editPreset(int index)
+  {
+    presetList[index] = PresetEntry(title: titleController.text, description: descriptionController.text, breathCount: breathCount, inhaleTime: inhaleTime, exhaleTime: exhaleTime, retentionTime: retentionTime);
+    setState(() {
+      
+    });
+    clearValues();
+  }
+
+  void deletePreset(int index)
   {
     presetList.removeAt(index);
     setState(() {
@@ -45,20 +88,70 @@ class _HomePageState extends State<HomePage>
   }
 
 
-  void showPresetDialog(BuildContext context)
+  void showNewPresetDialog({
+    required BuildContext context
+    }) async
   {
-    showDialog(context: context, builder: (BuildContext context)
-    {
-      return DialogBox(
-        titleController: titleController, 
-        descriptionController: descriptionController, 
-        breathCount: breathCount,
-        inhaleTime: inhaleTime,
-        exhaleTime: exhaleTime,
-        retentionTime: retentionTime,
-        savePreset: addPreset,
-        );
-    });
+    final result = await showDialog(
+      context: context, 
+      builder: (BuildContext context)
+      {
+        return DialogBox(
+          titleController: titleController, 
+          descriptionController: descriptionController, 
+          breathCount: breathCount,
+          inhaleTime: inhaleTime,
+          exhaleTime: exhaleTime,
+          retentionTime: retentionTime
+          );
+      });
+
+      if (result != null) {
+        setState(() {
+          titleController.text = result['title'];
+          descriptionController.text = result['description'];
+          breathCount = result['breathCount'];
+          inhaleTime = result['inhaleTime'];
+          exhaleTime = result['exhaleTime'];
+          retentionTime = result['retentionTime'];
+        });
+        addPreset();
+      }
+  }
+
+  void showEditPresetDialog({
+    required BuildContext context,
+    required int index
+    }) async
+  {
+    loadValues(index); // Loads values to variables before showing the dialog
+
+    final result = await showDialog(
+      context: context, 
+      builder: (BuildContext context)
+      {
+        
+        return DialogBox(
+          titleController: titleController, 
+          descriptionController: descriptionController, 
+          breathCount: breathCount,
+          inhaleTime: inhaleTime,
+          exhaleTime: exhaleTime,
+          retentionTime: retentionTime
+          );
+      });
+
+      if (result != null) {
+        setState(() {
+          titleController.text = result['title'];
+          descriptionController.text = result['description'];
+          breathCount = result['breathCount'];
+          inhaleTime = result['inhaleTime'];
+          exhaleTime = result['exhaleTime'];
+          retentionTime = result['retentionTime'];
+        });
+        editPreset(index);
+      }
   }
 
   @override
@@ -85,9 +178,10 @@ class _HomePageState extends State<HomePage>
                 values: presetList[index],
                 onClick: () => (),
                 deleteTile: (context) => deletePreset(index),
+                editTile: (context) => showEditPresetDialog(context: context, index: index),
               ) :
             
-              AddPresetTile(onClick: () => showPresetDialog(context))
+              AddPresetTile(onClick: () => showNewPresetDialog(context:context))
             );
           }
         )

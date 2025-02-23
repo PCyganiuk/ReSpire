@@ -1,6 +1,7 @@
 class PresetEntry
 {
   final String title;
+  final String description;
   final int breathCount;
   final int inhaleTime;
   final int exhaleTime;
@@ -8,6 +9,7 @@ class PresetEntry
 
   const PresetEntry({
     required this.title,
+    required this.description,
     required this.breathCount,
     required this.inhaleTime,
     required this.exhaleTime,
