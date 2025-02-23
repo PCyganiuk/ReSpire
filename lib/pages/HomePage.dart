@@ -102,7 +102,8 @@ class _HomePageState extends State<HomePage>
           breathCount: breathCount,
           inhaleTime: inhaleTime,
           exhaleTime: exhaleTime,
-          retentionTime: retentionTime
+          retentionTime: retentionTime,
+          onCancel: clearValues,
           );
       });
 
@@ -137,7 +138,8 @@ class _HomePageState extends State<HomePage>
           breathCount: breathCount,
           inhaleTime: inhaleTime,
           exhaleTime: exhaleTime,
-          retentionTime: retentionTime
+          retentionTime: retentionTime,
+          onCancel: clearValues,
           );
       });
 

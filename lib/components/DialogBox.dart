@@ -24,6 +24,8 @@ class DialogBox extends StatefulWidget
   final int minRetentionTime;
   final int maxRetentionTime;
 
+  final Function onCancel;
+
 
   const DialogBox({
     super.key,
@@ -33,6 +35,7 @@ class DialogBox extends StatefulWidget
     required this.inhaleTime,
     required this.exhaleTime,
     required this.retentionTime,
+    required this.onCancel,
 
     this.minBreaths = 10,
     this.maxBreaths = 100,
@@ -89,7 +92,10 @@ class _DialogBoxState extends State<DialogBox>
     
             }
         }, child: Text("Save")),
-        TextButton(onPressed: () => (Navigator.pop(context)), child: Text("Cancel"))
+        TextButton(onPressed: () {
+          Navigator.pop(context);
+          widget.onCancel();
+        }, child: Text("Cancel"))
       ],
       content: Container(
         padding: EdgeInsets.all(10),
