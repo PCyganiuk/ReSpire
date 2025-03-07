@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/HomePage/AddPresetTile.dart';
 import 'package:respire/components/HomePage/DialogBox.dart';
 import 'package:respire/components/Global/PresetEntry.dart';
@@ -18,7 +19,6 @@ class HomePage extends StatefulWidget{
 class _HomePageState extends State<HomePage>
 {
   final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
   final PresetDataBase db = PresetDataBase();
   int breathCount = 10;
   int inhaleTime = 3;
@@ -33,20 +33,16 @@ class _HomePageState extends State<HomePage>
 
   void loadValues(int index)
   {
-    PresetEntry entry = db.presetList[index];
+    Training entry = db.presetList[index];
 
     titleController.text = entry.title;
-    descriptionController.text = entry.description;
-    breathCount = entry.breathCount;
-    inhaleTime = entry.inhaleTime;
-    exhaleTime = entry.exhaleTime;
-    retentionTime = entry.retentionTime;
+
+    //TODO: Load other values
   }
 
   void clearValues()
   {
     titleController.text = "";
-    descriptionController.text = "";
     breathCount = 10;
     inhaleTime = 3;
     exhaleTime = 3;
@@ -55,7 +51,8 @@ class _HomePageState extends State<HomePage>
 
   void addPreset()
   {
-    db.presetList.add(PresetEntry(title: titleController.text, description: descriptionController.text, breathCount: breathCount, inhaleTime: inhaleTime, exhaleTime: exhaleTime, retentionTime: retentionTime));
+    //TODO: Implement preset adding (dedicated page + controllers)
+    db.presetList.add(Training(title: titleController.text, phases: List.empty()));
     setState(() {
 
     });
@@ -65,7 +62,8 @@ class _HomePageState extends State<HomePage>
 
   void editPreset(int index)
   {
-    db.presetList[index] = PresetEntry(title: titleController.text, description: descriptionController.text, breathCount: breathCount, inhaleTime: inhaleTime, exhaleTime: exhaleTime, retentionTime: retentionTime);
+    //TODO: Implement preset editing (dedicated page + controllers)
+    db.presetList[index] = Training(title: titleController.text, phases: List.empty());
     setState(() {
       
     });
@@ -92,8 +90,7 @@ class _HomePageState extends State<HomePage>
       builder: (BuildContext context)
       {
         return DialogBox(
-          titleController: titleController, 
-          descriptionController: descriptionController, 
+          titleController: titleController,
           breathCount: breathCount,
           inhaleTime: inhaleTime,
           exhaleTime: exhaleTime,
@@ -105,7 +102,6 @@ class _HomePageState extends State<HomePage>
       if (result != null) {
         setState(() {
           titleController.text = result['title'];
-          descriptionController.text = result['description'];
           breathCount = result['breathCount'];
           inhaleTime = result['inhaleTime'];
           exhaleTime = result['exhaleTime'];
@@ -129,7 +125,6 @@ class _HomePageState extends State<HomePage>
         
         return DialogBox(
           titleController: titleController, 
-          descriptionController: descriptionController, 
           breathCount: breathCount,
           inhaleTime: inhaleTime,
           exhaleTime: exhaleTime,
@@ -141,7 +136,6 @@ class _HomePageState extends State<HomePage>
       if (result != null) {
         setState(() {
           titleController.text = result['title'];
-          descriptionController.text = result['description'];
           breathCount = result['breathCount'];
           inhaleTime = result['inhaleTime'];
           exhaleTime = result['exhaleTime'];
