@@ -6,6 +6,7 @@ import 'package:respire/components/Global/StepIncrement.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/HomePage.dart';
 
+
 void main() async{
   await Hive.initFlutter();
   // If any changes in loaded data occur, uncomment the following
@@ -30,8 +31,6 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage()
-    );
+        debugShowCheckedModeBanner: false, home: HomePage());
   }
 }
