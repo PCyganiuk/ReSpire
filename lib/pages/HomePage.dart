@@ -5,6 +5,7 @@ import 'package:respire/components/HomePage/DialogBox.dart';
 import 'package:respire/components/HomePage/PresetTile.dart';
 import 'package:respire/pages/BreathingPage.dart';
 import 'package:respire/pages/SettingsPage.dart';
+import 'package:respire/pages/TutorialPage.dart';
 import 'package:respire/services/PresetDataBase.dart';
 
 class HomePage extends StatefulWidget {
@@ -141,7 +142,12 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.info_outline),
-          onPressed: () => {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TutorialPage()),
+              );
+          }
         ),
         title: Text("ReSpire", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
