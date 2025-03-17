@@ -56,7 +56,7 @@ class _BreathingPageState extends State<BreathingPage>
       ),
       body: Column (
          children: [
-          //Circle(tile: widget.tile)  //TODO: Uncomment and fix
+          Circle(training: widget.tile) 
          ]
       ),
     );
