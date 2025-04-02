@@ -7,14 +7,13 @@ import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
 
-class BreathingPage extends StatefulWidget{
+class BreathingPage extends StatefulWidget {
   final Training training;
-  
+
   const BreathingPage({super.key, required this.training});
 
   @override
   State<StatefulWidget> createState() => _BreathingPageState();
-  
 }
 
 void _showConfirmationDialog(BuildContext context) {
@@ -24,8 +23,8 @@ void _showConfirmationDialog(BuildContext context) {
       return AlertDialog(
         title: Text("Exit"),
         content: Text(
-          "Are you sure you want exit?\nIf you click \"Yes\" your session will end.",
-          textAlign: TextAlign.center),
+            "Are you sure you want exit?\nIf you click \"Yes\" your session will end.",
+            textAlign: TextAlign.center),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -33,7 +32,7 @@ void _showConfirmationDialog(BuildContext context) {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); 
+              Navigator.pop(context);
               Navigator.pop(context);
             },
             child: Text("Yes"),
@@ -44,105 +43,156 @@ void _showConfirmationDialog(BuildContext context) {
   );
 }
 
-
-class _BreathingPageState extends State<BreathingPage>
-{
+class _BreathingPageState extends State<BreathingPage> {
   late TrainingParser parser;
   Timer? _timer;
-  training_step.Step? previousStep;
-  training_step.Step? currentStep;
-  training_step.Step? nextStep;
-  int remainingTime = 3000; //in milliseconds
-  int nextStepRemainingTime = 0;
-  int stepsCount = 0;
-  int minimumDurationTime = 100; //in milliseconds
-  bool finished = false;
+  final Stopwatch _stopwatch = Stopwatch();
+  training_step.Step? _previousStep;
+  training_step.Step? _currentStep;
+  training_step.Step? _nextStep;
+  int _remainingTime = 3000; //in milliseconds
+  int _nextStepRemainingTime = 0;
+  int _stepsCount = 0;
+  final int _minimumDurationTime = 100; //in milliseconds
+  bool _finished = false;
+  bool _pause = true;
+  final int _pauseDuration = 300;  //in milliseconds
+// Dodajemy GlobalKey do InstructionBlocks
+  final GlobalKey<InstructionBlocksState> _instructionBlocksKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     parser = TrainingParser(training: widget.training);
+    _instructionBlocksKey.currentState?.animation();
+    _fetchNextStep();
     _startTraining();
   }
 
   void _startTraining() {
-    _fetchNextStep();
-    _timer = Timer.periodic(Duration(milliseconds: minimumDurationTime), (Timer timer) {
+     _stopwatch.start();
+    _timer = Timer.periodic(Duration(milliseconds: _minimumDurationTime),
+        (Timer timer) {
       setState(() {
-        if (remainingTime > 0) {
-          remainingTime -= minimumDurationTime;
-        } else if (finished){
-          previousStep = currentStep;
-          currentStep = null;
-          _timer?.cancel();
-        } else {
-          previousStep = currentStep;
-          currentStep = nextStep;
-          remainingTime = nextStepRemainingTime;
+        if (_remainingTime > 0) {
+          _remainingTime -= _minimumDurationTime;
+        } else if(_pause) {
+            _instructionBlocksKey.currentState?.animation();
+            _remainingTime = _pauseDuration;
+            _pause = false; 
+        } else if (_finished) {
+          _previousStep = _currentStep;
+          _currentStep = null;
+          pauseTimer();
+        } else{
+          _previousStep = _currentStep;
+          _currentStep = _nextStep;
+          _remainingTime = _nextStepRemainingTime;
           _fetchNextStep();
+          _stepsCount++;
+          _pause = true;
         }
       });
     });
   }
 
-void _fetchNextStep() {
-  var instructionData = parser.nextInstruction();
+  void _fetchNextStep() {
+    var instructionData = parser.nextInstruction();
 
-  if (instructionData == null) {
-    finished = true;
-    nextStep = null;
-    return;
+    if (instructionData == null) {
+      _finished = true;
+      _nextStep = null;
+      return;
+    }
+
+    setState(() {
+      _nextStep = instructionData["step"];
+      _nextStepRemainingTime = instructionData["remainingTime"];
+    });
   }
 
-  setState(() {
-    nextStep = instructionData["step"];
-    nextStepRemainingTime = instructionData["remainingTime"];
-    stepsCount = instructionData["stepsCount"];
-  });
-}
+    void pauseTimer() {
+    _timer?.cancel();
+    _stopwatch.stop();
+  }
+
+  void resumeTimer() {
+    _stopwatch.start();
+     _startTraining();
+  }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    pauseTimer();
     super.dispose();
   }
 
+  Widget textInCircle() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${(_remainingTime / 1000).toDouble()}',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back), 
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
-            currentStep != null ? _showConfirmationDialog(context) : Navigator.pop(context);
+            _currentStep != null
+                ? {_showConfirmationDialog(context)}
+                : Navigator.pop(context);
           },
         ),
         title: Text("ReSpire"),
         centerTitle: true,
         backgroundColor: Colors.grey,
       ),
-      body: Column (
-         children: [
-          Text(widget.training.title, style: TextStyle(fontSize: 16),),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, 
-                children: [
-                  InstructionBlocks(previous: previousStep, current: currentStep, next: nextStep),
-                  Circle(key: ValueKey(remainingTime), time: remainingTime),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      '$stepsCount / ${parser.countSteps()}',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),           
-                ],
-              )
-            )
+      body: Column(
+        children: [
+          SizedBox(height: 16),
+          //Title
+          Text(widget.training.title,
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
+
+          //Instructions
+         InstructionBlocks(
+            key: _instructionBlocksKey,
+            steps: [_previousStep, _currentStep, _nextStep],
+            currentIndex: _stepsCount
           ),
+
+          Text(
+            '$_stepsCount / ${parser.countSteps()}',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+
+          Expanded(
+              child: Center(
+                  child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Circle(
+                step: _nextStep,
+                child: textInCircle(),
+              ),
+            ],
+          ))),
         ],
       ),
     );

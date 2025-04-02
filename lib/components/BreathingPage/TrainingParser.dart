@@ -6,7 +6,6 @@ import 'package:respire/components/Global/Training.dart';
 class TrainingParser {
   int phaseID = 0;
   int stepID = -1;
-  int stepsCount = 0;
 
   Training training;
   Phase currentPhase;
@@ -33,14 +32,12 @@ class TrainingParser {
       } else {
         stepID++;
       }
-      stepsCount++;
 
     currentStep = currentPhase.steps[stepID];
 
     return {
       "step": currentStep,
       "remainingTime": remainingTimeValue(currentStep.duration),
-      "stepsCount": stepsCount,
     };
 }
 
