@@ -1,11 +1,12 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/Circle.dart';
 import 'package:respire/components/BreathingPage/InstructionBlocks.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
+import 'package:respire/services/TextToSpeechService.dart';
+
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -70,10 +71,19 @@ class _BreathingPageState extends State<BreathingPage> {
   }
 
   void _startTraining() {
+    int previousSecond = _remainingTime~/1000;
      _stopwatch.start();
     _timer = Timer.periodic(Duration(milliseconds: _minimumDurationTime),
         (Timer timer) {
       setState(() {
+        // Whenever the second changes, might want to change the calculations
+        // if we decide to switch to seconds instead of milliseconds!
+        if(previousSecond != _remainingTime~/1000)
+        {
+          previousSecond = _remainingTime~/1000;
+          TextToSpeechService().speak(previousSecond+1);
+        }
+
         if (_remainingTime > 0) {
           _remainingTime -= _minimumDurationTime;
         } else if(_pause) {
@@ -124,6 +134,7 @@ class _BreathingPageState extends State<BreathingPage> {
   @override
   void dispose() {
     pauseTimer();
+    TextToSpeechService().stopSpeaking();
     super.dispose();
   }
 
