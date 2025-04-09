@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/Circle.dart';
 import 'package:respire/components/BreathingPage/InstructionBlocks.dart';
@@ -84,7 +85,7 @@ class _BreathingPageState extends State<BreathingPage> {
           TextToSpeechService().speak(previousSecond+1);
         }
 
-        if (_remainingTime > 0) {
+        if (_remainingTime >= _minimumDurationTime) {
           _remainingTime -= _minimumDurationTime;
         } else if(_pause) {
             _instructionBlocksKey.currentState?.animation();
@@ -115,7 +116,6 @@ class _BreathingPageState extends State<BreathingPage> {
       _nextStep = null;
       return;
     }
-
     setState(() {
       _nextStep = instructionData["step"];
       _nextStepRemainingTime = instructionData["remainingTime"];

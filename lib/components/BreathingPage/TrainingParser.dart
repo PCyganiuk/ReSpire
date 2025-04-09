@@ -1,6 +1,5 @@
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
-import 'package:respire/components/Global/StepIncrement.dart';
 import 'package:respire/components/Global/Training.dart';
 
 class TrainingParser {
@@ -37,24 +36,10 @@ class TrainingParser {
 
     return {
       "step": currentStep,
-      "remainingTime": remainingTimeValue(currentStep.duration),
+      "remainingTime": (currentStep.getStepDuration(currentPhase.doneRepsCounter) * 1000).truncate(),
     };
 }
 
-   int remainingTimeValue(double duration) {
-    double result = duration * 1000;
-    switch (currentStep.increment?.type) {
-            case IncrementType.percentage:
-              result += (result * currentStep.increment!.value * currentPhase.doneRepsCounter);
-              break;
-            case IncrementType.value:
-              result += currentStep.increment!.value * 1000 * currentPhase.doneRepsCounter;
-              break;
-            default:
-              break;
-          }
-    return result.toInt();
-  }
 
   int countSteps() {
     int result = 0;
