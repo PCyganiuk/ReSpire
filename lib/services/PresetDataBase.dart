@@ -35,7 +35,8 @@ class PresetDataBase {
               Step(duration: 4, stepType: StepType.retention),
               Step(duration: 3, stepType: StepType.exhale),
               Step(duration: 1, stepType: StepType.recovery),
-            ]
+            ],
+            increment: 0,
           )
         ]
       ),
@@ -48,7 +49,8 @@ class PresetDataBase {
             Step(duration: 3.14, stepType: StepType.retention),
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
             Step(duration: 3, stepType: StepType.recovery),
-          ]
+          ],
+          increment: 0,
           )
         ]
          ),
@@ -63,6 +65,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 1, type: IncrementType.value)),
             Step(duration: 3, stepType: StepType.recovery),
           ],
+          increment: 10,
         ),
         Phase(
           reps: 1,
@@ -72,6 +75,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
             Step(duration: 3, stepType: StepType.recovery),
           ],
+          increment: 0,
         ),
       ],
     ),

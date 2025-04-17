@@ -37,9 +37,10 @@ class _StepTileState extends State<StepTile> {
 
   void updateDuration(String value) {
     double? newDuration = double.tryParse(value);
-    if (newDuration != null) {
+    if (newDuration != null && newDuration >= 0.1) {
+      double roundedDuration = (newDuration * 10).roundToDouble() / 10;
       respire.Step newStep = respire.Step(
-        duration: newDuration,
+        duration: roundedDuration,
         increment: widget.step.increment,
         stepType: widget.step.stepType,
         breathType: widget.step.breathType,
@@ -66,18 +67,22 @@ class _StepTileState extends State<StepTile> {
   Widget build(BuildContext context) {
     return ListTile(
       key: widget.key,
+      leading: ReorderableDragStartListener(
+        index: 0,
+        child: Icon(Icons.drag_handle),
+      ),
       title: Row(
         children: [
           Expanded(
             child: TextField(
               controller: durationController,
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 labelText: "Time (s)",
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 8.0),
               ),
-              onSubmitted: (value) {
+              onChanged: (value) {
                 updateDuration(value);
                 widget.onUpdate();
               },
@@ -93,7 +98,9 @@ class _StepTileState extends State<StepTile> {
                     ))
                 .toList(),
             onChanged: (newType) {
-              updateStepType(newType);
+              setState(() {
+                updateStepType(newType);
+              });
               widget.onUpdate();
             },
           ),

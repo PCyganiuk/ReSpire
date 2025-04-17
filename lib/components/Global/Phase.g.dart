@@ -18,7 +18,8 @@ class PhaseAdapter extends TypeAdapter<Phase> {
     };
     return Phase(
       reps: fields[0] as int,
-      steps: (fields[2] as List).cast<Step>(),
+      increment: fields[2] as int,
+      steps: (fields[3] as List).cast<Step>(),
     )..doneRepsCounter = fields[1] as int;
   }
 

@@ -21,17 +21,20 @@ class PhaseTile extends StatefulWidget {
 
 class _PhaseTileState extends State<PhaseTile> {
   late TextEditingController repsController;
+  late TextEditingController incrementController;
 
   @override
   void initState() {
     super.initState();
     repsController =
         TextEditingController(text: widget.phase.reps.toString());
+    incrementController = TextEditingController(text: widget.phase.increment.toString());
   }
 
   @override
   void dispose() {
     repsController.dispose();
+    incrementController.dispose();
     super.dispose();
   }
 
@@ -78,6 +81,11 @@ class _PhaseTileState extends State<PhaseTile> {
         initiallyExpanded: true,
         title: Row(
           children: [
+            ReorderableDragStartListener(
+              index: 0,
+              child: Icon(Icons.drag_handle),
+            ),
+            SizedBox(width: 8),
             Text("Reps: "),
             Container(
               width: 50,
@@ -88,11 +96,34 @@ class _PhaseTileState extends State<PhaseTile> {
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                 ),
-                onSubmitted: (value) {
+                onChanged: (value) {
                   int? newReps = int.tryParse(value);
                   if (newReps != null) {
                     setState(() {
                       widget.phase.reps = newReps;
+                    });
+                    widget.onUpdate();
+                  }
+                },
+              ),
+            ),
+            SizedBox(width: 8),
+            Text("Inc: "),
+            Container(
+              width: 50,
+              child: TextField(
+                controller: incrementController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                  suffixText: '%',
+                ),
+                onChanged: (value) {
+                  int? newIncrement = int.tryParse(value);
+                  if (newIncrement != null && newIncrement >= 0 && newIncrement <= 100) {
+                    setState(() {
+                      widget.phase.increment = newIncrement;
                     });
                     widget.onUpdate();
                   }
@@ -116,7 +147,7 @@ class _PhaseTileState extends State<PhaseTile> {
                   index < widget.phase.steps.length;
                   index++)
                 StepTile(
-                  key: ValueKey('step_$index'),
+                  key: ValueKey(widget.phase.steps[index]),
                   step: widget.phase.steps[index],
                   onStepChanged: (newStep) => updateStep(index, newStep),
                   onDelete: () => removeStep(index),
