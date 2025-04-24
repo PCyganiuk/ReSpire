@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/Circle.dart';
-import 'package:respire/components/BreathingPage/InstructionBlocks.dart';
+import 'package:respire/components/BreathingPage/InstructionSlider.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
@@ -46,34 +46,45 @@ void _showConfirmationDialog(BuildContext context) {
 }
 
 class _BreathingPageState extends State<BreathingPage> {
+  
   late TrainingParser parser;
   Timer? _timer;
   final Stopwatch _stopwatch = Stopwatch();
-  training_step.Step? _previousStep;
+
   training_step.Step? _currentStep;
   training_step.Step? _nextStep;
-  int _remainingTime = 3000; //in milliseconds
+
+  int _remainingTime = 3000;
+  int _nextRemainingTime = 0; //in milliseconds
   int _pauseRemainingTime = 600;
-  int _nextStepRemainingTime = 0;
-  int _stepsCount = 0;
-  final int _minimumDurationTime = 100; //in milliseconds
+  int _newStepRemainingTime = 0;
+
   bool _finished = false;
   bool _pause = true;
+  bool _stopTimer = false;
+  
+  final int _minimumDurationTime = 100; //in milliseconds
   final int _pauseDuration = 600;  //in milliseconds
-// Dodajemy GlobalKey do InstructionBlocks
-  final GlobalKey<InstructionBlocksState> _instructionBlocksKey = GlobalKey();
-  bool readingName = false;
+
+  final GlobalKey<InstructionSliderState> _instructionBlocksKey = GlobalKey();
+  int _stepsCount = 0;
 
   @override
   void initState() {
     super.initState();
     parser = TrainingParser(training: widget.training);
-    _instructionBlocksKey.currentState?.animation();
     _fetchNextStep();
-    _startTraining();
+    _currentStep = _nextStep;
+    _nextRemainingTime = _newStepRemainingTime;
+    _fetchNextStep();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _instructionBlocksKey.currentState?.addNewStep(_currentStep, true);
+      _instructionBlocksKey.currentState?.addNewStep(_nextStep, false);
+      _startTraining();
+    });
   }
 
-  void _startTraining() async{
+  void _startTraining() async{ 
     int previousSecond = _remainingTime~/1000; // subtracting one to skip the first second and audio bugging
      _stopwatch.start();
     _timer = Timer.periodic(Duration(milliseconds: _minimumDurationTime),
@@ -92,22 +103,31 @@ class _BreathingPageState extends State<BreathingPage> {
          
         }
         else if(_pause) {
-          _instructionBlocksKey.currentState?.animation();
-          TextToSpeechService().speak(_nextStep!.stepType.name);
+          _instructionBlocksKey.currentState?.next();
+          _stepsCount++;
+          TextToSpeechService().speak(_currentStep!.stepType.name);
           _pause = false; 
-        }  else if(_pauseRemainingTime >= _minimumDurationTime){
+
+        } else if(_pauseRemainingTime >= _minimumDurationTime){
           _pauseRemainingTime -= _minimumDurationTime;
+
         }else if (_finished) {
-          _previousStep = _currentStep;
-          _currentStep = null;
-          pauseTimer();
+          if(_stopTimer) {
+            _instructionBlocksKey.currentState?.next();
+            pauseTimer();
+          } else {
+            _remainingTime = _nextRemainingTime;
+            previousSecond = _remainingTime~/1000;
+            _stopTimer = true;
+          }
+          
         } else{
-          _previousStep = _currentStep;
           _currentStep = _nextStep;
-          _remainingTime = _nextStepRemainingTime;
+          _remainingTime = _nextRemainingTime;
+          _nextRemainingTime =_newStepRemainingTime;
           previousSecond = _remainingTime~/1000;
           _fetchNextStep();
-          _stepsCount++;
+          _instructionBlocksKey.currentState?.addNewStep(_nextStep, false);
           _pause = true;
           _pauseRemainingTime = _pauseDuration;
         }
@@ -125,7 +145,7 @@ class _BreathingPageState extends State<BreathingPage> {
     }
     setState(() {
       _nextStep = instructionData["step"];
-      _nextStepRemainingTime = instructionData["remainingTime"];
+      _newStepRemainingTime = instructionData["remainingTime"];
     });
   }
 
@@ -189,12 +209,7 @@ class _BreathingPageState extends State<BreathingPage> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
           SizedBox(height: 16),
 
-          //Instructions
-         InstructionBlocks(
-            key: _instructionBlocksKey,
-            steps: [_previousStep, _currentStep, _nextStep],
-            currentIndex: _stepsCount
-          ),
+          InstructionSlider(key: _instructionBlocksKey),
 
           Text(
             '$_stepsCount / ${parser.countSteps()}',
@@ -202,16 +217,18 @@ class _BreathingPageState extends State<BreathingPage> {
           ),
 
           Expanded(
-              child: Center(
-                  child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Circle(
-                step: _nextStep,
-                child: textInCircle(),
-              ),
-            ],
-          ))),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Circle(
+                    step: _currentStep,
+                    child: textInCircle(),
+                  ),
+                ],
+              )
+            )
+          ),
         ],
       ),
     );

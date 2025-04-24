@@ -171,9 +171,11 @@ class _HomePageState extends State<HomePage> {
                             onClick: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => BreathingPage(
-                                      training: db.presetList[index])),
-                            ),
+                                  builder: (context) => 
+                                  //InstructionSlider()
+                                  BreathingPage(
+                                      training: db.presetList[index]),
+                            ),),
                             deleteTile: (context) => deletePreset(index),
                             editTile: (context) => showEditPresetDialog(
                                 context: context, index: index),
