@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:respire/services/SettingsProvider.dart';
 
 class TextToSpeechService {
   static final TextToSpeechService _instance = TextToSpeechService._internal();
@@ -11,10 +12,22 @@ class TextToSpeechService {
 
 
   Future<void> init() async{
-    await _flutterTts.setLanguage("en-US");
+    var settings = SettingsProvider();
+    settings.addListener(() async {
+    String newVoice = settings.getVoiceType();
+    await _flutterTts.setLanguage(newVoice);
+    log("Voice changed to: $newVoice");
+    });
+    await settings.init();
+    await _flutterTts.setLanguage(SettingsProvider().getVoiceType());
     _flutterTts.setErrorHandler((error) {
       log("TTS Error: $error");
     });
+  }
+
+  Future<dynamic> getVoices() async {
+    var voices = await _flutterTts.getVoices;
+    return voices;
   }
 
   Future<void>readNumber(int number) async
