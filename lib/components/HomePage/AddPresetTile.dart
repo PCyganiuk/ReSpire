@@ -47,7 +47,7 @@ Widget build(BuildContext context) {
               child: Icon(
                 Icons.add,
                 size: 36,
-                color: darkblue,
+                color: Color.fromARGB(255, 0, 0, 0),
               ),
             ),
           ),

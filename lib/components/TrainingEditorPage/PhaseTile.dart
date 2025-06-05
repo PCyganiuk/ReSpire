@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Step.dart' as respire;
 import 'package:respire/components/TrainingEditorPage/StepTile.dart';
+import 'package:respire/theme/Colors.dart'; 
 
 class PhaseTile extends StatefulWidget {
   final Phase phase;
@@ -26,8 +27,7 @@ class _PhaseTileState extends State<PhaseTile> {
   @override
   void initState() {
     super.initState();
-    repsController =
-        TextEditingController(text: widget.phase.reps.toString());
+    repsController = TextEditingController(text: widget.phase.reps.toString());
     incrementController = TextEditingController(text: widget.phase.increment.toString());
   }
 
@@ -77,16 +77,28 @@ class _PhaseTileState extends State<PhaseTile> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      color: const Color.fromARGB(255, 255, 255, 255), 
       child: ExpansionTile(
         initiallyExpanded: true,
+        collapsedIconColor: darkblue,
+        iconColor: darkerblue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        collapsedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
         title: Row(
           children: [
             ReorderableDragStartListener(
               index: 0,
-              child: Icon(Icons.drag_handle),
+              child: Icon(Icons.drag_handle, color: darkerblue),
             ),
             SizedBox(width: 8),
-            Text("Reps: "),
+            Text("Reps: ", style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue)),
             Container(
               width: 50,
               child: TextField(
@@ -95,6 +107,9 @@ class _PhaseTileState extends State<PhaseTile> {
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                  border: InputBorder.none,
+                  fillColor: Colors.white,
+                  filled: true,
                 ),
                 onChanged: (value) {
                   int? newReps = int.tryParse(value);
@@ -105,10 +120,11 @@ class _PhaseTileState extends State<PhaseTile> {
                     widget.onUpdate();
                   }
                 },
+                style: TextStyle(color: darkerblue),
               ),
             ),
             SizedBox(width: 8),
-            Text("Inc: "),
+            Text("Inc: ",  style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue)),
             Container(
               width: 50,
               child: TextField(
@@ -118,6 +134,12 @@ class _PhaseTileState extends State<PhaseTile> {
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 8.0),
                   suffixText: '%',
+                   suffixStyle: TextStyle(
+                    color: darkerblue,
+                  ),
+                  border: InputBorder.none,
+                  fillColor: Colors.white,
+                  filled: true,
                 ),
                 onChanged: (value) {
                   int? newIncrement = int.tryParse(value);
@@ -128,37 +150,45 @@ class _PhaseTileState extends State<PhaseTile> {
                     widget.onUpdate();
                   }
                 },
+                style: TextStyle(color: darkerblue),
               ),
             ),
             Spacer(),
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: Icon(Icons.delete, color: darkerblue),
               onPressed: widget.onDelete,
             ),
           ],
         ),
         children: [
-          ReorderableListView(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            onReorder: reorderStep,
-            children: [
-              for (int index = 0;
-                  index < widget.phase.steps.length;
-                  index++)
-                StepTile(
-                  key: ValueKey(widget.phase.steps[index]),
-                  step: widget.phase.steps[index],
-                  onStepChanged: (newStep) => updateStep(index, newStep),
-                  onDelete: () => removeStep(index),
-                  onUpdate: widget.onUpdate,
-                ),
-            ],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: ReorderableListView(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              onReorder: reorderStep,
+              children: [
+                for (int index = 0; index < widget.phase.steps.length; index++)
+                  StepTile(
+                    key: ValueKey(widget.phase.steps[index]),
+                    step: widget.phase.steps[index],
+                    onStepChanged: (newStep) => updateStep(index, newStep),
+                    onDelete: () => removeStep(index),
+                    onUpdate: widget.onUpdate,
+                  ),
+              ],
+            ),
           ),
           TextButton.icon(
             onPressed: addStep,
-            icon: Icon(Icons.add),
-            label: Text("Add step"),
+            icon: Icon(Icons.add, color: darkerblue),
+            label: Text(
+              "Add step",
+              style: TextStyle(
+                color: darkerblue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

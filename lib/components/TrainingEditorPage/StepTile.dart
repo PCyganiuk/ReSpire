@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Step.dart' as respire;
+import 'package:respire/theme/Colors.dart';
 
 class StepTile extends StatefulWidget {
   final respire.Step step;
@@ -65,22 +66,45 @@ class _StepTileState extends State<StepTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      key: widget.key,
-      leading: ReorderableDragStartListener(
-        index: 0,
-        child: Icon(Icons.drag_handle),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: lightblue, 
+        borderRadius: BorderRadius.circular(30), 
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
-      title: Row(
+      child: Row(
         children: [
+          ReorderableDragStartListener(
+            index: 0,
+            child: Icon(Icons.drag_handle, color: darkerblue),
+          ),
+          SizedBox(width: 12),
           Expanded(
             child: TextField(
               controller: durationController,
+              cursorColor: darkerblue,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 labelText: "Time (s)",
+                labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: darkerblue),  // kolor gdy nie w focusie
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: darkerblue, width: 2),  // kolor i grubość na focusie
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               onChanged: (value) {
                 updateDuration(value);
@@ -88,7 +112,7 @@ class _StepTileState extends State<StepTile> {
               },
             ),
           ),
-          SizedBox(width: 8),
+          SizedBox(width: 12),
           DropdownButton<respire.StepType>(
             value: widget.step.stepType,
             items: respire.StepType.values
@@ -104,8 +128,9 @@ class _StepTileState extends State<StepTile> {
               widget.onUpdate();
             },
           ),
+          SizedBox(width: 8),
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: Icon(Icons.delete, color: const Color.fromARGB(255, 255, 255, 255)),
             onPressed: widget.onDelete,
           )
         ],

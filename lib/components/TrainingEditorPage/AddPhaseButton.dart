@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/HomePage/BaseTile.dart';
+import 'package:respire/theme/Colors.dart';
 
 class AddPhaseButton extends StatelessWidget
 {
@@ -10,7 +11,7 @@ class AddPhaseButton extends StatelessWidget
   const AddPhaseButton({
     super.key,
     required this.onClick,
-    this.color = const Color.fromARGB(255, 88, 88, 88)}
+    this.color = darkerblue}
     );
 
   @override

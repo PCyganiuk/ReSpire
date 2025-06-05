@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
+import 'package:respire/theme/Colors.dart';
 
 class TrainingEditorPage extends StatefulWidget {
   final Training training;
@@ -107,7 +108,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
             saveTraining();
           },
         ),
+        backgroundColor: Colors.white,
       ),
+      backgroundColor: mediumblue,
       body: ReorderableListView(
         scrollController: _scrollController,
         onReorder: reorderPhase,
@@ -129,8 +132,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: addPhase,
-        child: Icon(Icons.add),
-      ),
+        backgroundColor: Colors.white,       // tło na biały
+        child: Icon(
+          Icons.add,
+          color: darkerblue,                 // ikona na niebiesko
+        ),
+      )
     );
   }
 }

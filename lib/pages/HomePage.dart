@@ -183,7 +183,26 @@ class _HomePageState extends State<HomePage>
                 ),
               ) :
             
-              AddPresetTile(onClick: () => showNewPresetDialog(context:context))
+              AddPresetTile(
+                onClick: () async {
+                  final newTraining = await Navigator.push<Training>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TrainingEditorPage(
+                        training: Training(title: 'Training', phases: []),
+                      ),
+                    ),
+                  );
+
+                  if (newTraining != null) {
+                    setState(() {
+                      db.presetList.add(newTraining);
+                      db.updateDataBase();
+                    });
+                  }
+                },
+              ),
+
             );
           }
         )

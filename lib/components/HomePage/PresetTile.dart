@@ -64,7 +64,7 @@ class PresetTile extends StatelessWidget
                     scaleX: -1,  
                     child: Icon(
                       Icons.air,
-                      color: darkblue,
+                      color: const Color.fromARGB(255, 0, 0, 0),
                       size: 24.0,
                     ),
                   ),
@@ -82,7 +82,7 @@ class PresetTile extends StatelessWidget
                   const SizedBox(width: 8), 
                   Icon(
                     Icons.air,
-                    color: darkblue,
+                    color: const Color.fromARGB(255, 0, 0, 0),
                     size: 24.0,
                   ),
                 ],
