@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:respire/components/BreathingPage/Circle.dart';
-import 'package:respire/components/BreathingPage/InstructionBlocks.dart';
+import 'package:respire/components/BreathingPage/AnimatedCircle.dart';
+import 'package:respire/components/BreathingPage/InstructionSlider.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
 import 'package:respire/services/TextToSpeechService.dart';
-
+import 'package:respire/services/TrainingController.dart';
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -18,200 +19,190 @@ class BreathingPage extends StatefulWidget {
   State<StatefulWidget> createState() => _BreathingPageState();
 }
 
-void _showConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Exit"),
-        content: Text(
-            "Are you sure you want exit?\nIf you click \"Yes\" your session will end.",
-            textAlign: TextAlign.center),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("No"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text("Yes"),
-          ),
-        ],
-      );
-    },
-  );
-}
-
 class _BreathingPageState extends State<BreathingPage> {
   late TrainingParser parser;
-  Timer? _timer;
-  final Stopwatch _stopwatch = Stopwatch();
-  training_step.Step? _previousStep;
-  training_step.Step? _currentStep;
-  training_step.Step? _nextStep;
-  int _remainingTime = 3000; //in milliseconds
-  int _pauseRemainingTime = 600;
-  int _nextStepRemainingTime = 0;
-  int _stepsCount = 0;
-  final int _minimumDurationTime = 100; //in milliseconds
-  bool _finished = false;
-  bool _pause = true;
-  final int _pauseDuration = 600;  //in milliseconds
-// Dodajemy GlobalKey do InstructionBlocks
-  final GlobalKey<InstructionBlocksState> _instructionBlocksKey = GlobalKey();
-  bool readingName = false;
+  late TrainingController controller;
+  int second = 0;
+  int steps = 0;
 
   @override
   void initState() {
     super.initState();
     parser = TrainingParser(training: widget.training);
-    _instructionBlocksKey.currentState?.animation();
-    _fetchNextStep();
-    _startTraining();
-  }
-
-  void _startTraining() async{
-    int previousSecond = _remainingTime~/1000; // subtracting one to skip the first second and audio bugging
-     _stopwatch.start();
-    _timer = Timer.periodic(Duration(milliseconds: _minimumDurationTime),
-        (Timer timer) {
-      setState(() {
-        // Whenever the second changes, might want to change the calculations
-        // if we decide to switch to seconds instead of milliseconds!
-        if(previousSecond > _remainingTime~/1000)
-        {
-          previousSecond = _remainingTime~/1000;
-          TextToSpeechService().readNumber(previousSecond+1);
-        }
-
-        if (_remainingTime >= _minimumDurationTime) {
-          _remainingTime -= _minimumDurationTime;
-         
-        }
-        else if(_pause) {
-          _instructionBlocksKey.currentState?.animation();
-          TextToSpeechService().speak(_nextStep!.stepType.name);
-          _pause = false; 
-        }  else if(_pauseRemainingTime >= _minimumDurationTime){
-          _pauseRemainingTime -= _minimumDurationTime;
-        }else if (_finished) {
-          _previousStep = _currentStep;
-          _currentStep = null;
-          pauseTimer();
-        } else{
-          _previousStep = _currentStep;
-          _currentStep = _nextStep;
-          _remainingTime = _nextStepRemainingTime;
-          previousSecond = _remainingTime~/1000;
-          _fetchNextStep();
-          _stepsCount++;
-          _pause = true;
-          _pauseRemainingTime = _pauseDuration;
-        }
-      });
-    });
-  }
-
-  void _fetchNextStep() {
-    var instructionData = parser.nextInstruction();
-
-    if (instructionData == null) {
-      _finished = true;
-      _nextStep = null;
-      return;
-    }
-    setState(() {
-      _nextStep = instructionData["step"];
-      _nextStepRemainingTime = instructionData["remainingTime"];
-    });
-  }
-
-    void pauseTimer() {
-    _timer?.cancel();
-    _stopwatch.stop();
-  }
-
-  void resumeTimer() {
-    _stopwatch.start();
-     _startTraining();
+    controller = TrainingController(parser);
+    steps = parser.countSteps();
   }
 
   @override
   void dispose() {
-    pauseTimer();
-    TextToSpeechService().stopSpeaking();
     super.dispose();
+    controller.dispose();
   }
 
-  Widget textInCircle() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '${(_remainingTime / 1000).toDouble()}',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Exit"),
+          content: Text(
+              "Are you sure you want exit?\nIf you click \"Yes\" your session will end.",
+              textAlign: TextAlign.center),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                controller.resume();
+              },
+              child: Text("No"),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Widget textInCircle() {
+    return ValueListenableBuilder<int>(
+      valueListenable: controller.second,
+      builder: (context, value, _) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$value',
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            _currentStep != null
-                ? {_showConfirmationDialog(context)}
-                : Navigator.pop(context);
+        leading: ValueListenableBuilder<Queue<training_step.Step?>>(
+          valueListenable: controller.stepsQueue,
+          builder: (context, queue, _) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                if (queue.isNotEmpty && queue.first != null) {
+                  controller.pause();
+                  _showConfirmationDialog();
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+            );
           },
         ),
-        title: Text("ReSpire"),
+        actions: [
+          ValueListenableBuilder<bool>(
+            valueListenable: controller.isPaused,
+            builder: (context, isPaused, _) {
+              return IconButton(
+                icon: isPaused ? Icon(Icons.play_arrow) : Icon(Icons.pause),
+                onPressed: () {
+                  isPaused ? controller.resume() : controller.pause();
+                },
+              );
+            },
+          )
+        ],
+        title: Text(widget.training.title),
         centerTitle: true,
-        backgroundColor: Colors.grey,
+        backgroundColor: Color.fromRGBO(50, 183, 207, 1),
       ),
       body: Column(
         children: [
           SizedBox(height: 16),
-          //Title
-          Text(widget.training.title,
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16),
 
-          //Instructions
-         InstructionBlocks(
-            key: _instructionBlocksKey,
-            steps: [_previousStep, _currentStep, _nextStep],
-            currentIndex: _stepsCount
+          //instructions
+          ValueListenableBuilder<Queue<training_step.Step?>>(
+            valueListenable: controller.stepsQueue,
+            builder: (context, stepsQueue, _) {
+              return ValueListenableBuilder<int>(
+                valueListenable: controller.stepsCount,
+                builder: (context, change, _) {
+                  return InstructionSlider(
+                      stepsQueue: stepsQueue, change: change);
+                },
+              );
+            },
           ),
 
-          Text(
-            '$_stepsCount / ${parser.countSteps()}',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          //step counter
+          ValueListenableBuilder<int>(
+            valueListenable: controller.stepsCount,
+            builder: (context, stepsDone, _) {
+              return Text(
+                '${stepsDone <= steps ? stepsDone : steps} / $steps',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              );
+            },
           ),
 
+          //circles
           Expanded(
-              child: Center(
-                  child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Circle(
-                step: _nextStep,
-                child: textInCircle(),
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  //background circle, max value
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromRGBO(183, 244, 255, 1),
+                    ),
+                  ),
+
+                  //animated circle
+                  ValueListenableBuilder<Queue<training_step.Step?>>(
+                      valueListenable: controller.stepsQueue,
+                      builder: (context, steps, _) {
+                        return ValueListenableBuilder<bool>(
+                            valueListenable: controller.isPaused,
+                            builder: (context, isPaused, _) {
+                              return AnimatedCircle(
+                                  step: steps.first, isPaused: isPaused);
+                            });
+                      }),
+
+                  //foreground circle, min value
+                  Container(
+                    width: 125,
+                    height: 125,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromRGBO(44, 173, 196, 1),
+                    ),
+                  ),
+
+                  textInCircle()
+                ],
               ),
-            ],
-          ))),
+            ),
+          ),
         ],
       ),
     );
