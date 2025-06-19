@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Step.dart' as respire;
 import 'package:respire/theme/Colors.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class StepTile extends StatefulWidget {
   final respire.Step step;
@@ -90,7 +91,6 @@ class _StepTileState extends State<StepTile> {
           Expanded(
             child: TextField(
               controller: durationController,
-              cursorColor: darkerblue,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 labelText: "Time (s)",
@@ -102,7 +102,7 @@ class _StepTileState extends State<StepTile> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: darkerblue, width: 2),  // kolor i grubość na focusie
+                  borderSide: BorderSide(color: darkerblue, width: 2),  // kolor i grubość w focusie
                 ),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
@@ -113,8 +113,16 @@ class _StepTileState extends State<StepTile> {
             ),
           ),
           SizedBox(width: 12),
-          DropdownButton<respire.StepType>(
+          DropdownButton2<respire.StepType>(
             value: widget.step.stepType,
+            iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
+            dropdownStyleData: DropdownStyleData(
+              isOverButton: true,         
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             items: respire.StepType.values
                 .map((e) => DropdownMenuItem(
                       child: Text(e.toString().split('.').last),

@@ -25,7 +25,7 @@ Widget build(BuildContext context) {
         children: [
           //additional semi-hidden dot
           Transform.translate(
-            offset: const Offset(18, -10),
+            offset: const Offset(16, -10),
             child: Container(
               width: 55,
               height: 55,

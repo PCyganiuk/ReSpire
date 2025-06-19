@@ -5,6 +5,7 @@ import 'package:respire/components/Global/Step.dart';
 import 'package:respire/components/Global/StepIncrement.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/HomePage.dart';
+import 'theme/Colors.dart';
 
 void main() async{
   await Hive.initFlutter();
@@ -29,7 +30,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: darkerblue,             
+          selectionColor: lightblue, 
+          selectionHandleColor: darkerblue,    
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       home: HomePage()
     );

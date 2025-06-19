@@ -132,10 +132,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: addPhase,
-        backgroundColor: Colors.white,       // tło na biały
+        backgroundColor: Colors.white,       
         child: Icon(
           Icons.add,
-          color: darkerblue,                 // ikona na niebiesko
+          color: darkerblue,                 
         ),
       )
     );
