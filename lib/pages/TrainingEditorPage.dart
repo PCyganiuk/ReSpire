@@ -114,6 +114,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       body: ReorderableListView(
         scrollController: _scrollController,
         onReorder: reorderPhase,
+         proxyDecorator: (Widget child, int index, Animation<double> animation) {
+          return Material(
+            color: Colors.transparent, 
+            child: child,
+          );
+        },
         padding: EdgeInsets.only(bottom: 80),
         children: [
           for (int index = 0; index < phases.length; index++)

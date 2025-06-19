@@ -167,6 +167,12 @@ class _PhaseTileState extends State<PhaseTile> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               onReorder: reorderStep,
+               proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                return Material(
+                  color: Colors.transparent,  
+                  child: child,
+                );
+              },
               children: [
                 for (int index = 0; index < widget.phase.steps.length; index++)
                   StepTile(
