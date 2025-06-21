@@ -146,6 +146,12 @@ class _HomePageState extends State<HomePage>
       }
   }
 
+  // Pull-to-refresh for presets
+  Future<void> _refreshPresets() async {
+    db.loadData();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,10 +165,12 @@ class _HomePageState extends State<HomePage>
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       backgroundColor: mediumblue,
-      body: 
-      Center( 
-        child:
-        ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: _refreshPresets,
+        color: Colors.white,
+        backgroundColor: mediumblue,
+        edgeOffset: 16,
+        child: ListView.builder(
           itemCount: db.presetList.length + 1,
           itemBuilder: (context, index)
           {
@@ -177,10 +185,18 @@ class _HomePageState extends State<HomePage>
                   MaterialPageRoute(builder: (context) => BreathingPage(tile: db.presetList[index])),
                 ),
                 deleteTile: (context) => deletePreset(index),
-                editTile: (context) => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TrainingEditorPage(training: db.presetList[index])),
-                ),
+                editTile: (context) async {
+                  final updated = await Navigator.push<Training>(
+                    context,
+                    MaterialPageRoute(builder: (context) => TrainingEditorPage(training: db.presetList[index])),
+                  );
+                  if (updated != null) {
+                    setState(() {
+                      db.presetList[index] = updated;
+                      db.updateDataBase();
+                    });
+                  }
+                },
               ) :
             
               AddPresetTile(

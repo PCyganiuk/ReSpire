@@ -10,15 +10,24 @@ class PresetDataBase {
 
   final _box = Hive.box('respire');
 
-  void initialize()
-  {
-    if (_box.get('presets') == null) // If this is the first time launching the app
-    {
+  void initialize() {
+    try {
+      // Attempt to read stored presets, may throw if format mismatches
+      final stored = _box.get('presets');
+      if (stored == null) {
+        // No presets yet: create defaults
+        createInitialData();
+        updateDataBase();
+      } else {
+        // Valid entry exists: load into list
+        loadData();
+      }
+    } catch (e) {
+      // Corrupted or incompatible data: clear and reset
+      print('Error loading presets: $e – resetting to default presets.');
+      _box.delete('presets');
       createInitialData();
-    }
-    else
-    {
-      loadData();
+      updateDataBase();
     }
   }
 
@@ -85,8 +94,8 @@ class PresetDataBase {
   void loadData()
   {
     final storedList = _box.get('presets');
-    if (storedList != null) {
-      presetList = (storedList as List).cast<Training>();
+    if (storedList is List) {
+      presetList = storedList.cast<Training>();
     }
   }
 

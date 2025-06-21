@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
@@ -20,6 +21,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late List<Phase> phases;
   final ScrollController _scrollController = ScrollController();
   TextEditingController trainingNameController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -92,58 +94,69 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   @override
   void dispose() {
     trainingNameController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: trainingNameController,
-          decoration: InputDecoration(border: InputBorder.none),
-          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
-          onChanged: (value) {
-            widget.training.title = value;
-            saveTraining();
-          },
-        ),
-        backgroundColor: Colors.white,
-      ),
-      backgroundColor: mediumblue,
-      body: ReorderableListView(
-        scrollController: _scrollController,
-        onReorder: reorderPhase,
-         proxyDecorator: (Widget child, int index, Animation<double> animation) {
-          return Material(
-            color: Colors.transparent, 
-            child: child,
-          );
-        },
-        padding: EdgeInsets.only(bottom: 80),
-        children: [
-          for (int index = 0; index < phases.length; index++)
-            PhaseTile(
-              key: ValueKey('phase_$index'),
-              phase: phases[index],
-              onDelete: () => removePhase(index),
-              onUpdate: () {
-                setState(() {
-                  widget.training.phases = phases;
-                });
+    return WillPopScope(
+      onWillPop: () async {
+        // Automatically return updated training when popping
+        Navigator.pop(context, widget.training);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: TextField(
+            controller: trainingNameController,
+            decoration: InputDecoration(border: InputBorder.none),
+            style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
+            onChanged: (value) {
+              widget.training.title = value;
+              if (_debounce?.isActive ?? false) _debounce!.cancel();
+              _debounce = Timer(Duration(milliseconds: 500), () {
                 saveTraining();
-              },
-            ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addPhase,
-        backgroundColor: Colors.white,       
-        child: Icon(
-          Icons.add,
-          color: darkerblue,                 
+              });
+            },
+          ),
+          backgroundColor: Colors.white,
         ),
-      )
+        backgroundColor: mediumblue,
+        body: ReorderableListView(
+          scrollController: _scrollController,
+          onReorder: reorderPhase,
+           proxyDecorator: (Widget child, int index, Animation<double> animation) {
+            return Material(
+              color: Colors.transparent, 
+              child: child,
+            );
+          },
+          padding: EdgeInsets.only(bottom: 80),
+          children: [
+            for (int index = 0; index < phases.length; index++)
+              PhaseTile(
+                key: ValueKey('phase_$index'),
+                phase: phases[index],
+                onDelete: () => removePhase(index),
+                onUpdate: () {
+                  setState(() {
+                    widget.training.phases = phases;
+                  });
+                  saveTraining();
+                },
+              ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: addPhase,
+          backgroundColor: Colors.white,       
+          child: Icon(
+            Icons.add,
+            color: darkerblue,                 
+          ),
+        ),
+      ),
     );
   }
 }
