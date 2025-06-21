@@ -4,6 +4,8 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
 import 'package:respire/theme/Colors.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 
 class TrainingEditorPage extends StatefulWidget {
   final Training training;
@@ -22,6 +24,20 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   final ScrollController _scrollController = ScrollController();
   TextEditingController trainingNameController = TextEditingController();
   Timer? _debounce;
+
+  int _selectedTab = 0;
+  // Sound tab state
+  final List<String> _soundOptions = ['None', 'Birds', 'Ding', 'Dong', 'Bum', 'Bam'];
+  String _backgroundSound = 'Birds';
+  String _nextSound = 'None';
+  String _inhaleSound = 'Ding';
+  String _retentionSound = 'Dong';
+  String _exhaleSound = 'Bum';
+  String _recoverySound = 'Bam';
+  // Other tab state
+  bool _showNextStepToggle = true;
+  bool _showChartToggle = false;
+  bool _showStepColorsToggle = true;
 
   @override
   void initState() {
@@ -122,40 +138,137 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
           ),
           backgroundColor: Colors.white,
         ),
-        backgroundColor: mediumblue,
-        body: ReorderableListView(
-          scrollController: _scrollController,
-          onReorder: reorderPhase,
-           proxyDecorator: (Widget child, int index, Animation<double> animation) {
-            return Material(
-              color: Colors.transparent, 
-              child: child,
-            );
-          },
-          padding: EdgeInsets.only(bottom: 80),
-          children: [
-            for (int index = 0; index < phases.length; index++)
-              PhaseTile(
-                key: ValueKey('phase_$index'),
-                phase: phases[index],
-                onDelete: () => removePhase(index),
-                onUpdate: () {
-                  setState(() {
-                    widget.training.phases = phases;
-                  });
-                  saveTraining();
-                },
+        backgroundColor: Colors.white,
+        body: Container(
+          color: lightblue,
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: CustomSlidingSegmentedControl<int>(
+                  children: {
+                    0: Text('Training', style: TextStyle(color: _selectedTab==0?darkerblue:darkblue)),
+                    1: Text('Sound', style: TextStyle(color: _selectedTab==1?darkerblue:darkblue)),
+                    2: Text('Other', style: TextStyle(color: _selectedTab==2?darkerblue:darkblue)),
+                  },
+                  initialValue: _selectedTab,
+                  onValueChanged: (val) => setState(() => _selectedTab = val),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  thumbDecoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                  ),
+                  innerPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                ),
               ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: addPhase,
-          backgroundColor: Colors.white,       
-          child: Icon(
-            Icons.add,
-            color: darkerblue,                 
+              SizedBox(height: 2),
+              Expanded(
+                child: _selectedTab == 0
+                    ? ReorderableListView(
+                        scrollController: _scrollController,
+                        onReorder: reorderPhase,
+                        proxyDecorator: (child, idx, anim) => Material(color: Colors.transparent, child: child),
+                        padding: EdgeInsets.only(bottom: 80),
+                        children: [
+                          for (int index = 0; index < phases.length; index++)
+                            PhaseTile(
+                              key: ValueKey('phase_$index'),
+                              phase: phases[index],
+                              onDelete: () => removePhase(index),
+                              onUpdate: () {
+                                setState(() => widget.training.phases = phases);
+                                saveTraining();
+                              },
+                            ),
+                        ],
+                      )
+                    : SingleChildScrollView(
+                        padding: EdgeInsets.all(16),
+                        child: _selectedTab == 1 ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Training sounds', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkblue)),
+                            SizedBox(height: 8),
+                            Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
+                              child: Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [Text('Background sound'), DropdownButton<String>(value: _backgroundSound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _backgroundSound = v!))],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [Text('Next step sound'), DropdownButton<String>(value: _nextSound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _nextSound = v!))],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Text('Step type sounds', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkblue)),
+                            SizedBox(height: 8),
+                            Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
+                              child: Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Column(
+                                  children: [
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Inhale'), DropdownButton<String>(value: _inhaleSound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _inhaleSound = v!))]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Retention'), DropdownButton<String>(value: _retentionSound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _retentionSound = v!))]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Exhale'), DropdownButton<String>(value: _exhaleSound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _exhaleSound = v!))]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Recovery'), DropdownButton<String>(value: _recoverySound, items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _recoverySound = v!))]),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ) : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, onChanged: (v) => setState(() => _showNextStepToggle = v)),
+                                    SwitchListTile(title: Text('Chart'), value: _showChartToggle, onChanged: (v) => setState(() => _showChartToggle = v)),
+                                    SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, onChanged: (v) => setState(() => _showStepColorsToggle = v)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+            ],
           ),
         ),
+        floatingActionButton: _selectedTab == 0
+             ? FloatingActionButton(
+                 onPressed: addPhase,
+                 backgroundColor: darkerblue,
+                 child: Icon(Icons.add, color: Colors.white),
+               )
+             : null,
       ),
     );
   }
