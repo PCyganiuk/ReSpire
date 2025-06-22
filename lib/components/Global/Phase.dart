@@ -10,10 +10,17 @@ class Phase {
   int reps;
   
   @HiveField(1)
+  int doneRepsCounter = 0;
+
+  @HiveField(2)
+  int increment = 0; // percentage 0-100
+  
+  @HiveField(3)
   List<Step> steps;
 
   Phase({
     required this.reps,
+    required this.increment,
     required this.steps
   });
 

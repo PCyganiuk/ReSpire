@@ -1,13 +1,10 @@
-import 'dart:async';
 import 'dart:collection';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/AnimatedCircle.dart';
 import 'package:respire/components/BreathingPage/InstructionSlider.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
-import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TrainingController.dart';
 
 class BreathingPage extends StatefulWidget {

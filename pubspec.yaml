@@ -17,6 +17,9 @@ dependencies:
   hive_generator: ^2.0.1
   numberpicker: ^2.1.2
   shared_preferences: ^2.5.3
+  dropdown_button2: ^2.3.9
+  custom_sliding_segmented_control: ^1.0.0
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +28,20 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/logo_biale_tlo.png
+    - assets/logo_poziom.png
+    - assets/logo_bez_tla.png
+
+  fonts:
+    - family: Glacial
+      fonts:
+        - asset: fonts/GlacialIndifference-Regular.otf
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo_biale_tlo.jpg"
+  adaptive_icon_foreground: "assets/logo_bez_tla.png"
+  adaptive_icon_background: "#ffffff"

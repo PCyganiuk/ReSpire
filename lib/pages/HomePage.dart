@@ -4,8 +4,9 @@ import 'package:respire/components/HomePage/AddPresetTile.dart';
 import 'package:respire/components/HomePage/DialogBox.dart';
 import 'package:respire/components/HomePage/PresetTile.dart';
 import 'package:respire/pages/BreathingPage.dart';
-import 'package:respire/pages/SettingsPage.dart';
+import 'package:respire/pages/TrainingEditorPage.dart';
 import 'package:respire/services/PresetDataBase.dart';
+import 'package:respire/theme/Colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -135,55 +136,83 @@ class _HomePageState extends State<HomePage> {
       }
   }
 
+  // Pull-to-refresh for presets
+  Future<void> _refreshPresets() async {
+    db.loadData();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.info_outline),
-          onPressed: () => {},
-        ),
-        title: Text("ReSpire", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
-              );
-            },
-          ),
-        ],
-        backgroundColor: Colors.grey,
+        title: Image.asset(
+          'assets/logo_poziom.png', 
+          height: 36,       
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
-      body: Center(
-          child: ListView.builder(
-              itemCount: db.presetList.length + 1,
-              itemBuilder: (context, index) {
-                return Padding(
-                    padding:
-                        EdgeInsets.all(15), // padding between elements / screen
-                    child: index < db.presetList.length
-                        ? PresetTile(
-                            values: db.presetList[index],
-                            onClick: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => 
-                                  //InstructionSlider()
-                                  BreathingPage(
-                                      training: db.presetList[index]),
-                            ),),
-                            deleteTile: (context) => deletePreset(index),
-                            editTile: (context) => showEditPresetDialog(
-                                context: context, index: index),
-                          )
-                        : AddPresetTile(
-                            onClick: () =>
-                                showNewPresetDialog(context: context)));
-              })),
+      backgroundColor: mediumblue,
+      body: RefreshIndicator(
+        onRefresh: _refreshPresets,
+        color: Colors.white,
+        backgroundColor: mediumblue,
+        edgeOffset: 16,
+        child: ListView.builder(
+          itemCount: db.presetList.length + 1,
+          itemBuilder: (context, index)
+          {
+            return Padding(
+              padding: EdgeInsets.all(15), // padding between elements / screen
+              child: index < db.presetList.length ?
+              
+              PresetTile(
+                values: db.presetList[index],
+                onClick: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BreathingPage(training: db.presetList[index])),
+                ),
+                deleteTile: (context) => deletePreset(index),
+                editTile: (context) async {
+                  final updated = await Navigator.push<Training>(
+                    context,
+                    MaterialPageRoute(builder: (context) => TrainingEditorPage(training: db.presetList[index])),
+                  );
+                  if (updated != null) {
+                    setState(() {
+                      db.presetList[index] = updated;
+                      db.updateDataBase();
+                    });
+                  }
+                },
+              ) :
+            
+              AddPresetTile(
+                onClick: () async {
+                  final newTraining = await Navigator.push<Training>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TrainingEditorPage(
+                        training: Training(title: 'Training', phases: []),
+                      ),
+                    ),
+                  );
+
+                  if (newTraining != null) {
+                    setState(() {
+                      db.presetList.add(newTraining);
+                      db.updateDataBase();
+                    });
+                  }
+                },
+              ),
+
+            );
+          }
+        )
+      
+      ),
     );
   }
 }

@@ -10,15 +10,24 @@ class PresetDataBase {
 
   final _box = Hive.box('respire');
 
-  void initialize()
-  {
-    if (_box.get('presets') == null) // If this is the first time launching the app
-    {
+  void initialize() {
+    try {
+      // Attempt to read stored presets, may throw if format mismatches
+      final stored = _box.get('presets');
+      if (stored == null) {
+        // No presets yet: create defaults
+        createInitialData();
+        updateDataBase();
+      } else {
+        // Valid entry exists: load into list
+        loadData();
+      }
+    } catch (e) {
+      // Corrupted or incompatible data: clear and reset
+      print('Error loading presets: $e – resetting to default presets.');
+      _box.delete('presets');
       createInitialData();
-    }
-    else
-    {
-      loadData();
+      updateDataBase();
     }
   }
 
@@ -35,7 +44,8 @@ class PresetDataBase {
               Step(duration: 4, stepType: StepType.retention),
               Step(duration: 3, stepType: StepType.exhale),
               Step(duration: 1, stepType: StepType.recovery),
-            ]
+            ],
+            increment: 0,
           )
         ]
       ),
@@ -48,7 +58,8 @@ class PresetDataBase {
             Step(duration: 3.14, stepType: StepType.retention),
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
             Step(duration: 3, stepType: StepType.recovery),
-          ]
+          ],
+          increment: 0,
           )
         ]
          ),
@@ -63,6 +74,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 1, type: IncrementType.value)),
             Step(duration: 3, stepType: StepType.recovery),
           ],
+          increment: 10,
         ),
         Phase(
           reps: 1,
@@ -72,6 +84,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
             Step(duration: 3, stepType: StepType.recovery),
           ],
+          increment: 0,
         ),
       ],
     ),
@@ -81,8 +94,8 @@ class PresetDataBase {
   void loadData()
   {
     final storedList = _box.get('presets');
-    if (storedList != null) {
-      presetList = (storedList as List).cast<Training>();
+    if (storedList is List) {
+      presetList = storedList.cast<Training>();
     }
   }
 

@@ -16,19 +16,34 @@ class PhaseAdapter extends TypeAdapter<Phase> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Phase(
-      reps: fields[0] as int,
-      steps: (fields[1] as List).cast<Step>(),
-    );
+    // Support old format (3 fields: reps, doneRepsCounter, steps)
+    final int reps = fields[0] as int;
+    final int doneCount = fields[1] as int;
+    int increment;
+    List<Step> steps;
+    if (numOfFields == 3) {
+      // old data without increment field
+      increment = 0;
+      steps = (fields[2] as List).cast<Step>();
+    } else {
+      increment = fields[2] as int;
+      steps = (fields[3] as List).cast<Step>();
+    }
+    return Phase(reps: reps, increment: increment, steps: steps)
+      ..doneRepsCounter = doneCount;
   }
 
   @override
   void write(BinaryWriter writer, Phase obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4) // number of fields
       ..writeByte(0)
       ..write(obj.reps)
       ..writeByte(1)
+      ..write(obj.doneRepsCounter)
+      ..writeByte(2)
+      ..write(obj.increment)
+      ..writeByte(3)
       ..write(obj.steps);
   }
 

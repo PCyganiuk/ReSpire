@@ -6,7 +6,7 @@ import 'package:respire/components/Global/StepIncrement.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/HomePage.dart';
 import 'package:respire/services/TextToSpeechService.dart';
-
+import 'theme/Colors.dart';
 
 void main() async{
   await initialize();
@@ -18,7 +18,7 @@ Future<void> initialize() async
   await Hive.initFlutter();
   // If any changes in loaded data occur, uncomment the following
   // line to delete the data and load it again
-  // await Hive.deleteBoxFromDisk('respire');
+  // await Hive.deleteBoxFromDisk('respire'); // disable deleting local storage to retain presets between restarts
   Hive.registerAdapter(StepTypeAdapter());
   Hive.registerAdapter(BreathTypeAdapter());
   Hive.registerAdapter(BreathDepthAdapter());
@@ -36,7 +36,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: HomePage());
+    return MaterialApp(
+      theme: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: darkerblue,             
+          selectionColor: lightblue, 
+          selectionHandleColor: darkerblue,    
+        ),
+      ),
+      debugShowCheckedModeBanner: false,
+      home: HomePage()
+    );
   }
 }
