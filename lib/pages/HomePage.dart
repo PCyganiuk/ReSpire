@@ -210,7 +210,9 @@ class _HomePageState extends State<HomePage>
                     ),
                   );
 
-                  if (newTraining != null) {
+                  // Only persist if user added at least one step in any phase
+                  if (newTraining != null &&
+                      newTraining.phases.any((phase) => phase.steps.isNotEmpty)) {
                     setState(() {
                       db.presetList.add(newTraining);
                       db.updateDataBase();
