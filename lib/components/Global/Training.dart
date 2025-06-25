@@ -21,7 +21,8 @@ class Training {
 
   Training({
     required this.title,
-    required this.phases
+    required this.phases,
+    this.description,
   });
 
 }

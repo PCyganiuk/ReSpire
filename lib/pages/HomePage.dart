@@ -71,13 +71,6 @@ class _HomePageState extends State<HomePage> {
     db.updateDataBase();
   }
 
-  void deletePreset(int index) {
-    db.presetList.removeAt(index);
-    setState(() {});
-
-    db.updateDataBase();
-  }
-
   void showNewPresetDialog({required BuildContext context}) async {
     final result = await showDialog(
 
@@ -169,11 +162,18 @@ class _HomePageState extends State<HomePage> {
               
               PresetTile(
                 values: db.presetList[index],
-                onClick: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TrainingPage(training: db.presetList[index])),
-                ),
-                deleteTile: (context) => deletePreset(index),
+                onClick: () async { 
+                  final updated = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TrainingPage(index: index)));
+
+                  // If the user updated (removed) the training, refresh the state
+                  if (updated)
+                  {
+                    setState(() {});
+                  }
+                  },
+                deleteTile: (context) { db.deletePreset(index); setState(() {}); },
                 editTile: (context) async {
                   final updated = await Navigator.push<Training>(
                     context,

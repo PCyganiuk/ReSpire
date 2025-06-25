@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/BreathingPage.dart';
+import 'package:respire/pages/TrainingEditorPage.dart';
+import 'package:respire/services/PresetDataBase.dart';
 
 class TrainingPage extends StatefulWidget {
-  final Training training;
+  final int index;
+  final PresetDataBase db = PresetDataBase();
 
-  const TrainingPage({
+  TrainingPage({
     super.key,
-    required this.training,
+    required this.index,
   });
 
   @override
@@ -15,12 +18,20 @@ class TrainingPage extends StatefulWidget {
 }
 
 class _TrainingPageState extends State<TrainingPage> {
+  late Training training;
+
+  @override
+  void initState() {
+    super.initState();
+    training = widget.db.presetList[widget.index];
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.training.title,
+          title: Text(training.title,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 20,
@@ -50,7 +61,23 @@ class _TrainingPageState extends State<TrainingPage> {
                     icon: Icon(Icons.edit_rounded,
                         color: Color.fromARGB(255, 26, 147, 168)),
                     style: IconButton.styleFrom(backgroundColor: Colors.white),
-                    onPressed: () => {}),
+                    onPressed: () async {
+                      final updated = await Navigator.push<Training>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrainingEditorPage(
+                            training: widget.db.presetList[widget.index],
+                          ),
+                        ),
+                      );
+                      if (updated != null) {
+                        setState(() {
+                          widget.db.presetList[widget.index] = updated;
+                          widget.db.updateDataBase();
+                        });
+                      }
+                    }
+                  ),
               ),
               Padding(
                 padding: EdgeInsets.all(10),
@@ -58,7 +85,8 @@ class _TrainingPageState extends State<TrainingPage> {
                     icon: Icon(Icons.delete_rounded,
                         color: Color.fromARGB(255, 26, 147, 168)),
                     style: IconButton.styleFrom(backgroundColor: Colors.white),
-                    onPressed: () => {}),
+                    onPressed: removeTraining,
+                )
               ),
             ],
           ),
@@ -75,7 +103,7 @@ class _TrainingPageState extends State<TrainingPage> {
                 ),
                 child: Column(children: [
                   Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.only(top:10),
                     child: Text(
                       "Description",
                       style: TextStyle(
@@ -85,24 +113,26 @@ class _TrainingPageState extends State<TrainingPage> {
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  Container(
-                      width: screenWidth - 40,
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 123, 222, 240),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            "discription text something something",
-                            style: TextStyle(
-                                color: Color.fromARGB(255, 26, 147, 168)),
-                          ),
+                  Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Container(
+                        width: screenWidth - 40,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 123, 222, 240),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      ))
-                ]),
-              )),
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              training.description ?? "No description provided.",
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 26, 147, 168)),
+                            ),
+                          ),
+                        )))
+                  ]),
+                )),
           Padding(
               padding: EdgeInsets.all(10),
               child: TextButton(
@@ -110,7 +140,7 @@ class _TrainingPageState extends State<TrainingPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        BreathingPage(training: widget.training),
+                        BreathingPage(training: training),
                   ),
                 ),
                 style: TextButton.styleFrom(
@@ -127,5 +157,31 @@ class _TrainingPageState extends State<TrainingPage> {
                 ),
               ))
         ]));
+  }
+
+  Future<void> removeTraining() async {
+
+    showDialog(context: context, builder:  (context) {
+      return AlertDialog(
+        title: Text("Delete Training"),
+        content: Text("Are you sure you want to delete this training?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              widget.db.deletePreset(widget.index); 
+              Navigator.pop(context);
+              setState(() {});
+              Navigator.pop(context, true);
+            },
+            child: Text("Delete"),
+          ),
+        ],
+      );
+    });
+
   }
 }
