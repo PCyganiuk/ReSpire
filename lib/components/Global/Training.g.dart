@@ -20,7 +20,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
       title: fields[0] as String,
       phases: (fields[2] as List).cast<Phase>(),
     )
-      ..description = fields[1] as String?
+      ..description = fields[1] as String
       ..sounds = fields[3] as Sounds;
   }
 

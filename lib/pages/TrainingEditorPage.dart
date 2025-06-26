@@ -24,6 +24,7 @@ class TrainingEditorPage extends StatefulWidget {
 
 class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late List<Phase> phases;
+  late TextEditingController descriptionController;
   final ScrollController _scrollController = ScrollController();
   TextEditingController trainingNameController = TextEditingController();
   Timer? _debounce;
@@ -44,6 +45,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     phases = widget.training.phases;
     _sounds = widget.training.sounds;
     trainingNameController.text = widget.training.title;
+    descriptionController = TextEditingController(text: widget.training.description);
   }
 
   void saveTraining() {
@@ -110,6 +112,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   @override
   void dispose() {
     trainingNameController.dispose();
+    descriptionController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
@@ -320,6 +323,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 padding: EdgeInsets.all(16),
                                 child: Column(
                                   children: [
+                                    // Description field
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkblue)),
+                                    ),
+                                    TextField(
+                                      controller: descriptionController,
+                                      maxLines: 3,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter training description...',
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                      onChanged: (value) {
+                                        widget.training.description = value;
+                                        saveTraining();
+                                      },
+                                    ),
+                                    SizedBox(height: 12),
                                     SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, onChanged: (v) => setState(() => _showNextStepToggle = v)),
                                     SwitchListTile(title: Text('Chart'), value: _showChartToggle, onChanged: (v) => setState(() => _showChartToggle = v)),
                                     SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, onChanged: (v) => setState(() => _showStepColorsToggle = v)),

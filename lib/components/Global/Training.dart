@@ -11,7 +11,7 @@ class Training {
   String title;
 
   @HiveField(1)
-  String? description;
+  String description;
 
   @HiveField(2)
   List<Phase> phases;
@@ -21,7 +21,8 @@ class Training {
 
   Training({
     required this.title,
-    required this.phases
+    required this.phases,
+    this.description = '',
   });
 
 }
