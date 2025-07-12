@@ -3,6 +3,7 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/BreathingPage.dart';
 import 'package:respire/pages/TrainingEditorPage.dart';
 import 'package:respire/services/PresetDataBase.dart';
+import 'package:respire/theme/Colors.dart';
 
 class TrainingPage extends StatefulWidget {
   final int index;
@@ -43,7 +44,7 @@ class _TrainingPageState extends State<TrainingPage> {
                 Navigator.pop(context);
               }),
         ),
-        backgroundColor: Color.fromARGB(255, 50, 184, 207),
+        backgroundColor: mediumblue,
         body: Column(children: [
           Row(
             children: [
@@ -51,8 +52,8 @@ class _TrainingPageState extends State<TrainingPage> {
                 padding: EdgeInsets.all(10),
                 child: IconButton(
                     icon: Icon(Icons.share_rounded,
-                        color: Color.fromARGB(255, 26, 147, 168)),
-                    style: IconButton.styleFrom(backgroundColor: Colors.white),
+                        color: grey),
+                    style: IconButton.styleFrom(backgroundColor: darkgrey),
                     onPressed: () => {}),
               ),
               Spacer(),
@@ -60,7 +61,7 @@ class _TrainingPageState extends State<TrainingPage> {
                 padding: EdgeInsets.all(10),
                 child: IconButton(
                     icon: Icon(Icons.edit_rounded,
-                        color: Color.fromARGB(255, 26, 147, 168)),
+                        color: darkerblue),
                     style: IconButton.styleFrom(backgroundColor: Colors.white),
                     onPressed: () async {
                       final updated = await Navigator.push<Training>(
@@ -83,7 +84,7 @@ class _TrainingPageState extends State<TrainingPage> {
                   padding: EdgeInsets.all(10),
                   child: IconButton(
                     icon: Icon(Icons.delete_rounded,
-                        color: Color.fromARGB(255, 26, 147, 168)),
+                        color: darkerblue),
                     style: IconButton.styleFrom(backgroundColor: Colors.white),
                     onPressed: removeTraining,
                   )),
@@ -108,7 +109,7 @@ class _TrainingPageState extends State<TrainingPage> {
                         child: Text(
                           "Description",
                           style: TextStyle(
-                            color: Color.fromARGB(255, 26, 147, 168),
+                            color: darkerblue,
                             fontSize: 12,
                           ),
                           textAlign: TextAlign.left,
@@ -120,7 +121,7 @@ class _TrainingPageState extends State<TrainingPage> {
                           child: Container(
                               width: screenWidth - 40,
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 123, 222, 240),
+                                color: lightblue,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Center(
@@ -132,7 +133,7 @@ class _TrainingPageState extends State<TrainingPage> {
                                         : training.description,
                                     style: TextStyle(
                                         color:
-                                            Color.fromARGB(255, 26, 147, 168)),
+                                            darkerblue),
                                   ),
                                 ),
                               )))
@@ -149,13 +150,13 @@ class _TrainingPageState extends State<TrainingPage> {
                 ),
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: Color.fromARGB(255, 26, 147, 168),
+                  foregroundColor: darkerblue,
                   minimumSize: Size(screenWidth, 48),
                 ),
                 child: Text(
                   "Start training",
                   style: TextStyle(
-                    color: Color.fromARGB(255, 26, 147, 168),
+                    color: darkerblue,
                     fontSize: 24,
                   ),
                 ),

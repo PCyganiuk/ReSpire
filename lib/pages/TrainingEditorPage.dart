@@ -151,14 +151,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: CustomSlidingSegmentedControl<int>(
                   children: {
-                    0: Text('Training', style: TextStyle(color: _selectedTab==0?darkerblue:Colors.black, fontWeight:  _selectedTab==0?FontWeight.bold:FontWeight.normal)),
-                    1: Text('Sound', style: TextStyle(color: _selectedTab==1?darkerblue:Colors.black, fontWeight:  _selectedTab==1?FontWeight.bold:FontWeight.normal)),
-                    2: Text('Other', style: TextStyle(color: _selectedTab==2?darkerblue:Colors.black, fontWeight:  _selectedTab==2?FontWeight.bold:FontWeight.normal)),
+                    0: Text('Training', style: TextStyle(color: _selectedTab==0?darkerblue:Colors.white, fontWeight:  _selectedTab==0?FontWeight.bold:FontWeight.normal)),
+                    1: Text('Sound', style: TextStyle(color: _selectedTab==1?darkerblue:Colors.white, fontWeight:  _selectedTab==1?FontWeight.bold:FontWeight.normal)),
+                    2: Text('Other', style: TextStyle(color: _selectedTab==2?darkerblue:Colors.white, fontWeight:  _selectedTab==2?FontWeight.bold:FontWeight.normal)),
                   },
                   initialValue: _selectedTab,
                   onValueChanged: (val) => setState(() => _selectedTab = val),
                   decoration: BoxDecoration(
-                    color: grey,
+                    color: darkerblue,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   thumbDecoration: BoxDecoration(
@@ -326,7 +326,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     // Description field
                                     Align(
                                       alignment: Alignment.centerLeft,
-                                      child: Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkblue)),
+                                      child: Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
                                     ),
                                     TextField(
                                       controller: descriptionController,
@@ -341,9 +341,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       },
                                     ),
                                     SizedBox(height: 12),
-                                    SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, onChanged: (v) => setState(() => _showNextStepToggle = v)),
-                                    SwitchListTile(title: Text('Chart'), value: _showChartToggle, onChanged: (v) => setState(() => _showChartToggle = v)),
-                                    SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, onChanged: (v) => setState(() => _showStepColorsToggle = v)),
+                                    SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, onChanged: null), //(v) => setState(() => _showNextStepToggle = v)),
+                                    SwitchListTile(title: Text('Chart'), value: _showChartToggle, onChanged: null), //(v) => setState(() => _showChartToggle = v)),
+                                    SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, onChanged: null),//(v) => setState(() => _showStepColorsToggle = v)),
                                   ],
                                 ),
                               ),
