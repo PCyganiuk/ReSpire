@@ -69,7 +69,7 @@ class _StepTileState extends State<StepTile> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: lightblue, 
         borderRadius: BorderRadius.circular(30), 
@@ -85,63 +85,170 @@ class _StepTileState extends State<StepTile> {
         children: [
           ReorderableDragStartListener(
             index: 0,
-            child: Icon(Icons.drag_handle, color: darkerblue),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: durationController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: "Time (s)",
-                labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                isDense: true,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: darkerblue),  // kolor gdy nie w focusie
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: darkerblue, width: 2),  // kolor i grubość w focusie
-                ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-              onChanged: (value) {
-                updateDuration(value);
-                widget.onUpdate();
-              },
-            ),
-          ),
-          SizedBox(width: 12),
-          DropdownButton2<respire.StepType>(
-            value: widget.step.stepType,
-            underline: SizedBox(), //removes grey underline
-            iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
-            dropdownStyleData: DropdownStyleData(
-              //isOverButton: true,         
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            items: respire.StepType.values
-                .map((e) => DropdownMenuItem(
-                      child: Text(e.toString().split('.').last),
-                      value: e,
-                    ))
-                .toList(),
-            onChanged: (newType) {
-              setState(() {
-                updateStepType(newType);
-              });
-              widget.onUpdate();
-            },
+            child: Icon(Icons.drag_handle, color: darkerblue, size: 20),
           ),
           SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Time (s)",
+                style: TextStyle(
+                  color: darkerblue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+              SizedBox(height: 3),
+              Container(
+                width: 100, // Fixed width for 4 digits
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: darkerblue),
+                ),
+                child: Row(
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          double currentValue = double.tryParse(durationController.text) ?? 0.1;
+                          double newValue = (currentValue - 0.1).clamp(0.1, double.infinity);
+                          double roundedValue = (newValue * 10).roundToDouble() / 10;
+                          durationController.text = roundedValue.toString();
+                          updateDuration(roundedValue.toString());
+                          widget.onUpdate();
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 32,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.remove,
+                            color: darkerblue,
+                            size: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: durationController,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                        ),
+                        style: TextStyle(
+                          color: darkerblue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                        onChanged: (value) {
+                          updateDuration(value);
+                          widget.onUpdate();
+                        },
+                      ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          double currentValue = double.tryParse(durationController.text) ?? 0.1;
+                          double newValue = currentValue + 0.1;
+                          double roundedValue = (newValue * 10).roundToDouble() / 10;
+                          durationController.text = roundedValue.toString();
+                          updateDuration(roundedValue.toString());
+                          widget.onUpdate();
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 32,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.add,
+                            color: darkerblue,
+                            size: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Type",
+                  style: TextStyle(
+                    color: darkerblue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
+                ),
+                SizedBox(height: 3),
+                Container(
+                  height: 32, // Match the time input height
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: darkerblue),
+                  ),
+                  child: DropdownButton2<respire.StepType>(
+                    value: widget.step.stepType,
+                    underline: SizedBox(),
+                    isExpanded: true,
+                    iconStyleData: IconStyleData(
+                      icon: Icon(Icons.arrow_drop_down, color: darkerblue),
+                      iconSize: 20,
+                    ),
+                    buttonStyleData: ButtonStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      height: 32,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    items: respire.StepType.values
+                        .map((e) => DropdownMenuItem(
+                              child: Text(
+                                e.toString().split('.').last,
+                                style: TextStyle(fontSize: 13),
+                              ),
+                              value: e,
+                            ))
+                        .toList(),
+                    onChanged: (newType) {
+                      setState(() {
+                        updateStepType(newType);
+                      });
+                      widget.onUpdate();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 4),
           IconButton(
-            icon: Icon(Icons.delete, color: const Color.fromARGB(255, 255, 255, 255)),
+            padding: EdgeInsets.zero,
+            icon: Icon(Icons.delete, color: darkerblue, size: 20),
             onPressed: widget.onDelete,
-          )
+          ),
         ],
       ),
     );
