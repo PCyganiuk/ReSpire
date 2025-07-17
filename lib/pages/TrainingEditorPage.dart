@@ -5,7 +5,6 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/TrainingEditorPage/AudioSelectionDropdown.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
-import 'package:respire/components/TrainingEditorPage/SoundDropdownItem.dart';
 import 'package:respire/services/SoundManager.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,6 +30,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   TextEditingController trainingNameController = TextEditingController();
   Timer? _debounce;
   String title = "New training";
+
+  // Focus management
+  final FocusNode _titleFocusNode = FocusNode();
+  final FocusNode _descriptionFocusNode = FocusNode();
 
   int _selectedTab = 0;
   // Sound tab state
@@ -66,6 +69,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+      // Clear any active focus when adding new phase to prevent keyboard issues
+      FocusScope.of(context).unfocus();
     });
     saveTraining();
   }
@@ -116,6 +121,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void dispose() {
     trainingNameController.dispose();
     descriptionController.dispose();
+    _titleFocusNode.dispose();
+    _descriptionFocusNode.dispose();
     _debounce?.cancel();
     super.dispose();
   }
@@ -191,9 +198,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            trainingNameController.text,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          title: TextField(
+            controller: trainingNameController,
+            focusNode: _titleFocusNode,
+            decoration: InputDecoration(border: InputBorder.none),
+            style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
+            onChanged: (value) {
+              widget.training.title = value;
+              if (_debounce?.isActive ?? false) _debounce!.cancel();
+              _debounce = Timer(Duration(milliseconds: 500), () {
+                saveTraining();
+              });
+            },
           ),
           actions: [
             IconButton(
@@ -202,18 +218,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
               splashRadius: 20, // opcjonalnie: zmniejsza efekt nacisku
             ),
           ],
-          // title: TextField(
-          //   controller: trainingNameController,
-          //   decoration: InputDecoration(border: InputBorder.none),
-          //   style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
-          //   onChanged: (value) {
-          //     widget.training.title = value;
-          //     if (_debounce?.isActive ?? false) _debounce!.cancel();
-          //     _debounce = Timer(Duration(milliseconds: 500), () {
-          //       saveTraining();
-          //     });
-          //   },
-          // ),
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.white,
@@ -231,7 +235,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                     2: Text('Other', style: TextStyle(color: _selectedTab==2?darkerblue:Colors.white, fontWeight:  _selectedTab==2?FontWeight.bold:FontWeight.normal)),
                   },
                   initialValue: _selectedTab,
-                  onValueChanged: (val) => setState(() => _selectedTab = val),
+                  onValueChanged: (val) {
+                    setState(() => _selectedTab = val);
+                    // Clear focus when switching tabs to prevent focus issues
+                    FocusScope.of(context).unfocus();
+                  },
                   decoration: BoxDecoration(
                     color: darkerblue,
                     borderRadius: BorderRadius.circular(16),
@@ -368,10 +376,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     // Description field
                                     Align(
                                       alignment: Alignment.centerLeft,
-                                      child: Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                                      child: Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkblue)),
                                     ),
                                     TextField(
                                       controller: descriptionController,
+                                      focusNode: _descriptionFocusNode,
                                       maxLines: 3,
                                       decoration: InputDecoration(
                                         hintText: 'Enter training description...',
