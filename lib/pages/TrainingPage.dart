@@ -35,6 +35,7 @@ class _TrainingPageState extends State<TrainingPage> {
           title: Text(training.title,
               style: TextStyle(
                   color: Colors.black,
+                  fontFamily: 'Glacial',
                   fontSize: 20,
                   fontWeight: FontWeight.w800)),
           backgroundColor: Colors.white,
@@ -51,40 +52,39 @@ class _TrainingPageState extends State<TrainingPage> {
               Padding(
                 padding: EdgeInsets.all(10),
                 child: IconButton(
-                    icon: Icon(Icons.share_rounded,
-                        color: darkgrey),
-                    style: IconButton.styleFrom(backgroundColor: const Color.fromARGB(255, 207, 206, 206)),
+                    icon: Icon(Icons.share_rounded, color: darkgrey),
+                    style: IconButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(255, 207, 206, 206)),
                     onPressed: () => {}),
               ),
               Spacer(),
               Padding(
-                padding: EdgeInsets.all(10),
-                child: IconButton(
-                    icon: Icon(Icons.edit_rounded,
-                        color: darkerblue),
-                    style: IconButton.styleFrom(backgroundColor: Colors.white),
-                    onPressed: () async {
-                      final updated = await Navigator.push<Training>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TrainingEditorPage(
-                            training: widget.db.presetList[widget.index],
+                  padding: EdgeInsets.all(10),
+                  child: IconButton(
+                      icon: Icon(Icons.edit_rounded, color: darkerblue),
+                      style:
+                          IconButton.styleFrom(backgroundColor: Colors.white),
+                      onPressed: () async {
+                        final updated = await Navigator.push<Training>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TrainingEditorPage(
+                              training: widget.db.presetList[widget.index],
+                            ),
                           ),
-                        ),
-                      );
-                      if (updated != null) {
-                        setState(() {
-                          widget.db.presetList[widget.index] = updated;
-                          widget.db.updateDataBase();
-                        });
-                      }
-                    }),
-              ),
+                        );
+                        if (updated != null) {
+                          setState(() {
+                            widget.db.presetList[widget.index] = updated;
+                            widget.db.updateDataBase();
+                          });
+                        }
+                      })),
               Padding(
                   padding: EdgeInsets.all(10),
                   child: IconButton(
-                    icon: Icon(Icons.delete_rounded,
-                        color: darkerblue),
+                    icon: Icon(Icons.delete_rounded, color: darkerblue),
                     style: IconButton.styleFrom(backgroundColor: Colors.white),
                     onPressed: removeTraining,
                   )),
@@ -93,54 +93,35 @@ class _TrainingPageState extends State<TrainingPage> {
           Padding(
               padding: EdgeInsets.all(10),
               child: Container(
-                width: screenWidth - 20,
-                constraints: BoxConstraints(
-                  minHeight: 80,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 10, left: 20),
-                        child: Text(
-                          "Description",
-                          style: TextStyle(
-                            color: darkerblue,
-                            fontSize: 12,
+                  width: screenWidth - 20,
+                  constraints: BoxConstraints(
+                    minHeight: 80,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Container(
+                          width: screenWidth - 40,
+                          decoration: BoxDecoration(
+                            color: lightblue,
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      Padding(
-                          padding:
-                              EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                          child: Container(
-                              width: screenWidth - 40,
-                              decoration: BoxDecoration(
-                                color: lightblue,
-                                borderRadius: BorderRadius.circular(16),
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                training.description == ''
+                                    ? "No description provided."
+                                    : training.description,
+                                style: TextStyle(color: greenblue),
                               ),
-                              child: Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    training.description == ''
-                                        ? "No description provided."
-                                        : training.description,
-                                    style: TextStyle(
-                                        color:
-                                            darkerblue),
-                                  ),
-                                ),
-                              )))
-                    ]),
-              )),
+                            ),
+                          ))))),
           Padding(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(20),
               child: TextButton(
                 onPressed: () => Navigator.push(
                   context,
@@ -149,16 +130,24 @@ class _TrainingPageState extends State<TrainingPage> {
                   ),
                 ),
                 style: TextButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: darkerblue,
-                  minimumSize: Size(screenWidth, 48),
-                ),
-                child: Text(
-                  "Start training",
-                  style: TextStyle(
-                    color: darkerblue,
-                    fontSize: 24,
-                  ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(70),
+                      bottomRight: Radius.circular(35),
+                      topLeft: Radius.circular(35),
+                      topRight: Radius.circular(70),
+                    ))),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text("Start training",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Glacial',
+                        fontSize: 23,
+                        fontWeight: FontWeight.w500,
+                      )),
                 ),
               ))
         ]));
