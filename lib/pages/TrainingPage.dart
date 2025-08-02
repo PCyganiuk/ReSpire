@@ -93,7 +93,7 @@ class _TrainingPageState extends State<TrainingPage> {
                 width: screenWidth - 40,
                 decoration: BoxDecoration(
                   color: lightblue,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
                   child: Padding(

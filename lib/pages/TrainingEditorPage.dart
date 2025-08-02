@@ -41,9 +41,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late Sounds _sounds;
   
   // Other tab state
-  bool _showNextStepToggle = true;
-  bool _showChartToggle = true;
-  bool _showStepColorsToggle = true;
+  bool _showNextStepToggle = false;
+  bool _showChartToggle = false;
+  bool _showStepColorsToggle = false;
 
   @override
   void initState() {
@@ -300,8 +300,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         DropdownButton2<String>(
                                           underline: SizedBox(), 
                                           iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
-                                            dropdownStyleData: DropdownStyleData(
-                                              //isOverButton: true,         
+                                            dropdownStyleData: DropdownStyleData(        
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(12),
@@ -316,8 +315,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         DropdownButton2<String>(
                                           underline: SizedBox(),
                                           iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
-                                            dropdownStyleData: DropdownStyleData(
-                                              //isOverButton: true,         
+                                            dropdownStyleData: DropdownStyleData(       
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(12),
@@ -405,9 +403,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       },
                                     ),
                                     SizedBox(height: 12),
-                                    SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, activeColor: darkerblue, onChanged: null), // (v) => setState(() => _showNextStepToggle = v)),
-                                    SwitchListTile(title: Text('Chart'), value: _showChartToggle, activeColor: darkerblue, onChanged: null), //(v) => setState(() => _showChartToggle = v)),
-                                    SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, activeColor: darkerblue,  onChanged: null),//(v) => setState(() => _showStepColorsToggle = v)),
+                                    SwitchListTile(title: Text('Next step'), value: _showNextStepToggle, activeColor: darkerblue, inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
+                                      WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                                        if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
+                                          return mediumblue;
+                                        } return null;}), 
+                                      onChanged: null),//(v) => setState(() => _showNextStepToggle = v)),
+                                    SwitchListTile(title: Text('Chart'), value: _showChartToggle, activeColor: darkerblue, inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
+                                      WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                                        if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
+                                          return mediumblue;
+                                        } return null;}),
+                                      onChanged: null), //(v) => setState(() => _showChartToggle = v)),
+                                    SwitchListTile(title: Text('Step colors'), value: _showStepColorsToggle, activeColor: darkerblue,inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
+                                      WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                                        if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
+                                          return mediumblue;
+                                        } return null;}),
+                                      onChanged: null),//(v) => setState(() => _showStepColorsToggle = v)),
                                   ],
                                 ),
                               ),
