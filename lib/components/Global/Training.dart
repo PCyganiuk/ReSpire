@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/Phase.dart';
+import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/Global/Sounds.dart';
 
 part 'Training.g.dart';
@@ -18,6 +19,9 @@ class Training {
 
   @HiveField(3)
   Sounds sounds = Sounds();
+
+  @HiveField(4)
+  Settings settings = Settings();
 
   Training({
     required this.title,

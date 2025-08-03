@@ -1,44 +1,34 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'Training.dart';
+part of 'Settings.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class TrainingAdapter extends TypeAdapter<Training> {
+class SettingsAdapter extends TypeAdapter<Settings> {
   @override
-  final int typeId = 1;
+  final int typeId = 10;
 
   @override
-  Training read(BinaryReader reader) {
+  Settings read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Training(
-      title: fields[0] as String,
-      phases: (fields[2] as List).cast<Phase>(),
-      description: fields[1] as String,
-    )
-      ..sounds = fields[3] as Sounds
-      ..settings = fields[4] as Settings;
+    return Settings()
+      ..preparationDuration = fields[0] as int
+      ..differentColors = fields[1] as bool;
   }
 
   @override
-  void write(BinaryWriter writer, Training obj) {
+  void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.title)
-      ..writeByte(1)
-      ..write(obj.description)
       ..writeByte(2)
-      ..write(obj.phases)
-      ..writeByte(3)
-      ..write(obj.sounds)
-      ..writeByte(4)
-      ..write(obj.settings);
+      ..writeByte(0)
+      ..write(obj.preparationDuration)
+      ..writeByte(1)
+      ..write(obj.differentColors);
   }
 
   @override
@@ -47,7 +37,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TrainingAdapter &&
+      other is SettingsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

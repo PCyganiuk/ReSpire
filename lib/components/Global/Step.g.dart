@@ -22,13 +22,14 @@ class StepAdapter extends TypeAdapter<Step> {
       stepType: fields[2] as StepType,
       breathType: fields[3] as BreathType?,
       breathDepth: fields[4] as BreathDepth?,
+      sound: fields[5] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Step obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.duration)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class StepAdapter extends TypeAdapter<Step> {
       ..writeByte(3)
       ..write(obj.breathType)
       ..writeByte(4)
-      ..write(obj.breathDepth);
+      ..write(obj.breathDepth)
+      ..writeByte(5)
+      ..write(obj.sound);
   }
 
   @override

@@ -22,13 +22,19 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..inhaleSound = fields[2] as String
       ..retentionSound = fields[3] as String
       ..exhaleSound = fields[4] as String
-      ..recoverySound = fields[5] as String;
+      ..recoverySound = fields[5] as String
+      ..preparationSound = fields[6] as String
+      ..nextInhaleSound = fields[7] as String
+      ..nextRetentionSound = fields[8] as String
+      ..nextExhaleSound = fields[9] as String
+      ..nextRecoverySound = fields[10] as String
+      ..nextGlobalSound = fields[11] as String;
   }
 
   @override
   void write(BinaryWriter writer, Sounds obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.backgroundSound)
       ..writeByte(1)
@@ -40,7 +46,19 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..writeByte(4)
       ..write(obj.exhaleSound)
       ..writeByte(5)
-      ..write(obj.recoverySound);
+      ..write(obj.recoverySound)
+      ..writeByte(6)
+      ..write(obj.preparationSound)
+      ..writeByte(7)
+      ..write(obj.nextInhaleSound)
+      ..writeByte(8)
+      ..write(obj.nextRetentionSound)
+      ..writeByte(9)
+      ..write(obj.nextExhaleSound)
+      ..writeByte(10)
+      ..write(obj.nextRecoverySound)
+      ..writeByte(11)
+      ..write(obj.nextGlobalSound);
   }
 
   @override
