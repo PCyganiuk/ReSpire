@@ -48,7 +48,7 @@ class _StepTileState extends State<StepTile> {
     super.initState();
     currentDuration = widget.step.duration;
     durationController =
-        TextEditingController(text: currentDuration.toString());
+        TextEditingController(text: currentDuration>=2 ? currentDuration.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '') : currentDuration.toString());
     durationFocusNode = FocusNode();
   }
 
@@ -165,9 +165,9 @@ class _StepTileState extends State<StepTile> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
                             double currentValue = double.tryParse(durationController.text) ?? 0.1;
-                            double newValue = (currentValue - 0.1).clamp(0.1, double.infinity);
+                            double newValue = ((currentValue>=2 ? currentValue - 1.0:currentValue-0.1)).clamp(0.1, double.infinity);
                             double roundedValue = (newValue * 10).roundToDouble() / 10;
-                            durationController.text = roundedValue.toString();
+                            durationController.text = roundedValue>=2 ? roundedValue.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '') : roundedValue.toString();
                             updateDuration(roundedValue.toString());
                             widget.onUpdate();
                           },
@@ -225,9 +225,9 @@ class _StepTileState extends State<StepTile> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
                             double currentValue = double.tryParse(durationController.text) ?? 0.1;
-                            double newValue = currentValue + 0.1;
+                            double newValue = currentValue>=2 ? currentValue + 1.0 : currentValue + 0.1;
                             double roundedValue = (newValue * 10).roundToDouble() / 10;
-                            durationController.text = roundedValue.toString();
+                            durationController.text = roundedValue>=2 ? roundedValue.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '') : roundedValue.toString();
                             updateDuration(roundedValue.toString());
                             widget.onUpdate();
                           },

@@ -72,11 +72,38 @@ class _PhaseTileState extends State<PhaseTile> {
     widget.onUpdate();
   }
 
-  void removeStep(int index) {
-    setState(() {
+  void removeStep(int index) async{
+      bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Remove phase?'),
+          backgroundColor: Colors.white,
+          content: Text('Are you sure you want to remove this phase?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('Cancel', style: TextStyle(color: darkerblue)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Remove', style: TextStyle(color: darkerblue)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete ?? false) {
+      setState(() {
       widget.phase.steps.removeAt(index);
     });
-    widget.onUpdate();
+      widget.onUpdate();
+    }
   }
 
   void updateStep(int index, respire.Step newStep) {
