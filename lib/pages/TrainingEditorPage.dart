@@ -40,14 +40,19 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   final List<String> _soundOptions = SoundManager().getAvailableSounds();
   late Sounds _sounds;
 
-  //Next step sound state
+  //Next step sound options
   final List<String> _showNextStepSoundOptions = ["None", "Global", "For each phase"];
+
+  //Counting sounds tab state
+  final List<String> _countingSoundOptions = ["None", "Voice", "Tic", "Gong"];
+
+  //To remove, when tic and gong sounds will be added
+  final disabledOptions = {'Tic', 'Gong'};
   
   // Other tab state
   bool _showNextStepToggle = false;
   bool _showChartToggle = false;
   bool _showStepColorsToggle = false;
-  bool _countingSounds = true;
 
   @override
   void initState() {
@@ -301,7 +306,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       children: [Text('Background sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),), 
                                         DropdownButton2<String>(
                                           underline: SizedBox(), 
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: Colors.white )),//darkerblue)),
+                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: const Color.fromARGB(123, 26, 147, 168))),//darkerblue)),
                                             dropdownStyleData: DropdownStyleData(        
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
@@ -316,7 +321,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       children: [Text('Preparation sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
                                         DropdownButton2<String>(
                                           underline: SizedBox(),
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: Colors.white)),
+                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: const Color.fromARGB(123, 26, 147, 168))),
                                             dropdownStyleData: DropdownStyleData(       
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
@@ -325,6 +330,39 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             ), 
                                           value: _sounds.preparationSound, 
                                           items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: null)],//(v) => setState(() => _sounds.preparationSound = v!))],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [Text('Counting sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),), 
+                                        DropdownButton2<String>(
+                                          underline: SizedBox(), 
+                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),//darkerblue)),
+                                            dropdownStyleData: DropdownStyleData(        
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                          value: _sounds.countingSound, 
+                                           items: _countingSoundOptions.map((s) {
+                                            final isDisabled = disabledOptions.contains(s);
+                                            return DropdownMenuItem(
+                                              value: s,
+                                              enabled: !isDisabled,
+                                              child: Text(
+                                                s,
+                                                style: TextStyle(
+                                                  color: isDisabled ? Colors.grey : Colors.black,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (v) {
+                                            if (v == null) return;
+                                            if (disabledOptions.contains(v)) return; 
+                                            setState(() => _sounds.countingSound = v);
+                                          },
+                                        )],
                                     ),
                                   ],
                                 ),
@@ -416,7 +454,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       children: [Text('Next step sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
                                         DropdownButton2<String>(
                                           underline: SizedBox(),
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: Colors.white)),
+                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color:Color.fromARGB(123, 26, 147, 168))),
                                             dropdownStyleData: DropdownStyleData(       
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
@@ -430,19 +468,59 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     else
                                     ...[Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Inhale', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),  
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => null),//setState(() { _sounds.nextInhaleSound = v!; SoundManager().stopAllSounds();})),
+                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextInhaleSound = v!; SoundManager().stopAllSounds();})),
+                                      Opacity(
+                                        opacity: 0.5, 
+                                        child: IgnorePointer(
+                                          child: AudioSelectionDropdown(
+                                            items: _soundOptions,
+                                            selectedValue: _sounds.inhaleSound,
+                                            onChanged: (_) {}, 
+                                          ),
+                                        ),
+                                      )
                                     ]),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Retention', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.retentionSound, onChanged: (v) => null),//setState(() { _sounds.nextRetentionSound = v!; SoundManager().stopAllSounds();})),
+                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextRetentionSound = v!; SoundManager().stopAllSounds();})),
+                                      Opacity(
+                                        opacity: 0.5, 
+                                        child: IgnorePointer(
+                                          child: AudioSelectionDropdown(
+                                            items: _soundOptions,
+                                            selectedValue: _sounds.retentionSound,
+                                            onChanged: (_) {}, 
+                                          ),
+                                        ),
+                                      )
                                     ]),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Exhale', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.exhaleSound, onChanged: (v) => null),//setState(() { _sounds.nextExhaleSound = v!; SoundManager().stopAllSounds();})),
+                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.exhaleSound, onChanged: (v) => setState(() { _sounds.nextExhaleSound = v!; SoundManager().stopAllSounds();})),
+                                      Opacity(
+                                        opacity: 0.5, 
+                                        child: IgnorePointer(
+                                          child: AudioSelectionDropdown(
+                                            items: _soundOptions,
+                                            selectedValue: _sounds.exhaleSound,
+                                            onChanged: (_) {}, 
+                                          ),
+                                        ),
+                                      )
                                     ]),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Recovery', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.recoverySound, onChanged: (v) => null), //setState(() { _sounds.nextRecoverySound = v!; SoundManager().stopAllSounds();})),
+                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextRecoverySound = v!; SoundManager().stopAllSounds();})),
+                                      Opacity(
+                                        opacity: 0.5, 
+                                        child: IgnorePointer(
+                                          child: AudioSelectionDropdown(
+                                            items: _soundOptions,
+                                            selectedValue: _sounds.recoverySound,
+                                            onChanged: (_) {}, 
+                                          ),
+                                        ),
+                                      )
                                     ]),],
                                   ],
                                 ),
@@ -511,12 +589,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                           return mediumblue;
                                         } return null;}),
                                       onChanged: null),//(v) => setState(() => _showStepColorsToggle = v)),
-                                    SwitchListTile(title: Text('Counting sound'), value: _countingSounds, activeColor: darkerblue,inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
-                                    WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                                      if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
-                                        return mediumblue;
-                                      } return null;}),
-                                    onChanged: (v) => setState(() => _countingSounds = v)),
                                   ],
                                 ),
                               ),
