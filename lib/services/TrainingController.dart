@@ -7,23 +7,23 @@ import 'package:respire/services/SoundManager.dart';
 import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
-class TrainingController{
-
+class TrainingController {
   Timer? _timer;
   final TrainingParser parser;
-  final ValueNotifier<Queue<training_step.Step?>> stepsQueue = ValueNotifier(Queue<training_step.Step?>());
+  final ValueNotifier<Queue<training_step.Step?>> stepsQueue =
+      ValueNotifier(Queue<training_step.Step?>());
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> stepsCount = ValueNotifier(0);
 
   final int _updateInterval = 100; //in milliseconds
   final int _stepDelayDuration = 600; //in milliseconds
- 
-  int _remainingTime = 3000; //in milliseconds
+
+  int _remainingTime = 0; //in milliseconds
   int _nextRemainingTime = 0; //in milliseconds
   int _newStepRemainingTime = 0; //in milliseconds
 
-  int _stepDelayRemainingTime = 600;//in milliseconds
+  int _stepDelayRemainingTime = 600; //in milliseconds
 
   bool _finished = false;
   bool _stepDelay = true;
@@ -35,6 +35,7 @@ class TrainingController{
 
   TrainingController(this.parser) {
     SoundManager().stopAllSounds();
+    _remainingTime = parser.training.settings.preparationDuration * 1000;
     _preloadSteps();
     _start();
   }
@@ -74,82 +75,80 @@ class TrainingController{
     _start();
   }
 
-
-  Future<void> handleStepChange(training_step.Step step) async{
-    await SoundManager().pauseSoundFadeOut(_currentSound, (_stepDelayDuration/2).toInt());
+  Future<void> handleStepChange(training_step.Step step) async {
+    await SoundManager()
+        .pauseSoundFadeOut(_currentSound, (_stepDelayDuration / 2).toInt());
     _currentSound = step.sound;
-    await SoundManager().playSoundFadeIn(_currentSound, (_stepDelayDuration/2).toInt());
+    await SoundManager()
+        .playSoundFadeIn(_currentSound, (_stepDelayDuration / 2).toInt());
   }
 
-  void _start()
-  {
-    int previousSecond = _remainingTime~/1000;
-    _timer = Timer.periodic(Duration(milliseconds: _updateInterval),
-      (Timer timer) {
+  void _start() {
+    int previousSecond = _remainingTime ~/ 1000;
+    _timer =
+        Timer.periodic(Duration(milliseconds: _updateInterval), (Timer timer) {
+      //voice
+      if (previousSecond > _remainingTime ~/ 1000 && _stopTimer != 0) {
+        previousSecond = _remainingTime ~/ 1000;
+        second.value = previousSecond + 1;
+        TextToSpeechService().readNumber(previousSecond + 1);
+      }
 
-        //voice
-        if(previousSecond > _remainingTime~/1000 && _stopTimer!=0)
-        {
-          previousSecond = _remainingTime~/1000;
-          second.value = previousSecond+1;
-          TextToSpeechService().readNumber(previousSecond+1);
+      //time update
+      if (_remainingTime >= _updateInterval) {
+        _remainingTime -= _updateInterval;
+      }
+
+      //step dalay for reading the name
+      else if (_stepDelay && _stopTimer != 0) {
+        stepsCount.value++;
+        if (stepsQueue.value.elementAt(1) != null) {
+          second.value = 0;
+          training_step.Step _step = stepsQueue.value.elementAt(1)!;
+          handleStepChange(_step);
+          String stepName =
+              translationProvider.getTranslation("StepType.${_step.stepType.name}");
+          TextToSpeechService().speak(stepName);
         }
-
-        //time update
-        if (_remainingTime >= _updateInterval) {
-          _remainingTime -= _updateInterval;
-        }
-
-        //step dalay for reading the name
-        else if(_stepDelay && _stopTimer!=0) {
-          stepsCount.value++;
-          if (stepsQueue.value.elementAt(1)!=null) {
-            second.value = 0;
-            training_step.Step _step = stepsQueue.value.elementAt(1)!;
-            handleStepChange(_step);
-            String stepName = translationProvider.getTranslation("StepType.${_step.stepType.name}");
-            TextToSpeechService().speak(stepName);
-          }
-          _stepDelay = false; 
+        _stepDelay = false;
 
         //step delay time update
-        } else if(_stepDelayRemainingTime >= _updateInterval){
-          _stepDelayRemainingTime -= _updateInterval;
+      } else if (_stepDelayRemainingTime >= _updateInterval) {
+        _stepDelayRemainingTime -= _updateInterval;
 
         //two last steps
-        }else if (_finished) {
-          
-          //last step
-          if(_stopTimer==0) {
-            second.value = 0;
-             _timer?.cancel();
-          
+      } else if (_finished) {
+        //last step
+        if (_stopTimer == 0) {
+          second.value = 0;
+          _timer?.cancel();
+
           //one step before last
-          } else {
-            stepsQueue.value.removeFirst();
-            stepsQueue.value.add(null);
-            stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
-            _remainingTime = _nextRemainingTime;
-            previousSecond = _remainingTime~/1000;
-            _stopTimer--;
-            _stepDelay = true;
-            _stepDelayRemainingTime = _stepDelayDuration;
-          }
-          
-        //new step updates
-        } else{
+        } else {
           stepsQueue.value.removeFirst();
+          stepsQueue.value.add(null);
+          stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
           _remainingTime = _nextRemainingTime;
-          _nextRemainingTime =_newStepRemainingTime;
-          previousSecond = _remainingTime~/1000;
-          _fetchNextStep();
-           stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
+          previousSecond = _remainingTime ~/ 1000;
+          _stopTimer--;
           _stepDelay = true;
           _stepDelayRemainingTime = _stepDelayDuration;
         }
+
+        //new step updates
+      } else {
+        stepsQueue.value.removeFirst();
+        _remainingTime = _nextRemainingTime;
+        _nextRemainingTime = _newStepRemainingTime;
+        previousSecond = _remainingTime ~/ 1000;
+        _fetchNextStep();
+        stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
+        _stepDelay = true;
+        _stepDelayRemainingTime = _stepDelayDuration;
       }
-    );
+    });
   }
+
   void dispose() {
     TextToSpeechService().stopSpeaking();
     SoundManager().stopAllSounds();
