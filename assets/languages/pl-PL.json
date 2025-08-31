@@ -70,11 +70,13 @@
 
             "NextStepSounds":{
                 "title":"Dźwięki kolejnej fazy",
-                "none":"Brak",
                 "global":"Globalny",
                 "for_each_phase":"Dla każdej fazy",
                 "next_step_sound_label":"Dźwięk następnej fazy"
-            }
+            },
+            
+            "None":"Brak"
+
         },
 
         "OtherTab":{

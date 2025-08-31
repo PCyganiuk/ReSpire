@@ -2,19 +2,24 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:respire/components/TrainingEditorPage/SoundDropdownItem.dart';
+import 'package:respire/services/SoundManager.dart';
 import 'package:respire/theme/Colors.dart';
 
 class AudioSelectionDropdown extends StatefulWidget{
+  final SoundListType soundListType;
   final List<String> items;
   final String? selectedValue;
   final ValueChanged<String?> onChanged;
 
-  const AudioSelectionDropdown({
+  AudioSelectionDropdown({
     super.key,
-    required this.items,
     required this.selectedValue,
     required this.onChanged,
-  });
+    required this.soundListType,
+  }) : items = [
+    ...SoundManager().getSounds(soundListType).keys,
+    "Add sound",
+  ];
 
   @override
   State<AudioSelectionDropdown> createState() => _AudioSelectionDropdownState();
@@ -57,6 +62,7 @@ class _AudioSelectionDropdownState extends State<AudioSelectionDropdown> {
 
   @override
   void dispose() {
+    SoundManager().stopAllSounds();
     _currentlyPlaying.dispose();
     super.dispose();
   }

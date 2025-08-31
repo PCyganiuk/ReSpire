@@ -17,24 +17,25 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Sounds()
-      ..backgroundSound = fields[0] as String
-      ..nextSound = fields[1] as String
-      ..inhaleSound = fields[2] as String
-      ..retentionSound = fields[3] as String
-      ..exhaleSound = fields[4] as String
-      ..recoverySound = fields[5] as String
-      ..preparationSound = fields[6] as String
-      ..nextInhaleSound = fields[7] as String
-      ..nextRetentionSound = fields[8] as String
-      ..nextExhaleSound = fields[9] as String
-      ..nextRecoverySound = fields[10] as String
-      ..nextGlobalSound = fields[11] as String;
+      ..backgroundSound = fields[0] as String?
+      ..nextSound = fields[1] as String?
+      ..inhaleSound = fields[2] as String?
+      ..retentionSound = fields[3] as String?
+      ..exhaleSound = fields[4] as String?
+      ..recoverySound = fields[5] as String?
+      ..preparationSound = fields[6] as String?
+      ..nextInhaleSound = fields[7] as String?
+      ..nextRetentionSound = fields[8] as String?
+      ..nextExhaleSound = fields[9] as String?
+      ..nextRecoverySound = fields[10] as String?
+      ..nextGlobalSound = fields[11] as String?
+      ..countingSound = fields[12] as String?;
   }
 
   @override
   void write(BinaryWriter writer, Sounds obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.backgroundSound)
       ..writeByte(1)
@@ -58,7 +59,9 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..writeByte(10)
       ..write(obj.nextRecoverySound)
       ..writeByte(11)
-      ..write(obj.nextGlobalSound);
+      ..write(obj.nextGlobalSound)
+      ..writeByte(12)
+      ..write(obj.countingSound);
   }
 
   @override

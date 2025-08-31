@@ -61,7 +61,8 @@
             "TrainingSounds":{
                 "title":"Training sounds",
                 "background_sound":"Background sound",
-                "preparation_sound":"Preparation sound"
+                "preparation_sound":"Preparation sound",
+                "counting_sound":"Counting sound"
             },
 
             "StepSounds":{
@@ -70,11 +71,13 @@
 
             "NextStepSounds":{
                 "title":"Next step sounds",
-                "none":"None",
                 "global":"Global",
                 "for_each_phase":"For each phase",
                 "next_step_sound_label":"Next step sound"
-            }
+            },
+
+            "None":"None"
+            
         },
 
         "OtherTab":{

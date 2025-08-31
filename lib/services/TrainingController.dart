@@ -29,7 +29,7 @@ class TrainingController {
   bool _stepDelay = true;
   int _stopTimer = 2;
 
-  String _currentSound = "";
+  String? _currentSound;
 
   TranslationProvider translationProvider = TranslationProvider();
 
@@ -65,13 +65,13 @@ class TrainingController {
 
   void pause() {
     isPaused.value = true;
-    SoundManager().pauseSound(_currentSound);
+    SoundManager().pauseSound(_currentSound!);
     _timer?.cancel();
   }
 
   void resume() {
     isPaused.value = false;
-    SoundManager().playSound(_currentSound);
+    SoundManager().playSound(_currentSound!);
     _start();
   }
 

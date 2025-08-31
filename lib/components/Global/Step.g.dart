@@ -22,7 +22,7 @@ class StepAdapter extends TypeAdapter<Step> {
       stepType: fields[2] as StepType,
       breathType: fields[3] as BreathType?,
       breathDepth: fields[4] as BreathDepth?,
-      sound: fields[5] as String,
+      sound: fields[5] as String?,
     );
   }
 

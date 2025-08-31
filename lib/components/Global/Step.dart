@@ -68,7 +68,7 @@ class Step {
   BreathDepth? breathDepth;
 
   @HiveField(5)
-  String sound;
+  String? sound;
 
   Step({
     required this.duration,

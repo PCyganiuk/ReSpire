@@ -57,6 +57,7 @@ class TextToSpeechService {
     // Cannot reproduce, but sometimes the language resets and needs to be set again even after init is called.
     // Leaving this in code in case something like this ever happens again. (Seems like the only viable solution)
     //await _flutterTts.setLanguage("en-US"); // maybe call it with a language fetched from app settings instead?
+    _flutterTts.setSpeechRate(1.0);
     log("Speaking... (value=$text)");
     await _flutterTts.speak(text);
     log("Finished speaking.");

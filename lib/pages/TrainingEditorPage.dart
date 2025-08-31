@@ -6,10 +6,10 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/TrainingEditorPage/AudioSelectionDropdown.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
+import 'package:respire/components/TrainingEditorPage/SoundSelectionRow.dart';
 import 'package:respire/services/SoundManager.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -42,7 +42,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late Sounds _sounds;
 
   //Next step sound options
-  final List<String> _showNextStepSoundOptions = ["None", "Global", "For each phase"];
+  final Map<String,String?> _showNextStepSoundOptions = {
+    "None": null,
+    "Global": "global",
+    "For each phase": "phase",
+  };
 
   //Counting sounds tab state
   final List<String> _countingSoundOptions = ["None", "Voice", "Tic", "Gong"];
@@ -304,69 +308,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [Text(translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.background_sound"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),), 
-                                        DropdownButton2<String>(
-                                          underline: SizedBox(), 
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: const Color.fromARGB(123, 26, 147, 168))),//darkerblue)),
-                                            dropdownStyleData: DropdownStyleData(        
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                            ),
-                                          value: _sounds.backgroundSound, 
-                                          items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: null)],//(v) => setState(() => _sounds.backgroundSound = v!))],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [Text(translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.preparation_sound"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                        DropdownButton2<String>(
-                                          underline: SizedBox(),
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: const Color.fromARGB(123, 26, 147, 168))),
-                                            dropdownStyleData: DropdownStyleData(       
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                            ), 
-                                          value: _sounds.preparationSound, 
-                                          items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: null)],//(v) => setState(() => _sounds.preparationSound = v!))],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [Text('Counting sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),), 
-                                        DropdownButton2<String>(
-                                          underline: SizedBox(), 
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),//darkerblue)),
-                                            dropdownStyleData: DropdownStyleData(        
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                            ),
-                                          value: _sounds.countingSound, 
-                                           items: _countingSoundOptions.map((s) {
-                                            final isDisabled = disabledOptions.contains(s);
-                                            return DropdownMenuItem(
-                                              value: s,
-                                              enabled: !isDisabled,
-                                              child: Text(
-                                                s,
-                                                style: TextStyle(
-                                                  color: isDisabled ? Colors.grey : Colors.black,
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
-                                          onChanged: (v) {
-                                            if (v == null) return;
-                                            if (disabledOptions.contains(v)) return; 
-                                            setState(() => _sounds.countingSound = v);
-                                          },
-                                        )],
-                                    ),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.background_sound"), selectedValue: _sounds.backgroundSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.backgroundSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.preparation_sound"), selectedValue: _sounds.preparationSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound = v; })),
+                                  
                                   ],
                                 ),
                               ),
@@ -388,22 +333,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.inhale"), style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold)),  
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.inhaleSound = v!; SoundManager().stopAllSounds();})),
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.retention"), style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.retentionSound, onChanged: (v) => setState(() { _sounds.retentionSound = v!; SoundManager().stopAllSounds();})),
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.exhale"), style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.exhaleSound, onChanged: (v) => setState(() { _sounds.exhaleSound = v!; SoundManager().stopAllSounds();})),
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.recovery"), style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold)), 
-                                      AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.recoverySound, onChanged: (v) => setState(() { _sounds.recoverySound = v!; SoundManager().stopAllSounds();})),
-                                    ]),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.inhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.inhaleSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.retention"), selectedValue: _sounds.retentionSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.retentionSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.exhale"), selectedValue: _sounds.exhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.exhaleSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.recovery"), selectedValue: _sounds.recoverySound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.recoverySound = v ; })),
                                   ],
                                 ),
                               ),
@@ -438,10 +371,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               ),
                                             ), 
                                           value: _sounds.nextSound, 
-                                          items: _showNextStepSoundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: (v) => setState(() => _sounds.nextSound = v!))],
+                                          items: _showNextStepSoundOptions.map((key, value) {
+                                            return MapEntry(key, DropdownMenuItem(value: value, child: Text(key)));
+                                          }).values.toList(),
+                                          onChanged: (v) => setState(() => _sounds.nextSound = v))],
                               ),
                             ),
-                            if (_sounds.nextSound !="None")...[
+                            if (_sounds.nextSound != null)...[
                               SizedBox(height: 8),
                             Card(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -451,7 +387,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                                 child: Column(
                                   children: [
-                                    if(_sounds.nextSound=="Global") ...[
+                                    if(_sounds.nextSound=="global") ...[
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [Text('Next step sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
@@ -469,62 +405,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     ),
                                     ] 
                                     else
-                                    ...[Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.inhale"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),  
-                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextInhaleSound = v!; SoundManager().stopAllSounds();})),
-                                      Opacity(
-                                        opacity: 0.5, 
-                                        child: IgnorePointer(
-                                          child: AudioSelectionDropdown(
-                                            items: _soundOptions,
-                                            selectedValue: _sounds.inhaleSound,
-                                            onChanged: (_) {}, 
-                                          ),
-                                        ),
-                                      )
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.retention"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextRetentionSound = v!; SoundManager().stopAllSounds();})),
-                                      Opacity(
-                                        opacity: 0.5, 
-                                        child: IgnorePointer(
-                                          child: AudioSelectionDropdown(
-                                            items: _soundOptions,
-                                            selectedValue: _sounds.retentionSound,
-                                            onChanged: (_) {}, 
-                                          ),
-                                        ),
-                                      )
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.exhale"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.exhaleSound, onChanged: (v) => setState(() { _sounds.nextExhaleSound = v!; SoundManager().stopAllSounds();})),
-                                      Opacity(
-                                        opacity: 0.5, 
-                                        child: IgnorePointer(
-                                          child: AudioSelectionDropdown(
-                                            items: _soundOptions,
-                                            selectedValue: _sounds.exhaleSound,
-                                            onChanged: (_) {}, 
-                                          ),
-                                        ),
-                                      )
-                                    ]),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(translationProvider.getTranslation("StepType.recovery"), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                      //AudioSelectionDropdown(items: _soundOptions, selectedValue: _sounds.inhaleSound, onChanged: (v) => setState(() { _sounds.nextRecoverySound = v!; SoundManager().stopAllSounds();})),
-                                      Opacity(
-                                        opacity: 0.5, 
-                                        child: IgnorePointer(
-                                          child: AudioSelectionDropdown(
-                                            items: _soundOptions,
-                                            selectedValue: _sounds.recoverySound,
-                                            onChanged: (_) {}, 
-                                          ),
-                                        ),
-                                      )
-                                    ]),],
+                                    ...[SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.nextInhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextInhaleSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.retention"), selectedValue: _sounds.nextRetentionSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRetentionSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.exhale"), selectedValue: _sounds.nextExhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextExhaleSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("StepType.recovery"), selectedValue: _sounds.nextRecoverySound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRecoverySound = v ; })),
+                                  ],
                                   ],
                                 ),
                               ),

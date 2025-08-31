@@ -6,41 +6,41 @@ part 'Sounds.g.dart';
 class Sounds {
   
   @HiveField(0)
-  String backgroundSound = 'None';
+  String? backgroundSound;
   
   @HiveField(1)
-  String nextSound = 'None';
+  String? nextSound;
   
   @HiveField(2)
-  String inhaleSound = 'None';
+  String? inhaleSound;
   
   @HiveField(3)
-  String retentionSound = 'None';
+  String? retentionSound;
   
   @HiveField(4)
-  String exhaleSound = 'None';
+  String? exhaleSound;
   
   @HiveField(5)
-  String recoverySound = 'None';
+  String? recoverySound;
 
   @HiveField(6)
-  String preparationSound = 'None';
+  String? preparationSound;
 
   @HiveField(7)
-  String nextInhaleSound = 'None';
+  String? nextInhaleSound;
 
   @HiveField(8)
-  String nextRetentionSound = 'None';
+  String? nextRetentionSound;
 
   @HiveField(9)
-  String nextExhaleSound = 'None';
+  String? nextExhaleSound;
 
   @HiveField(10)
-  String nextRecoverySound = 'None';
+  String? nextRecoverySound;
 
   @HiveField(11)
-  String nextGlobalSound = 'None';
+  String? nextGlobalSound;
 
   @HiveField(12)
-  String countingSound = 'None';
+  String? countingSound;
 }

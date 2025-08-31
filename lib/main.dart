@@ -9,6 +9,7 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/HomePage.dart';
 import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'package:respire/services/UserSoundsDataBase.dart';
 import 'theme/Colors.dart';
 
 void main() async{
@@ -33,7 +34,10 @@ Future<void> initialize() async
   Hive.registerAdapter(SoundsAdapter());
   Hive.registerAdapter(SettingsAdapter());
   await Hive.openBox('respire');
+  await Hive.openBox('userShortSounds');
+  await Hive.openBox('userLongSounds');
   await TextToSpeechService().init();
+  UserSoundsDatabase().loadData();
   TranslationProvider();
 }
 
