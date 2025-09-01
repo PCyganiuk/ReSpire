@@ -27,7 +27,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late List<Phase> phases;
   late TextEditingController descriptionController;
   final ScrollController _scrollController = ScrollController();
-  // Title is no longer edited inline (only via dialog), so no controller/focus node needed.
   final FocusNode _descriptionFocusNode = FocusNode();
 
   int _selectedTab = 0;
