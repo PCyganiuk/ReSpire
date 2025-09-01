@@ -27,11 +27,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late List<Phase> phases;
   late TextEditingController descriptionController;
   final ScrollController _scrollController = ScrollController();
-  TextEditingController trainingNameController = TextEditingController();
-  
-
-  // Focus management
-  final FocusNode _titleFocusNode = FocusNode();
+  // Title is no longer edited inline (only via dialog), so no controller/focus node needed.
   final FocusNode _descriptionFocusNode = FocusNode();
 
   int _selectedTab = 0;
@@ -61,7 +57,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     super.initState();
     phases = widget.training.phases;
     _sounds = widget.training.sounds;
-    trainingNameController.text = widget.training.title;
     descriptionController = TextEditingController(text: widget.training.description);
   }
 
@@ -122,39 +117,41 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   @override
   void dispose() {
-    trainingNameController.dispose();
     descriptionController.dispose();
-    _titleFocusNode.dispose();
     _descriptionFocusNode.dispose();
     super.dispose();
   }
 
   
   void showEditTitleDialog(BuildContext context) {
+    final tempController = TextEditingController(text: widget.training.title);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white, 
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_title"), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkerblue)),
+        title: Text(
+          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_title"),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkerblue),
+        ),
         content: TextField(
-          controller: trainingNameController,
+          controller: tempController,
           autofocus: true,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12), 
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: darkerblue,
-                width: 2.0, 
+                width: 2.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12), 
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: darkerblue,
-                width: 2.0, 
+                width: 2.0,
               ),
             ),
             hintText: translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_hint"),
@@ -163,14 +160,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         actions: [
           TextButton(
             child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(), // discard changes
           ),
           ElevatedButton(
             child: Text(translationProvider.getTranslation("PopupButton.save"), style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
             onPressed: () {
               setState(() {
-                widget.training.title = trainingNameController.text;
+                widget.training.title = tempController.text.trim();
               });
               Navigator.of(context).pop();
             },
@@ -190,20 +187,16 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: TextField(
-            controller: trainingNameController,
-            focusNode: _titleFocusNode,
-            decoration: InputDecoration(border: InputBorder.none),
+          title: Text(
+            widget.training.title,
             style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
-            onChanged: (value) {
-              widget.training.title = value;
-            },
+            overflow: TextOverflow.ellipsis,
           ),
           actions: [
             IconButton(
               icon: Icon(Icons.edit, color: darkerblue),
               onPressed: () => showEditTitleDialog(context),
-              splashRadius: 20, 
+              splashRadius: 20,
             ),
           ],
           backgroundColor: Colors.white,
