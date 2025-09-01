@@ -177,7 +177,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         ),
         actions: [
           TextButton(
-            child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
+            child: Text(translationProvider.getTranslation("PopupButton.cancel")),
             onPressed: () => Navigator.of(context).pop(),
           ),
           ElevatedButton(

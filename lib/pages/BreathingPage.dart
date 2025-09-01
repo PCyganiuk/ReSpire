@@ -7,7 +7,6 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
-import 'package:respire/theme/Colors.dart';
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -54,14 +53,14 @@ class _BreathingPageState extends State<BreathingPage> {
                 Navigator.pop(context);
                 controller.resume();
               },
-              child: Text(translationProvider.getTranslation("PopupButton.no"), style: TextStyle(color: darkerblue)),
+              child: Text(translationProvider.getTranslation("PopupButton.no")),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
-              child: Text(translationProvider.getTranslation("PopupButton.yes"), style: TextStyle(color: darkerblue)),
+              child: Text(translationProvider.getTranslation("PopupButton.yes")),
             ),
           ],
         );

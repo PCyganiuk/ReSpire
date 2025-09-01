@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/TrainingEditorPage/AudioListTile.dart';
 import 'package:respire/services/SoundManager.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
+import 'package:respire/theme/Colors.dart';
 
 class AudioSelectionPopup extends StatefulWidget {
   final SoundListType listType;
@@ -51,8 +52,9 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   onPressed: _addCustomSound,
-                  icon: const Icon(Icons.add),
-                  label: const Text("Add Custom Sound"),
+                  icon: const Icon(Icons.add, color: Colors.white),
+                  label: const Text("Add Custom Sound", style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
                 ),
               ),
             ),

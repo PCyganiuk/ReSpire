@@ -334,7 +334,7 @@ class _TrainingPageState extends State<TrainingPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
+                child: Text(translationProvider.getTranslation("PopupButton.cancel")),
               ),
               TextButton(
                 onPressed: () {
@@ -343,7 +343,7 @@ class _TrainingPageState extends State<TrainingPage> {
                   setState(() {});
                   Navigator.pop(context, true);
                 },
-                child: Text(translationProvider.getTranslation("PopupButton.delete"), style: TextStyle(color: darkerblue)),
+                child: Text(translationProvider.getTranslation("PopupButton.delete")),
               ),
             ],
           );

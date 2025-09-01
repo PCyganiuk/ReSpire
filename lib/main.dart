@@ -56,7 +56,9 @@ class MainApp extends StatelessWidget {
           selectionHandleColor: darkerblue,    
         ),
         textButtonTheme: TextButtonThemeData(
-          style: ButtonStyle(
+          style: TextButton.styleFrom(
+            foregroundColor: darkerblue, 
+          ).copyWith(
             overlayColor: MaterialStateProperty.all(Colors.transparent),
           ),
         ),
@@ -75,7 +77,7 @@ class MainApp extends StatelessWidget {
             fontSize: 16,
             color: Colors.black,
           ),
-    ),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: HomePage()

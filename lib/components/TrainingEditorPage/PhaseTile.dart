@@ -85,13 +85,13 @@ class _PhaseTileState extends State<PhaseTile> {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text('Cancel', style: TextStyle(color: darkerblue)),
+              child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text('Remove', style: TextStyle(color: darkerblue)),
+              child: Text('Remove'),
             ),
           ],
         );

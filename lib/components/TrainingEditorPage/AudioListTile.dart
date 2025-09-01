@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:respire/theme/Colors.dart';
 
 class AudioListTile extends StatelessWidget {
   final MapEntry<String, String?> entry;
@@ -23,6 +24,9 @@ class AudioListTile extends StatelessWidget {
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         selected: isSelected,
+        selectedColor: Colors.black,
+        textColor: Colors.black,
+        titleTextStyle: isSelected ? TextStyle(fontWeight: FontWeight.bold):TextStyle(fontWeight: FontWeight.normal),
         selectedTileColor: Color.fromARGB(99, 156, 156, 156),
         leading: IconButton(onPressed: onPlayToggle, icon: entry.value == null ? Icon(Icons.volume_off, color: Colors.grey) : isPlaying ? Icon(Icons.pause, color: Colors.red) : Icon(Icons.play_arrow, color: Colors.green)),
         title: Text(entry.key, overflow: TextOverflow.fade, maxLines: 1,),
