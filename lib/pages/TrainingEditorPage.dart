@@ -394,21 +394,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 child: Column(
                                   children: [
                                     if(_sounds.nextSound=="global") ...[
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [Text('Next step sound', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)), 
-                                        DropdownButton2<String>(
-                                          underline: SizedBox(),
-                                          iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color:Color.fromARGB(123, 26, 147, 168))),
-                                            dropdownStyleData: DropdownStyleData(       
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                            ), 
-                                          value: _sounds.nextGlobalSound, 
-                                          items: _soundOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(), onChanged: null)],//(v) => setState(() => _sounds.nextGlobalSound = v!))],
-                                    ),
+                                      SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextStepSounds.global"), selectedValue: _sounds.nextGlobalSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.nextGlobalSound = v; }))
                                     ] 
                                     else
                                     ...[SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.nextInhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextInhaleSound = v; })),

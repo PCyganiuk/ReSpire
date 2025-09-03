@@ -72,6 +72,14 @@ class SoundManager{
       return false;
     }
     AudioPlayer audioPlayer = AudioPlayer();
+    audioPlayer.setReleaseMode(ReleaseMode.stop);
+    audioPlayer.onPlayerComplete.listen((event) async {
+        if (currentlyPlaying.value == soundName) {
+          currentlyPlaying.value = null;
+          await audioPlayer.seek(Duration.zero);
+        }
+      });
+
     bool isAsset = _availableSounds[soundName]!.startsWith("sounds/");
     try{
 
@@ -163,7 +171,7 @@ class SoundManager{
     }
     log("Pausing sound: $soundName");
     await _audioPlayers[soundName]!.pause();
-    currentlyPlaying.value = "";
+    currentlyPlaying.value = null;
   }
 
   ///Stops a sound from a file in the assets folder if playing.
@@ -181,15 +189,7 @@ class SoundManager{
 
     log("Stopping sound: $soundName");
     await _audioPlayers[soundName]!.stop();
-    
-    Source? currentSource = _audioPlayers[soundName]!.source;
-    try {
-      await _audioPlayers[soundName]!.setSource(currentSource!);
-    } catch (e) {
-      log("Error resetting source after stop: $e");
-    }
-
-    currentlyPlaying.value = "";
+    currentlyPlaying.value = null;
   }
 
   ///Pauses the provided sound with a fade-out effect.\
