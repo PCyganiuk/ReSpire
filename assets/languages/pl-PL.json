@@ -20,7 +20,8 @@
 
     "TrainingPage":{
         "start_button_label":"Rozpocznij trening",
-        "description_placeholder":"Dodaj opis treningu ",
+        "description_placeholder":"Brak opisu.",
+        "description_placeholder_prefix":"Dodaj opis treningu dla:",
         "TrainingOverview":{
             "title":"Przegląd treningu",
             "reps":"Powtórzenia",
@@ -43,12 +44,12 @@
             "edit_title_dialog_hint":"Wpisz nazwę treningu",
             "remove_phase_dialog_title":"Usunąć fazę?",
             "remove_phase_dialog_content":"Na pewno chcesz usunąć fazę?",
-            "add_phase_button_label":"Dodaj fazę",
+            "add_stage_button_label":"Dodaj etap treningu",
             
             "PhaseTile":{
                 "reps":"Powtórzenia",
                 "increment":"Przyrost (s)",
-                "add_step_button_label":"Dodaj krok"
+                "add_phase_button_label":"Dodaj fazę oddechu"
             },
 
             "StepTile":{
@@ -60,25 +61,38 @@
         },
 
         "SoundsTab":{
-            "TrainingSounds":{
-                "title":"Dźwięki treningu",
-                "background_sound":"Dźwięk w tle",
-                "preparation_sound":"Dźwięk przygotowania"
+            "TrainingMusic":{
+                "title":"Muzyka treningu",
+                "background_music":"Muzyka w tle",
+                "preparation_music":"Muzyka przygotowania",
+                "counting_sound":"Dźwięk odliczania"
             },
 
-            "StepSounds":{
-                "title":"Dźwięki kroków"
+            "PhaseSounds":{
+                "title":"Dźwięki w tle etapów"
             },
 
-            "NextStepSounds":{
-                "title":"Dźwięki kolejnej fazy",
+            "NextPhaseSounds":{
+                "title":"Dźwięk rozpoczęcia fazy",
                 "global":"Globalny",
                 "for_each_phase":"Dla każdej fazy",
                 "next_step_sound_label":"Dźwięk następnej fazy"
             },
+
+            "AudioSelectionPopup":{
+                "title":"Wybierz dźwięk",
+                "user_sounds":"Dźwięki użytkownika",
+                "add_custom_sound_button_label":"Dodaj własny dźwięk"
+            },
             
             "None":"Brak"
 
+        },
+        "SoundOption":{
+            "none":"Brak",
+            "voice":"Głos",
+            "tic":"Tyk",
+            "gong":"Gong"
         },
 
         "OtherTab":{
@@ -107,5 +121,11 @@
         "exhale":"Wydech",
         "retention":"Wstrzymanie",
         "recovery":"Regeneracja"
+    },
+    "ProfilePage":{
+        "page_title":"Mój Profil",
+        "badges_title":"Odznaki",
+        "default_name":"Jan Kowalski",
+        "default_email":"jan.kowalski@poczta.pl"
     }
 }

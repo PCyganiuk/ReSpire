@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:respire/components/TrainingEditorPage/AudioListTile.dart';
 import 'package:respire/services/SoundManager.dart';
+import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 import 'package:respire/theme/Colors.dart';
 
@@ -16,7 +17,8 @@ class AudioSelectionPopup extends StatefulWidget {
 
 class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
   
-    final SoundManager _soundManager = SoundManager();
+  final SoundManager _soundManager = SoundManager();
+  final TranslationProvider _translationProvider = TranslationProvider();
   
   Future<void> _togglePlay(String soundName) async {
     if (_soundManager.currentlyPlaying.value == soundName) {
@@ -35,7 +37,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
           : UserSoundsDatabase().userShortSounds;
 
     final itemsMap = {
-      "None": null,
+      _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.None"): null,
       ..._soundManager.getSounds(widget.listType)
     };
 
@@ -56,12 +58,12 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(_translationProvider.getTranslation("PopupButton.cancel")),
             ),
           ],
         ),
       ],
-      title: const Text('Select Audio'),
+      title: Text(_translationProvider.getTranslation("TrainingEditorPage.SoundsTab.AudioSelectionPopup.title")),
       content: SizedBox(
         width: 300,
         child: ConstrainedBox(
@@ -154,7 +156,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
     return TextButton.icon(
       onPressed: _addCustomSound,
       icon: const Icon(Icons.add, color: Colors.white),
-      label: const Text("Add Custom Sound", style: TextStyle(color: Colors.white)),
+      label: Text(_translationProvider.getTranslation("TrainingEditorPage.SoundsTab.AudioSelectionPopup.add_custom_sound_button_label"), style: TextStyle(color: Colors.white)),
       style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
     );
   }
@@ -166,7 +168,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'User sounds',
+                _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.AudioSelectionPopup.user_sounds"),
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const Divider(thickness: 1),

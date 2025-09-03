@@ -22,7 +22,7 @@ Future<void> initialize() async
   await Hive.initFlutter();
   // If any changes in loaded data occur, uncomment the following
   // line to delete the data and load it again
-  //await Hive.deleteBoxFromDisk('respire'); // disable deleting local storage to retain presets between restarts
+  // await Hive.deleteBoxFromDisk('respire'); // disable deleting local storage to retain presets between restarts
   Hive.registerAdapter(StepTypeAdapter());
   Hive.registerAdapter(BreathTypeAdapter());
   Hive.registerAdapter(BreathDepthAdapter());
@@ -46,8 +46,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
+    final translationProvider = TranslationProvider();
+    return AnimatedBuilder(
+      animation: translationProvider,
+      builder: (context, _) => MaterialApp(
+        theme: ThemeData(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         textSelectionTheme: TextSelectionThemeData(
@@ -77,10 +80,11 @@ class MainApp extends StatelessWidget {
             fontSize: 16,
             color: Colors.black,
           ),
+    ),
         ),
+        debugShowCheckedModeBanner: false,
+        home: HomePage(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: HomePage()
     );
   }
 }

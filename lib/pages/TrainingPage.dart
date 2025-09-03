@@ -6,7 +6,6 @@ import 'package:respire/pages/TrainingEditorPage.dart';
 import 'package:respire/services/PresetDataBase.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
-import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
 
 class TrainingPage extends StatefulWidget {
   final int index;
@@ -100,31 +99,11 @@ class _TrainingPageState extends State<TrainingPage> {
                 child: Center(
                   child: Padding(
                     padding: EdgeInsets.all(10),
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(color: greenblue), // domyślny styl dla zwykłego tekstu
-                        children: [
-                          if (training.description == '')
-                            TextSpan(
-                              text: translationProvider.getTranslation("TrainingPage.description_placeholder"),
-                            ),
-                          if (training.description == '')
-                            TextSpan(
-                              text: training.title, 
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          if (training.description == '')
-                            TextSpan(
-                              text: ".",
-                            ),
-                          if (training.description != '')
-                            TextSpan(
-                              text: training.description,
-                            ),
-                        ],
-                      ),
+                    child: Text(
+            training.description == ''
+              ? '${translationProvider.getTranslation("TrainingPage.description_placeholder_prefix")} ${training.title}'
+              : training.description,
+                      style: TextStyle(color: greenblue),
                     ),
                   ),
                 ))));

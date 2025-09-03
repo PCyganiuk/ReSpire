@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Sounds.dart';
-import 'dart:async';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Settings.dart';
@@ -30,11 +29,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late TextEditingController preparationController;
   late TextEditingController descriptionController;
   final ScrollController _scrollController = ScrollController();
-  TextEditingController trainingNameController = TextEditingController();
-  Timer? _debounce;
-
-  // Focus management
-  final FocusNode _titleFocusNode = FocusNode();
   final FocusNode _descriptionFocusNode = FocusNode();
   FocusNode? _preparationFocusNode;
 
@@ -43,15 +37,17 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   final List<String> _soundOptions = SoundManager().getAvailableSounds();
   late Sounds _sounds;
 
+  TranslationProvider _translationProvider = TranslationProvider();
+
   //Next step sound options
-  final Map<String,String?> _showNextStepSoundOptions = {
-    "None": null,
+  late Map<String,String?> _showNextStepSoundOptions = {
+    _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.None"): null,
     "Global": "global",
     "For each phase": "phase",
   };
 
-  //Counting sounds tab state
-  final List<String> _countingSoundOptions = ["None", "Voice", "Tic", "Gong"];
+  // Counting sounds options (internal values capitalized)
+  late final List<String> _countingSoundOptions = ["None", "Voice", "Tic", "Gong"];
 
   //To remove, when tic and gong sounds will be added
   final disabledOptions = {'Tic', 'Gong'};
@@ -66,18 +62,20 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   @override
   void initState() {
     super.initState();
+    _initializeStepSoundOptions();
     phases = widget.training.phases;
     _sounds = widget.training.sounds;
-    settings = widget.training.settings;
-    trainingNameController.text = widget.training.title;
     descriptionController = TextEditingController(text: widget.training.description);
     preparationController = TextEditingController(text: widget.training.settings.preparationDuration.toString());
     _preparationFocusNode = FocusNode();
   }
 
-  void saveTraining() {
-    // TODO: implement actual saving logic, e.g., write to local storage or call an API
-    print("Training saved: ${widget.training.title}");
+  void _initializeStepSoundOptions() {
+    _showNextStepSoundOptions = {
+    _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.None"): null,
+    _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextPhaseSounds.global"): "global",
+    _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextPhaseSounds.for_each_phase"): "phase",
+  };
   }
 
   void addPhase() {
@@ -93,7 +91,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       // Clear any active focus when adding new phase to prevent keyboard issues
       FocusScope.of(context).unfocus();
     });
-    saveTraining();
   }
 
   void removePhase(int index) async {
@@ -125,7 +122,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       setState(() {
         phases.removeAt(index);
       });
-      saveTraining();
     }
   }
 
@@ -135,47 +131,45 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       final phase = phases.removeAt(oldIndex);
       phases.insert(newIndex, phase);
     });
-    saveTraining();
   }
 
   @override
   void dispose() {
-    trainingNameController.dispose();
     descriptionController.dispose();
-    preparationController.dispose();
-    _titleFocusNode.dispose();
     _descriptionFocusNode.dispose();
-    _preparationFocusNode?.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
   
   void showEditTitleDialog(BuildContext context) {
+    final tempController = TextEditingController(text: widget.training.title);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white, 
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_title"), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkerblue)),
+        title: Text(
+          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_title"),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkerblue),
+        ),
         content: TextField(
-          controller: trainingNameController,
+          controller: tempController,
           autofocus: true,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12), 
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: darkerblue,
-                width: 2.0, 
+                width: 2.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12), 
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: darkerblue,
-                width: 2.0, 
+                width: 2.0,
               ),
             ),
             hintText: translationProvider.getTranslation("TrainingEditorPage.TrainingTab.edit_title_dialog_hint"),
@@ -183,17 +177,16 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         ),
         actions: [
           TextButton(
-            child: Text(translationProvider.getTranslation("PopupButton.cancel")),
-            onPressed: () => Navigator.of(context).pop(),
+            child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
+            onPressed: () => Navigator.of(context).pop(), // discard changes
           ),
           ElevatedButton(
             child: Text(translationProvider.getTranslation("PopupButton.save"), style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
             onPressed: () {
               setState(() {
-                widget.training.title = trainingNameController.text;
+                widget.training.title = tempController.text.trim();
               });
-              saveTraining();
               Navigator.of(context).pop();
             },
           ),
@@ -212,24 +205,16 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: TextField(
-            controller: trainingNameController,
-            focusNode: _titleFocusNode,
-            decoration: InputDecoration(border: InputBorder.none),
+          title: Text(
+            widget.training.title,
             style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
-            onChanged: (value) {
-              widget.training.title = value;
-              if (_debounce?.isActive ?? false) _debounce!.cancel();
-              _debounce = Timer(Duration(milliseconds: 500), () {
-                saveTraining();
-              });
-            },
+            overflow: TextOverflow.ellipsis,
           ),
           actions: [
             IconButton(
               icon: Icon(Icons.edit, color: darkerblue),
               onPressed: () => showEditTitleDialog(context),
-              splashRadius: 20, 
+              splashRadius: 20,
             ),
           ],
           backgroundColor: Colors.white,
@@ -250,9 +235,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                   },
                   initialValue: _selectedTab,
                   onValueChanged: (val) {
-                    setState(() => _selectedTab = val);
-                    // Clear focus when switching tabs to prevent focus issues
+                    // Clear focus first so TextFields lose focus and commit
                     FocusScope.of(context).unfocus();
+                    setState(() => _selectedTab = val);
                   },
                   decoration: BoxDecoration(
                     color: darkerblue,
@@ -288,7 +273,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                               onDelete: () => removePhase(index),
                               onUpdate: () {
                                 setState(() => widget.training.phases = phases);
-                                saveTraining();
                               },
                             ),
                         ],
@@ -301,7 +285,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 6),
                               child: Text(
-                                translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.title"),
+                                translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.title"),
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                             ),
@@ -314,9 +298,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                                 child: Column(
                                   children: [
-                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.background_sound"), selectedValue: _sounds.backgroundSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.backgroundSound = v; })),
-                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.preparation_sound"), selectedValue: _sounds.preparationSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationSound = v; })),
-                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.background_music"), selectedValue: _sounds.backgroundSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.backgroundSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"), selectedValue: _sounds.preparationSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationSound = v; })),
+                                    SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.counting_sound"), selectedValue: _sounds.countingSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound = v; })),
                                   
                                   ],
                                 ),
@@ -326,7 +310,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 6),
                               child: Text(
-                                translationProvider.getTranslation("TrainingEditorPage.SoundsTab.StepSounds.title"),
+                                translationProvider.getTranslation("TrainingEditorPage.SoundsTab.PhaseSounds.title"),
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                             ),
@@ -353,7 +337,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                               child: Row(
                                 children: [
                                   Text(
-                                    translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextStepSounds.title"),
+                                    translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextPhaseSounds.title"),
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                   SizedBox(width: 8),
@@ -394,7 +378,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                 child: Column(
                                   children: [
                                     if(_sounds.nextSound=="global") ...[
-                                      SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextStepSounds.global"), selectedValue: _sounds.nextGlobalSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextGlobalSound = v; }))
+                                      SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.NextPhaseSounds.global"), selectedValue: _sounds.nextGlobalSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextGlobalSound = v; }))
                                     ] 
                                     else
                                     ...[SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.nextInhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextInhaleSound = v; })),
@@ -447,7 +431,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       ),
                                       onChanged: (value) {
                                         widget.training.description = value;
-                                        saveTraining();
                                       },
                                     ),
                                     SizedBox(height: 12),
@@ -494,7 +477,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   setState(() {
                                                     widget.training.settings.preparationDuration = newValue;
                                                   });
-                                                  saveTraining();
                                                 },
                                                 child: const Padding(
                                                   padding: EdgeInsets.all(8),
@@ -522,7 +504,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   setState(() {
                                                     widget.training.settings.preparationDuration = newValue;
                                                   });
-                                                  saveTraining();
                                                 },
                                                 child: const Padding(
                                                   padding: EdgeInsets.all(8),
@@ -549,7 +530,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
              ? FloatingActionButton.extended(
                  onPressed: addPhase,
                  backgroundColor: darkerblue,
-                 label: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.add_phase_button_label"), style: TextStyle(color: Colors.white)),
+                 label: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.add_stage_button_label"), style: TextStyle(color: Colors.white)),
                  icon: Icon(Icons.add, color: Colors.white),
                )
              : null,

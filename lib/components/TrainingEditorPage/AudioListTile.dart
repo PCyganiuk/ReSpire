@@ -20,6 +20,7 @@ class AudioListTile extends StatelessWidget {
     this.onRemove = _defaultOnRemove,
   });
 
+  static const List<String?> specialValues = [null, "voice"];
   static void _defaultOnRemove() {}
 
   @override
@@ -36,7 +37,7 @@ class AudioListTile extends StatelessWidget {
           textColor: Colors.black,
           titleTextStyle: isSelected ? TextStyle(fontWeight: FontWeight.bold):TextStyle(fontWeight: FontWeight.normal),
           selectedTileColor: Color.fromARGB(99, 156, 156, 156),
-          leading: IconButton(onPressed: onPlayToggle, icon: entry.value == null ? Icon(Icons.volume_off, color: Colors.grey) : isPlaying ? Icon(Icons.pause, color: Colors.red) : Icon(Icons.play_arrow, color: Colors.green)),
+          leading: IconButton(onPressed: onPlayToggle, iconSize:35, icon: isSpecialValue(entry.value) ? Icon(Icons.volume_off, color: Colors.grey) : isPlaying ? Icon(Icons.pause, color: Colors.red) : Icon(Icons.play_arrow, color: Colors.green)),
           title: Text(entry.key, overflow: TextOverflow.clip, maxLines: 1,),
           trailing: isRemovable ? IconButton(onPressed: () => _removeUserEntry(context, onRemove), icon: Icon(Icons.delete, color: Colors.red)) : null,
           onTap: onTap,
@@ -45,7 +46,11 @@ class AudioListTile extends StatelessWidget {
     );
   }
 
- void _removeUserEntry(BuildContext context, VoidCallback onConfirmed) {
+  bool isSpecialValue(String? value) {
+    return specialValues.contains(value);
+  }
+
+  void _removeUserEntry(BuildContext context, VoidCallback onConfirmed) {
     showDialog(
       context: context,
       builder: (context) {
