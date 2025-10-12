@@ -23,9 +23,9 @@ class Phase {
 
   Phase({
     required this.reps,
-    required this.increment, // Value in seconds 
+    required this.increment,
     required this.steps,
-    this.name = "Phase", //Default name
+    this.name = '',
   });
 
   void addStep(Step step)

@@ -132,6 +132,54 @@ class _BreathingPageState extends State<BreathingPage> {
         children: [
           SizedBox(height: 16),
 
+          ValueListenableBuilder<String>(
+            valueListenable: controller.currentPhaseName,
+            builder: (context, stageName, _) {
+              final trimmed = stageName.trim();
+              final hasLabel = trimmed.isNotEmpty;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Visibility(
+                      visible: hasLabel,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: Text(
+                        translationProvider
+                            .getTranslation("BreathingPage.current_stage_label"),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Visibility(
+                      visible: hasLabel,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: Text(
+                        trimmed,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+              );
+            },
+          ),
+
           //instructions
           ValueListenableBuilder<Queue<training_step.Step?>>(
             valueListenable: controller.stepsQueue,

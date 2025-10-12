@@ -65,6 +65,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     super.initState();
     _initializeStepSoundOptions();
     phases = widget.training.phases;
+    _ensurePhaseNames();
     _sounds = widget.training.sounds;
     descriptionController = TextEditingController(text: widget.training.description);
     preparationController = TextEditingController(text: widget.training.settings.preparationDuration.toString());
@@ -79,9 +80,21 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   };
   }
 
+  void saveTraining() {
+    // TODO: implement actual saving logic, e.g., write to local storage or call an API
+    print("Training saved: ${widget.training.title}");
+  }
+
   void addPhase() {
     setState(() {
-      phases.add(Phase(reps: 3, steps: [], increment: 0));
+      final newPhaseIndex = phases.length;
+      phases.add(Phase(
+        reps: 3,
+        steps: [],
+        increment: 0,
+        name: _defaultStageName(newPhaseIndex),
+      ));
+      _ensurePhaseNames();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -122,6 +135,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (confirmDelete ?? false) {
       setState(() {
         phases.removeAt(index);
+        _ensurePhaseNames();
       });
     }
   }
@@ -131,6 +145,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       if (newIndex > oldIndex) newIndex -= 1;
       final phase = phases.removeAt(oldIndex);
       phases.insert(newIndex, phase);
+      _ensurePhaseNames();
     });
   }
 
@@ -139,6 +154,23 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     descriptionController.dispose();
     _descriptionFocusNode.dispose();
     super.dispose();
+  }
+
+  void _ensurePhaseNames() {
+    for (var i = 0; i < phases.length; i++) {
+      if (phases[i].name.trim().isEmpty) {
+        phases[i].name = _defaultStageName(i);
+      }
+    }
+  }
+
+  String _defaultStageName(int index) {
+    final template = translationProvider
+        .getTranslation("TrainingEditorPage.TrainingTab.default_stage_name");
+    if (template.contains('{number}')) {
+      return template.replaceAll('{number}', (index + 1).toString());
+    }
+    return "Stage ${index + 1}";
   }
 
   
@@ -306,6 +338,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                               onDelete: () => removePhase(index),
                               onUpdate: () {
                                 setState(() => widget.training.phases = phases);
+                                _ensurePhaseNames();
+                                saveTraining();
                               },
                             ),
                         ],

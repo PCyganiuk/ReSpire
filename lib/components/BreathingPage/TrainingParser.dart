@@ -50,8 +50,9 @@ class TrainingParser {
     log('prePhase: ${progressedStep.sounds.prePhase}, background ${progressedStep.sounds.background}');
 
     return {
-      "step": progressedStep,
-      "remainingTime": (durationSeconds * 1000).truncate(),
+      "step": currentStep,
+      "remainingTime": (currentStep.getStepDuration(doneReps) * 1000).truncate(),
+      "phaseName": currentPhase.name,
     };
   }
 

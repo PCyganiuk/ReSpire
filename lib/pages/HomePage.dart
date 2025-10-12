@@ -176,13 +176,13 @@ class _HomePageState extends State<HomePage> {
                       ? PresetTile(
                           values: db.presetList[index],
                           onClick: () async {
-                            // Expect a bool? (true when training was modified/removed and Home should refresh)
-                            final bool? updated = await Navigator.push<bool>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TrainingPage(index: index),
-                              ),
-                            );
+                            final updated = await Navigator.push<bool>(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        TrainingPage(index: index)));
+
+                            // If the user updated (removed) the training, refresh the state
                             if (updated == true) {
                               setState(() {});
                             }

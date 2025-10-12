@@ -13,9 +13,11 @@ class TrainingController {
   final TrainingParser parser;
   final ValueNotifier<Queue<training_step.Step?>> stepsQueue =
       ValueNotifier(Queue<training_step.Step?>());
+  final Queue<String?> _phaseNameQueue = Queue<String?>();
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> stepsCount = ValueNotifier(0);
+  final ValueNotifier<String> currentPhaseName = ValueNotifier('');
 
   final int _updateInterval = 100; //in milliseconds
   final int _stepDelayDuration = 600; //in milliseconds
@@ -48,6 +50,8 @@ class TrainingController {
 
   void _preloadSteps() {
     stepsQueue.value.add(null);
+    _phaseNameQueue.add(null);
+    _updateCurrentPhaseLabel();
     _fetchNextStep();
     _nextRemainingTime = _newStepRemainingTime;
     _fetchNextStep();
@@ -58,21 +62,28 @@ class TrainingController {
     if (instructionData == null) {
       _finished = true;
       stepsQueue.value.add(null);
+      _phaseNameQueue.add(null);
       return;
     }
     stepsQueue.value.add(instructionData["step"]);
+    _phaseNameQueue.add(_resolvePhaseName(
+        instructionData["phaseName"] as String?, parser.phaseID));
     _newStepRemainingTime = instructionData["remainingTime"];
   }
 
   void pause() {
     isPaused.value = true;
-    soundManager.pauseSound(_currentSound);
+    if (_currentSound != null) {
+      SoundManager().pauseSound(_currentSound!);
+    }
     _timer?.cancel();
   }
 
   void resume() {
     isPaused.value = false;
-    soundManager.playSound(_currentSound);
+    if (_currentSound != null) {
+      SoundManager().playSound(_currentSound!);
+    }
     _start();
   }
 
@@ -144,6 +155,7 @@ class TrainingController {
       // step delay for reading the name (enter delay when main time finished)
       if (_remainingTime == 0 && _stepDelay && _stopTimer != 0) {
         stepsCount.value++;
+        _updateCurrentPhaseLabel(peekNext: true);
         if (stepsQueue.value.elementAt(1) != null) {
           second.value = 0;
           training_step.Step step = stepsQueue.value.elementAt(1)!;
@@ -151,11 +163,21 @@ class TrainingController {
           _playPrePhaseSound(step);
           currentBackgroundSound = step.sounds.background;
         }
-        _stepDelay = false; 
-      } else if (_remainingTime == 0 && _stepDelayRemainingTime > 0) {
-        // decrement delay with elapsed time
-        if (_stepDelayRemainingTime > elapsed) {
-          _stepDelayRemainingTime -= elapsed;
+        _stepDelay = false;
+
+        //step delay time update
+      } else if (_stepDelayRemainingTime >= _updateInterval) {
+        _stepDelayRemainingTime -= _updateInterval;
+
+        //two last steps
+      } else if (_finished) {
+        //last step
+        if (_stopTimer == 0) {
+          second.value = 0;
+          _timer?.cancel();
+          currentPhaseName.value = '';
+
+          //one step before last
         } else {
           _stepDelayRemainingTime = 0;
         }
@@ -181,6 +203,13 @@ class TrainingController {
         } else if (!_stepDelay) {
           // start new step
           stepsQueue.value.removeFirst();
+          if (_phaseNameQueue.isNotEmpty) {
+            _phaseNameQueue.removeFirst();
+          }
+          stepsQueue.value.add(null);
+          _phaseNameQueue.add(null);
+          stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
+          _updateCurrentPhaseLabel();
           _remainingTime = _nextRemainingTime;
           _nextRemainingTime = _newStepRemainingTime;
           previousSecond = _remainingTime ~/ 1000;
@@ -190,6 +219,21 @@ class TrainingController {
           _stepDelay = true;
           _stepDelayRemainingTime = _stepDelayDuration;
         }
+
+        //new step updates
+      } else {
+        stepsQueue.value.removeFirst();
+        if (_phaseNameQueue.isNotEmpty) {
+          _phaseNameQueue.removeFirst();
+        }
+        _remainingTime = _nextRemainingTime;
+        _nextRemainingTime = _newStepRemainingTime;
+        previousSecond = _remainingTime ~/ 1000;
+        _fetchNextStep();
+        stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
+        _updateCurrentPhaseLabel();
+        _stepDelay = true;
+        _stepDelayRemainingTime = _stepDelayDuration;
       }
     });
   }
@@ -198,6 +242,48 @@ class TrainingController {
     TextToSpeechService().stopSpeaking();
     soundManager.stopAllSounds();
     _timer?.cancel();
+    currentPhaseName.dispose();
+  }
+
+  String _resolvePhaseName(String? rawName, int phaseIndex) {
+    final cleaned = rawName?.trim();
+    if (cleaned != null && cleaned.isNotEmpty) {
+      return cleaned;
+    }
+    return _defaultStageName(phaseIndex);
+  }
+
+  void _updateCurrentPhaseLabel({bool peekNext = false}) {
+    String? name;
+    if (peekNext) {
+      if (_phaseNameQueue.length > 1) {
+        name = _phaseNameQueue.elementAt(1);
+      } else {
+        name = null;
+      }
+    } else {
+      if (_phaseNameQueue.isEmpty) {
+        name = null;
+      } else {
+        name = _phaseNameQueue.first;
+      }
+    }
+
+    final trimmed = name?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      currentPhaseName.value = '';
+    } else {
+      currentPhaseName.value = trimmed;
+    }
+  }
+
+  String _defaultStageName(int index) {
+    final template = translationProvider
+        .getTranslation("BreathingPage.default_stage_name");
+    if (template.contains('{number}')) {
+      return template.replaceAll('{number}', (index + 1).toString());
+    }
+    return 'Stage ${index + 1}';
   }
   
 }

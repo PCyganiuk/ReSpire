@@ -14,7 +14,7 @@
 
     "SettingsPage":{
         "page_title":"Settings",
-        "app_section_title":"Application",
+        "app_section_title":"App",
         "language_label":"Language"
     },
 
@@ -24,6 +24,7 @@
         "description_placeholder_prefix":"Add training description for:",
         "TrainingOverview":{
             "title":"Training Overview",
+            "stage":"Stage",
             "reps":"Reps",
             "increment":"Inc"
         },
@@ -43,11 +44,14 @@
             "edit_title_dialog_title":"Edit training title",
             "edit_title_dialog_hint":"Enter training title",
             "error":"Title cannot be empty",
-            "remove_phase_dialog_title":"Remove phase?",
-            "remove_phase_dialog_content":"Are you sure you want to remove this phase?",
             "add_stage_button_label":"Add training stage",
+            "remove_phase_dialog_title":"Remove stage?",
+            "remove_phase_dialog_content":"Are you sure you want to remove this stage?",
+            "default_stage_name":"Stage {number}",
 
             "PhaseTile":{
+                "name":"Stage name",
+                "name_placeholder":"Enter stage name",
                 "reps":"Reps",
                 "increment":"Inc (s)",
                 "add_phase_button_label":"Add breathing phase"
@@ -76,7 +80,7 @@
             "NextPhaseSounds":{
                 "title":"Next phase sounds",
                 "global":"Global",
-                "for_each_phase":"For each phase",
+                "for_each_phase":"For each stage",
                 "next_step_sound_label":"Next step sound"
             },
 
@@ -102,7 +106,7 @@
             "next_step_label":"Next step",
             "chart_label":"Chart",
             "step_colors_label":"Step colors",
-            "preparation_duration_label":"Duration of preparation phase (s)"
+            "preparation_duration_label":"Duration of preparation stage (s)"
         }
     },
 
@@ -110,6 +114,8 @@
         "exit_popup_title":"Exit",
         "exit_popup_message":"Are you sure you want exit?\nIf you click \"Yes\" your session will end.",
         "circle_paused_text":"Resume",
+        "current_stage_label":"Current stage",
+        "default_stage_name":"Stage {number}",
         
         "InstructionSlider":{
             "get_ready_block_text":"Get ready",

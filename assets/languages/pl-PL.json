@@ -24,6 +24,7 @@
         "description_placeholder_prefix":"Dodaj opis treningu dla:",
         "TrainingOverview":{
             "title":"Przegląd treningu",
+            "stage":"Etap",
             "reps":"Powtórzenia",
             "increment":"Przyrost"
         },
@@ -46,8 +47,11 @@
             "remove_phase_dialog_title":"Usunąć fazę?",
             "remove_phase_dialog_content":"Na pewno chcesz usunąć fazę?",
             "add_stage_button_label":"Dodaj etap treningu",
+            "default_stage_name":"Etap {number}",
             
             "PhaseTile":{
+                "name":"Nazwa etapu",
+                "name_placeholder":"Wpisz nazwę etapu",
                 "reps":"Powtórzenia",
                 "increment":"Przyrost (s)",
                 "add_phase_button_label":"Dodaj fazę oddechu"
@@ -110,6 +114,8 @@
         "exit_popup_title":"Wyjdź",
         "exit_popup_message":"Zakończyć trening?\nJeśli naciśniesz \"Tak\" twój trening zostanie przerwany.",
         "circle_paused_text":"Wznów",
+        "current_stage_label":"Aktualny etap",
+        "default_stage_name":"Etap {number}",
         
         "InstructionSlider":{
             "get_ready_block_text":"Przygotuj się",
