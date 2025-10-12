@@ -223,7 +223,9 @@ class _TrainingPageState extends State<TrainingPage> {
             ? Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: Column(
-                  children: phases.map((phase) {
+                  children: phases.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final phase = entry.value;
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: 6),
                       child: Card(
@@ -236,6 +238,15 @@ class _TrainingPageState extends State<TrainingPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text(
+                                _phaseDisplayName(phase, index),
+                                style: TextStyle(
+                                  color: darkerblue,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 6),
                               Text(
                                 '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${phase.reps} ${translationProvider.getTranslation("TrainingPage.TrainingOverview.increment")}: ${phase.increment} [s]',
                                 style: TextStyle(
@@ -288,6 +299,16 @@ class _TrainingPageState extends State<TrainingPage> {
             : SizedBox.shrink(),
       ),
     );
+  }
+
+  String _phaseDisplayName(Phase phase, int index) {
+    final trimmed = phase.name.trim();
+    if (trimmed.isNotEmpty) {
+      return trimmed;
+    }
+    final template = translationProvider
+        .getTranslation("TrainingPage.TrainingOverview.stage");
+    return '$template ${index + 1}';
   }
 
   Widget trainingOverview(double screenWidth) {

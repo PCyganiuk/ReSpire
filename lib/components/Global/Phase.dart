@@ -18,10 +18,14 @@ class Phase {
   @HiveField(3)
   List<Step> steps;
 
+  @HiveField(4)
+  String name;
+
   Phase({
     required this.reps,
     required this.increment,
-    required this.steps
+    required this.steps,
+    this.name = '',
   });
 
   void addStep(Step step)

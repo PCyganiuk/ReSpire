@@ -20,13 +20,14 @@ class PhaseAdapter extends TypeAdapter<Phase> {
       reps: fields[0] as int,
       increment: fields[2] as int,
       steps: (fields[3] as List).cast<Step>(),
-    )..doneRepsCounter = fields[1] as int;
+      name: fields[4] as String? ?? '',
+  )..doneRepsCounter = (fields[1] as int?) ?? 0;
   }
 
   @override
   void write(BinaryWriter writer, Phase obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.reps)
       ..writeByte(1)
@@ -34,7 +35,9 @@ class PhaseAdapter extends TypeAdapter<Phase> {
       ..writeByte(2)
       ..write(obj.increment)
       ..writeByte(3)
-      ..write(obj.steps);
+      ..write(obj.steps)
+      ..writeByte(4)
+      ..write(obj.name);
   }
 
   @override

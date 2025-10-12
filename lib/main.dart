@@ -11,8 +11,12 @@ import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 import 'theme/Colors.dart';
+import 'dart:ui' as ui;
 
 void main() async{
+  
+  WidgetsFlutterBinding.ensureInitialized();
+
   await initialize();
   runApp(const MainApp());
 }

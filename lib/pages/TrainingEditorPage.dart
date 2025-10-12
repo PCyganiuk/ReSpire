@@ -67,6 +67,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void initState() {
     super.initState();
     phases = widget.training.phases;
+    _ensurePhaseNames();
     _sounds = widget.training.sounds;
     settings = widget.training.settings;
     trainingNameController.text = widget.training.title;
@@ -82,7 +83,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   void addPhase() {
     setState(() {
-      phases.add(Phase(reps: 3, steps: [], increment: 0));
+      final newPhaseIndex = phases.length;
+      phases.add(Phase(
+        reps: 3,
+        steps: [],
+        increment: 0,
+        name: _defaultStageName(newPhaseIndex),
+      ));
+      _ensurePhaseNames();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -124,6 +132,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (confirmDelete ?? false) {
       setState(() {
         phases.removeAt(index);
+        _ensurePhaseNames();
       });
       saveTraining();
     }
@@ -134,6 +143,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       if (newIndex > oldIndex) newIndex -= 1;
       final phase = phases.removeAt(oldIndex);
       phases.insert(newIndex, phase);
+      _ensurePhaseNames();
     });
     saveTraining();
   }
@@ -148,6 +158,23 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     _preparationFocusNode?.dispose();
     _debounce?.cancel();
     super.dispose();
+  }
+
+  void _ensurePhaseNames() {
+    for (var i = 0; i < phases.length; i++) {
+      if (phases[i].name.trim().isEmpty) {
+        phases[i].name = _defaultStageName(i);
+      }
+    }
+  }
+
+  String _defaultStageName(int index) {
+    final template = translationProvider
+        .getTranslation("TrainingEditorPage.TrainingTab.default_stage_name");
+    if (template.contains('{number}')) {
+      return template.replaceAll('{number}', (index + 1).toString());
+    }
+    return "Stage ${index + 1}";
   }
 
   
@@ -288,6 +315,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                               onDelete: () => removePhase(index),
                               onUpdate: () {
                                 setState(() => widget.training.phases = phases);
+                                _ensurePhaseNames();
                                 saveTraining();
                               },
                             ),

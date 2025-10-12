@@ -54,6 +54,7 @@ class TrainingParser {
     return {
       "step": currentStep,
       "remainingTime": (currentStep.getStepDuration(doneReps) * 1000).truncate(),
+      "phaseName": currentPhase.name,
     };
 }
 
