@@ -11,12 +11,8 @@ class PhaseSounds {
   @HiveField(1)
   String? background;
 
-  @HiveField(2)
-  String? counting;
-
   PhaseSounds({
     this.prePhase,
-    this.background,
-    this.counting,
+    this.background
   });
 }

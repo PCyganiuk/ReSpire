@@ -1,35 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'PhaseSounds.dart';
+part of 'TrainingSounds.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PhaseSoundsAdapter extends TypeAdapter<PhaseSounds> {
+class TrainingSoundsAdapter extends TypeAdapter<TrainingSounds> {
   @override
-  final int typeId = 11;
+  final int typeId = 12;
 
   @override
-  PhaseSounds read(BinaryReader reader) {
+  TrainingSounds read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return PhaseSounds(
-      prePhase: fields[0] as String?,
-      background: fields[1] as String?,
+    return TrainingSounds(
+      preparation: fields[0] as String?,
+      ending: fields[1] as String?,
+      counting: fields[2] as String?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, PhaseSounds obj) {
+  void write(BinaryWriter writer, TrainingSounds obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.prePhase)
+      ..write(obj.preparation)
       ..writeByte(1)
-      ..write(obj.background);
+      ..write(obj.ending)
+      ..writeByte(2)
+      ..write(obj.counting);
   }
 
   @override
@@ -38,7 +41,7 @@ class PhaseSoundsAdapter extends TypeAdapter<PhaseSounds> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PhaseSoundsAdapter &&
+      other is TrainingSoundsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
