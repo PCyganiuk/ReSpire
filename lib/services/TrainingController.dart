@@ -78,7 +78,7 @@ class TrainingController {
 
   Future<void> _handleBackgroundSoundChange(training_step.Step step) async {
     await soundManager.pauseSoundFadeOut(_currentSound, (_stepDelayDuration / 2).toInt());
-    _currentSound = step.sound;
+    _currentSound = step.sounds.background;
     await soundManager.playSoundFadeIn(_currentSound, (_stepDelayDuration / 2).toInt());
   }
 

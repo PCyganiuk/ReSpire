@@ -23,10 +23,19 @@ class Training {
   @HiveField(4)
   Settings settings = Settings();
 
+  @HiveField(5)
+  String? globalBackgroundSound;
+
   Training({
     required this.title,
     required this.phases,
     this.description = '',
   });
 
+  // Call this method after loading or modifying the training to ensure that all phases and steps have the correct background sounds.
+  void propagateBackgroundSounds() {
+    for (var phase in phases) {
+      phase.propabateBackgroundSound(globalBackgroundSound);
+    }
+  }
 }

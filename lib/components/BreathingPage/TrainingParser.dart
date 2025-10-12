@@ -43,16 +43,16 @@ class TrainingParser {
     // Assign sound based on step type (global training sounds currently used)
     switch (currentStep.stepType) {
       case training_step.StepType.inhale:
-        currentStep.sound = training.sounds.inhaleSound;
+        currentStep.sounds.background = training.sounds.inhaleSound;
         break;
       case training_step.StepType.retention:
-        currentStep.sound = training.sounds.retentionSound;
+        currentStep.sounds.background = training.sounds.retentionSound;
         break;
       case training_step.StepType.exhale:
-        currentStep.sound = training.sounds.exhaleSound;
+        currentStep.sounds.background = training.sounds.exhaleSound;
         break;
       case training_step.StepType.recovery:
-        currentStep.sound = training.sounds.recoverySound;
+        currentStep.sounds.background = training.sounds.recoverySound;
         break;
     }
 
@@ -68,7 +68,7 @@ class TrainingParser {
       stepType: currentStep.stepType,
       breathType: currentStep.breathType,
       breathDepth: currentStep.breathDepth,
-      sound: currentStep.sound,
+      sounds: currentStep.sounds,
     );
 
     return {
