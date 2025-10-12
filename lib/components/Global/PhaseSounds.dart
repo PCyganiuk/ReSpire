@@ -1,5 +1,4 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:respire/components/Global/Step.dart';
 
 part 'PhaseSounds.g.dart';
 
