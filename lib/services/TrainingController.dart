@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart' as training_step;
-import 'package:respire/services/SoundManager.dart';
+import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
@@ -33,11 +33,13 @@ class TrainingController {
   late Sounds _sounds;
 
   String? _currentSound;
+  late SoundManager soundManager;
 
   TranslationProvider translationProvider = TranslationProvider();
 
   TrainingController(this.parser) {
-    SoundManager().stopAllSounds();
+    soundManager = SoundManager();
+    soundManager.stopAllSounds();
     _remainingTime = parser.training.settings.preparationDuration * 1000;
     _sounds = parser.training.sounds;
     _preloadSteps();
@@ -64,22 +66,20 @@ class TrainingController {
 
   void pause() {
     isPaused.value = true;
-    SoundManager().pauseSound(_currentSound);
+    soundManager.pauseSound(_currentSound);
     _timer?.cancel();
   }
 
   void resume() {
     isPaused.value = false;
-    SoundManager().playSound(_currentSound);
+    soundManager.playSound(_currentSound);
     _start();
   }
 
   Future<void> _handleBackgroundSoundChange(training_step.Step step) async {
-    await SoundManager()
-        .pauseSoundFadeOut(_currentSound, (_stepDelayDuration / 2).toInt());
+    await soundManager.pauseSoundFadeOut(_currentSound, (_stepDelayDuration / 2).toInt());
     _currentSound = step.sound;
-    await SoundManager()
-        .playSoundFadeIn(_currentSound, (_stepDelayDuration / 2).toInt());
+    await soundManager.playSoundFadeIn(_currentSound, (_stepDelayDuration / 2).toInt());
   }
 
   void _playCountingSound(previousSecond) {
@@ -90,7 +90,7 @@ class TrainingController {
       case "None":
         break;
       default:
-        SoundManager().playSound(_sounds.countingSound);
+        soundManager.playSound(_sounds.countingSound);
         break;
     }
   }
@@ -105,9 +105,9 @@ class TrainingController {
       case "None":
         break;
       default:
-        SoundManager().playSound(soundType);
+        soundManager.playSound(soundType);
         Future.delayed(const Duration(seconds: 1), () {
-          SoundManager().stopSound(soundType);
+          soundManager.stopSound(soundType);
         });
         break;
     }
@@ -126,8 +126,6 @@ class TrainingController {
         break;
       case training_step.StepType.retention:
         _playNextStepSound(stepType, _sounds.nextRetentionSound);
-        break;
-      default:
         break;
     }
   }
@@ -222,7 +220,7 @@ class TrainingController {
 
   void dispose() {
     TextToSpeechService().stopSpeaking();
-    SoundManager().stopAllSounds();
+    soundManager.stopAllSounds();
     _timer?.cancel();
   }
 }
