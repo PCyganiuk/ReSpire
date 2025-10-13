@@ -163,21 +163,11 @@ class TrainingController {
           _playPrePhaseSound(step);
           currentBackgroundSound = step.sounds.background;
         }
-        _stepDelay = false;
-
-        //step delay time update
-      } else if (_stepDelayRemainingTime >= _updateInterval) {
-        _stepDelayRemainingTime -= _updateInterval;
-
-        //two last steps
-      } else if (_finished) {
-        //last step
-        if (_stopTimer == 0) {
-          second.value = 0;
-          _timer?.cancel();
-          currentPhaseName.value = '';
-
-          //one step before last
+        _stepDelay = false; 
+      } else if (_remainingTime == 0 && _stepDelayRemainingTime > 0) {
+        // decrement delay with elapsed time
+        if (_stepDelayRemainingTime > elapsed) {
+          _stepDelayRemainingTime -= elapsed;
         } else {
           _stepDelayRemainingTime = 0;
         }
@@ -203,37 +193,20 @@ class TrainingController {
         } else if (!_stepDelay) {
           // start new step
           stepsQueue.value.removeFirst();
+          _remainingTime = _nextRemainingTime;
+          _phaseNameQueue.add(null);
           if (_phaseNameQueue.isNotEmpty) {
             _phaseNameQueue.removeFirst();
           }
-          stepsQueue.value.add(null);
-          _phaseNameQueue.add(null);
-          stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
-          _updateCurrentPhaseLabel();
-          _remainingTime = _nextRemainingTime;
           _nextRemainingTime = _newStepRemainingTime;
           previousSecond = _remainingTime ~/ 1000;
           _fetchNextStep();
           stepsQueue.value =
               Queue<training_step.Step?>.from(stepsQueue.value);
+          _updateCurrentPhaseLabel();
           _stepDelay = true;
           _stepDelayRemainingTime = _stepDelayDuration;
         }
-
-        //new step updates
-      } else {
-        stepsQueue.value.removeFirst();
-        if (_phaseNameQueue.isNotEmpty) {
-          _phaseNameQueue.removeFirst();
-        }
-        _remainingTime = _nextRemainingTime;
-        _nextRemainingTime = _newStepRemainingTime;
-        previousSecond = _remainingTime ~/ 1000;
-        _fetchNextStep();
-        stepsQueue.value = Queue<training_step.Step?>.from(stepsQueue.value);
-        _updateCurrentPhaseLabel();
-        _stepDelay = true;
-        _stepDelayRemainingTime = _stepDelayDuration;
       }
     });
   }
