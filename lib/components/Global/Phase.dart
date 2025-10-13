@@ -1,24 +1,28 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/Step.dart';
+import 'package:uuid/uuid.dart';
 
 part 'Phase.g.dart';
 
 @HiveType(typeId: 2)
 class Phase {
-  
+
   @HiveField(0)
+  String id = Uuid().v4();
+  
+  @HiveField(1)
   String name;
 
-  @HiveField(1)
+  @HiveField(2)
   int reps;
 
-  @HiveField(2)
+  @HiveField(3)
   int increment;
   
-  @HiveField(3)
+  @HiveField(4)
   List<Step> steps;
 
-  @HiveField(4)
+  @HiveField(5)
   String? phaseBackgroundSound;
 
   Phase({

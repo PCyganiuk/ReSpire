@@ -1,10 +1,38 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:respire/components/Global/Step.dart';
 
 part 'Sounds.g.dart';
 
 @HiveType(typeId: 9)
 class Sounds {
+
+  // // Sound for counting during exercises
+  // String? countingSound;
+
+  // // Global switch phase sound to be used across all training
+  // String? globalSound;
+
+  // // Sounds for each phase type
+  // Map<StepType, String?> stepTypeSounds = {
+  //   for (var type in StepType.values) type: null
+  // };
+
+  // // Preparation and ending tracks for the training session
+  // String? preparationTrack;
+  // String? endingTrack;
+
+  // // Background audio for the entire training session
+  // String? trainingBackgroundTrack;
+
+  // // Stage tracks for different training stages
+  // // key - stage uuid, value - sound name
+  // Map<String, String?> stageTracks = {};
   
+  // // Audio files for each phase type
+  // Map<StepType, String?> stepTypeTracks = {
+  //   for (var type in StepType.values) type: null
+  // };
+
   @HiveField(0)
   String? backgroundSound;
   

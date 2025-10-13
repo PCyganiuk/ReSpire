@@ -22,6 +22,7 @@ dependencies:
   custom_sliding_segmented_control: ^1.0.0
   flutter_launcher_icons: ^0.14.3
   file_picker: ^10.3.2
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:

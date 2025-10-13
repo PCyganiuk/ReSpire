@@ -6,7 +6,6 @@ import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
 import 'package:respire/components/TrainingEditorPage/SoundSelectionRow.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
-import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
@@ -31,11 +30,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late TextEditingController descriptionController;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _descriptionFocusNode = FocusNode();
-  FocusNode? _preparationFocusNode;
 
   int _selectedTab = 0;
-  // Sound tab state
-  final List<String> _soundOptions = SoundManager().getAvailableSounds();
+
   late Sounds _sounds;
 
   TranslationProvider _translationProvider = TranslationProvider();
@@ -45,9 +42,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   //Background sound options
   late Map<String,String?> _showBackgroundSoundOptions = {};
-
-  // Counting sounds options (internal values capitalized)
-  late final List<String> _countingSoundOptions = ["None", "Voice", "Tic", "Gong"];
 
   //To remove, when tic and gong sounds will be added
   final disabledOptions = {'Tic', 'Gong'};
@@ -69,12 +63,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     _sounds = widget.training.sounds;
     descriptionController = TextEditingController(text: widget.training.description);
     preparationController = TextEditingController(text: widget.training.settings.preparationDuration.toString());
-    _preparationFocusNode = FocusNode();
   }
 
   void _initializeStepSoundOptions() {
     _showNextStepSoundOptions = {
       _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.none"): null,
+      _translationProvider.getTranslation("TrainingEditorPage.SoundOption.voice"): "voice",
       _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.global"): "global",
       _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.for_each_phase"): "phase",
     };

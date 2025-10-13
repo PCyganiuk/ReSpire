@@ -102,9 +102,7 @@
         },
         "SoundOption":{
             "none":"Brak",
-            "voice":"Głos",
-            "tic":"Tyk",
-            "gong":"Gong"
+            "voice":"Głos"
         },
 
         "OtherTab":{

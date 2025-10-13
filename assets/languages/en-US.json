@@ -102,9 +102,7 @@
         },
         "SoundOption":{
             "none":"None",
-            "voice":"Voice",
-            "tic":"Tic",
-            "gong":"Gong"
+            "voice":"Voice"
         },
 
         "OtherTab":{
