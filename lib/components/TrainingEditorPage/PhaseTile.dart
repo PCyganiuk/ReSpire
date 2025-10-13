@@ -8,12 +8,14 @@ import 'package:respire/theme/Colors.dart';
 
 class PhaseTile extends StatefulWidget {
   final Phase phase;
+  final int phaseIndex;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
 
   const PhaseTile({
     Key? key,
     required this.phase,
+    required this.phaseIndex,
     required this.onDelete,
     required this.onUpdate,
   }) : super(key: key);
@@ -25,8 +27,10 @@ class PhaseTile extends StatefulWidget {
 class _PhaseTileState extends State<PhaseTile> {
   late TextEditingController repsController;
   late TextEditingController incrementController;
+  late TextEditingController nameController;
   FocusNode? repsFocusNode;
   FocusNode? incrementFocusNode;
+  FocusNode? nameFocusNode;
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
@@ -34,8 +38,11 @@ class _PhaseTileState extends State<PhaseTile> {
     super.initState();
     repsController = TextEditingController(text: widget.phase.reps.toString());
     incrementController = TextEditingController(text: widget.phase.increment.toString());
+    // Initialize with actual name or default name
+    nameController = TextEditingController(text: _getInitialName());
     repsFocusNode = FocusNode();
     incrementFocusNode = FocusNode();
+    nameFocusNode = FocusNode();
     repsFocusNode!.addListener(() {
       if (!(repsFocusNode?.hasFocus ?? true)) {
         final value = int.tryParse(repsController.text);
@@ -54,6 +61,12 @@ class _PhaseTileState extends State<PhaseTile> {
         widget.onUpdate();
       }
     });
+    nameFocusNode!.addListener(() {
+      if (!(nameFocusNode?.hasFocus ?? true)) {
+        setState(() => widget.phase.name = nameController.text);
+        widget.onUpdate();
+      }
+    });
   }
 
   @override
@@ -65,14 +78,23 @@ class _PhaseTileState extends State<PhaseTile> {
     if (oldWidget.phase.increment != widget.phase.increment && !incrementFocusNode!.hasFocus) {
       incrementController.text = widget.phase.increment.toString();
     }
+    if (oldWidget.phase.name != widget.phase.name && !nameFocusNode!.hasFocus) {
+      nameController.text = _getInitialName();
+    }
+    // Update if phase index changed (reordering)
+    if (oldWidget.phaseIndex != widget.phaseIndex && !nameFocusNode!.hasFocus) {
+      nameController.text = _getInitialName();
+    }
   }
 
   @override
   void dispose() {
     repsController.dispose();
     incrementController.dispose();
+    nameController.dispose();
     repsFocusNode?.dispose();
     incrementFocusNode?.dispose();
+    nameFocusNode?.dispose();
     super.dispose();
   }
 
@@ -140,6 +162,19 @@ class _PhaseTileState extends State<PhaseTile> {
     widget.onUpdate();
   }
 
+  String _getInitialName() {
+    final trimmed = widget.phase.name.trim();
+    if (trimmed.isNotEmpty) {
+      return trimmed;
+    }
+    // Return the default generated name
+    final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_stage_name");
+    if (template.contains('{number}')) {
+      return template.replaceAll('{number}', (widget.phaseIndex + 1).toString());
+    }
+    return 'Stage ${widget.phaseIndex + 1}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -158,15 +193,81 @@ class _PhaseTileState extends State<PhaseTile> {
         collapsedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ReorderableDragStartListener(
-              index: 0,
-              child: Icon(Icons.drag_handle, color: darkerblue),
+            // Stage Name Section (First Row)
+            Row(
+              children: [
+                ReorderableDragStartListener(
+                  index: 0,
+                  child: Icon(Icons.drag_handle, color: darkerblue),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        translationProvider.getTranslation("TrainingEditorPage.TrainingTab.PhaseTile.name"),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: darkerblue,
+                          fontSize: 12,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Container(
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: darkerblue, width: 1),
+                        ),
+                        child: TextField(
+                          controller: nameController,
+                          focusNode: nameFocusNode,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            isDense: true,
+                          ),
+                          style: TextStyle(
+                            color: darkerblue,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              widget.phase.name = value;
+                            });
+                          },
+                          onEditingComplete: () {
+                            widget.onUpdate();
+                          },
+                          onTapOutside: (event) {
+                            FocusScope.of(context).unfocus();
+                            widget.onUpdate();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.delete, color: darkerblue),
+                  onPressed: widget.onDelete,
+                ),
+              ],
             ),
-            
-            // Repetitions Section
-            Column(
+            SizedBox(height: 8),
+            // Reps and Increment Section (Second Row)
+            Row(
+              children: [
+                SizedBox(width: 40), // Align with content after drag handle
+                // Repetitions Section
+                Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -394,11 +495,7 @@ class _PhaseTileState extends State<PhaseTile> {
                 ),
               ],
             ),
-            
-            Spacer(),
-            IconButton(
-              icon: Icon(Icons.delete, color: darkerblue),
-              onPressed: widget.onDelete,
+              ],
             ),
           ],
         ),

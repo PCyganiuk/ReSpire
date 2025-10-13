@@ -303,6 +303,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                             PhaseTile(
                               key: ValueKey('phase_$index'),
                               phase: phases[index],
+                              phaseIndex: index,
                               onDelete: () => removePhase(index),
                               onUpdate: () {
                                 setState(() => widget.training.phases = phases);
