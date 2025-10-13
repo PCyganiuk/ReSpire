@@ -68,25 +68,26 @@
         "SoundsTab":{
             "TrainingSounds":{
                 "title":"Dźwięki treningu",
-                "counting_sound": "Dźwięk odliczania",
+                "counting_sound": "Odliczanie",
                 "NextPhaseSounds":{
-                    "title":"Dźwięki następnej fazy oddechowej",
+                    "title":"Następna faza",
                     "none": "Brak",
-                    "global":"Globalne",
+                    "voice":"Lektor",
+                    "global":"Globalnie",
                     "for_each_phase":"Dla każdej fazy"
                 }
             },
 
             "TrainingMusic":{
                 "title":"Muzyka treningu",
-                "preparation_music":"Muzyka przygotowawcza",
-                "ending_music":"Muzyka zakończenia",
+                "preparation_music":"Przygotowanie",
+                "ending_music":"Zakończenie",
                 "Background_music":{
                     "title": "Muzyka w tle",
                     "global": "Dla całego treningu",
                     "stages": "Dla etapów",
-                    "breathing_phases": "Dla faz oddechowych",
-                    "breathing_phases_label": "Fazy oddechowe",
+                    "breathing_phases": "Dla faz",
+                    "breathing_phases_label": "Fazy",
                     "none": "Brak"
                 }
             },
@@ -99,10 +100,6 @@
             
             "None":"Brak"
 
-        },
-        "SoundOption":{
-            "none":"Brak",
-            "voice":"Głos"
         },
 
         "OtherTab":{

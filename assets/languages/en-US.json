@@ -68,25 +68,25 @@
         "SoundsTab":{
             "TrainingSounds":{
                 "title": "Training sounds",
-                "counting_sound": "Counting sound",
+                "counting_sound": "Counting",
                 "NextPhaseSounds":{
-                    "title":"Next breathing phase sounds",
-                    "none": "None",
+                    "title":"Next phase",
                     "global":"Global",
+                    "voice":"Lector",
                     "for_each_phase":"For each phase"
                 }
             },
 
             "TrainingMusic":{
                 "title":"Training music",
-                "preparation_music":"Preparation music",
-                "ending_music":"Ending music",
+                "preparation_music":"Preparation",
+                "ending_music":"Ending",
                 "Background_music":{
-                    "title": "Background music",
+                    "title": "Background",
                     "global": "For whole training",
                     "stages": "For stages",
-                    "breathing_phases": "For breathing phases",
-                    "breathing_phases_label": "Breathing phases",
+                    "breathing_phases": "For phases",
+                    "breathing_phases_label": "Phases",
                     "none": "None"
                 }
             },
@@ -99,10 +99,6 @@
 
             "None":"None"
             
-        },
-        "SoundOption":{
-            "none":"None",
-            "voice":"Voice"
         },
 
         "OtherTab":{

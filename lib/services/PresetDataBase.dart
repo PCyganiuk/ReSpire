@@ -3,8 +3,11 @@ import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Step.dart';
 import 'package:respire/components/Global/StepIncrement.dart';
 import 'package:respire/components/Global/Training.dart';
+import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
 class PresetDataBase {
+
+  TranslationProvider translationProvider = TranslationProvider();
 
   List<Training> presetList = [];
 
@@ -54,6 +57,7 @@ class PresetDataBase {
               Step(duration: 1, stepType: StepType.recovery),
             ],
             increment: 0,
+            name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
           )
         ]
       ),
@@ -68,6 +72,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.recovery),
           ],
           increment: 0,
+          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
           )
         ]
          ),
@@ -83,6 +88,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.recovery),
           ],
           increment: 10,
+          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
         ),
         Phase(
           reps: 1,
@@ -93,6 +99,7 @@ class PresetDataBase {
             Step(duration: 3, stepType: StepType.recovery),
           ],
           increment: 0,
+          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 2"
         ),
       ],
     ),
