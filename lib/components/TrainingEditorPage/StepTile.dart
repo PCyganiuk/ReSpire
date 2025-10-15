@@ -19,25 +19,25 @@ class CommaToDecimalFormatter extends TextInputFormatter {
   }
 }
 
-class StepTile extends StatefulWidget {
-  final respire.Step step;
-  final Function(respire.Step newStep) onStepChanged;
+class BreathingPhaseTile extends StatefulWidget {
+  final respire.BreathingPhase breathingPhase;
+  final Function(respire.BreathingPhase newStep) onBreathingPhaseChanged;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
 
-  const StepTile({
+  const BreathingPhaseTile({
     Key? key,
-    required this.step,
-    required this.onStepChanged,
+    required this.breathingPhase,
+    required this.onBreathingPhaseChanged,
     required this.onDelete,
     required this.onUpdate,
   }) : super(key: key);
 
   @override
-  _StepTileState createState() => _StepTileState();
+  _BreathingPhaseTileState createState() => _BreathingPhaseTileState();
 }
 
-class _StepTileState extends State<StepTile> {
+class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
   late TextEditingController durationController;
   FocusNode? durationFocusNode;
   late double currentDuration;
@@ -46,7 +46,7 @@ class _StepTileState extends State<StepTile> {
   @override
   void initState() {
     super.initState();
-    currentDuration = widget.step.duration;
+    currentDuration = widget.breathingPhase.duration;
     durationController =
         TextEditingController(text: currentDuration.toStringAsFixed(1));
     durationFocusNode = FocusNode();
@@ -58,11 +58,11 @@ class _StepTileState extends State<StepTile> {
   }
 
   @override
-  void didUpdateWidget(StepTile oldWidget) {
+  void didUpdateWidget(BreathingPhaseTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.step.duration != widget.step.duration &&
+    if (oldWidget.breathingPhase.duration != widget.breathingPhase.duration &&
         !(durationFocusNode?.hasFocus ?? false)) {
-      currentDuration = widget.step.duration;
+      currentDuration = widget.breathingPhase.duration;
       durationController.text = currentDuration.toString();
     }
   }
@@ -87,27 +87,27 @@ class _StepTileState extends State<StepTile> {
 
     durationController.text = currentDuration.toStringAsFixed(1);
 
-    respire.Step newStep = respire.Step(
+    respire.BreathingPhase newBreathingPhase = respire.BreathingPhase(
       duration: currentDuration,
-      increment: widget.step.increment,
-      stepType: widget.step.stepType,
-      breathType: widget.step.breathType,
-      breathDepth: widget.step.breathDepth,
+      increment: widget.breathingPhase.increment,
+      breathingPhaseType: widget.breathingPhase.breathingPhaseType,
+      breathType: widget.breathingPhase.breathType,
+      breathDepth: widget.breathingPhase.breathDepth,
     );
-    widget.onStepChanged(newStep);
+    widget.onBreathingPhaseChanged(newBreathingPhase);
     widget.onUpdate();
   }
 
-  void updateStepType(respire.StepType? newType) {
+  void updateBreathingPhaseType(respire.BreathingPhaseType? newType) {
     if (newType != null) {
-      respire.Step newStep = respire.Step(
-        duration: widget.step.duration,
-        increment: widget.step.increment,
-        stepType: newType,
-        breathType: widget.step.breathType,
-        breathDepth: widget.step.breathDepth,
+      respire.BreathingPhase newBreathingPhase = respire.BreathingPhase(
+        duration: widget.breathingPhase.duration,
+        increment: widget.breathingPhase.increment,
+        breathingPhaseType: newType,
+        breathType: widget.breathingPhase.breathType,
+        breathDepth: widget.breathingPhase.breathDepth,
       );
-      widget.onStepChanged(newStep);
+      widget.onBreathingPhaseChanged(newBreathingPhase);
     }
   }
 
@@ -145,7 +145,7 @@ class _StepTileState extends State<StepTile> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  translationProvider.getTranslation("TrainingEditorPage.TrainingTab.StepTile.time"),
+                  translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.time"),
                   style: TextStyle(
                     color: darkerblue,
                     fontWeight: FontWeight.bold,
@@ -170,8 +170,8 @@ class _StepTileState extends State<StepTile> {
                           onTap: () {
                             double currentValue =
                                 double.tryParse(durationController.text) ?? 0.1;
-                            double step = currentValue <= 1 ? 0.1 : 0.5;
-                            double newValue = (currentValue - step)
+                            double breathingPhase = currentValue <= 1 ? 0.1 : 0.5;
+                            double newValue = (currentValue - breathingPhase)
                                 .clamp(0.1, double.infinity);
                             currentDuration = newValue;
                             commitDurationChange();
@@ -191,7 +191,7 @@ class _StepTileState extends State<StepTile> {
                       Expanded(
                         child: TextField(
                           key: ValueKey(
-                              'duration_${widget.step.stepType}_${widget.step.breathType}'),
+                              'duration_${widget.breathingPhase.breathingPhaseType}_${widget.breathingPhase.breathType}'),
                           controller: durationController,
                           focusNode: durationFocusNode,
                           keyboardType:
@@ -234,8 +234,8 @@ class _StepTileState extends State<StepTile> {
                           onTap: () {
                             double currentValue =
                                 double.tryParse(durationController.text) ?? 0.1;
-                            double step = currentValue < 1 ? 0.1 : 0.5;
-                            double newValue = (currentValue + step)
+                            double breathingPhase = currentValue < 1 ? 0.1 : 0.5;
+                            double newValue = (currentValue + breathingPhase)
                                 .clamp(0.1, double.infinity);
                             currentDuration = newValue;
                             commitDurationChange();
@@ -263,7 +263,7 @@ class _StepTileState extends State<StepTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    translationProvider.getTranslation("TrainingEditorPage.TrainingTab.StepTile.type"),
+                    translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.type"),
                     style: TextStyle(
                       color: darkerblue,
                       fontWeight: FontWeight.bold,
@@ -278,8 +278,8 @@ class _StepTileState extends State<StepTile> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: darkerblue),
                     ),
-                    child: DropdownButton2<respire.StepType>(
-                      value: widget.step.stepType,
+                    child: DropdownButton2<respire.BreathingPhaseType>(
+                      value: widget.breathingPhase.breathingPhaseType,
                       underline: SizedBox(),
                       isExpanded: true,
                       iconStyleData: IconStyleData(
@@ -296,18 +296,18 @@ class _StepTileState extends State<StepTile> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      items: respire.StepType.values
+                      items: respire.BreathingPhaseType.values
                           .map((e) => DropdownMenuItem(
                                 value: e,
                                 child: Text(
-                                  translationProvider.getTranslation("StepType.${e.toString().split('.').last}"),
+                                  translationProvider.getTranslation("BreathingPhaseType.${e.toString().split('.').last}"),
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 13),
                                 ),
                               ))
                           .toList(),
                       onChanged: (newType) {
-                        updateStepType(newType);
+                        updateBreathingPhaseType(newType);
                         widget.onUpdate();
                       },
                     ),

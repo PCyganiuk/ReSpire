@@ -47,14 +47,14 @@ class PresetDataBase {
       Training(
         title: "Deep Serenity",
         description: "A calming routine to enhance relaxation and mindfulness.",
-        phases: [
-          Phase(
+        trainingStages: [
+          TrainingStage(
             reps: 5,
-            steps:[
-              Step(duration: 5, stepType: StepType.inhale),
-              Step(duration: 4, stepType: StepType.retention),
-              Step(duration: 3, stepType: StepType.exhale),
-              Step(duration: 1, stepType: StepType.recovery),
+            breathingPhases:[
+              BreathingPhase(duration: 5, breathingPhaseType: BreathingPhaseType.inhale),
+              BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.retention),
+              BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.exhale),
+              BreathingPhase(duration: 1, breathingPhaseType: BreathingPhaseType.recovery),
             ],
             increment: 0,
             name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
@@ -63,13 +63,13 @@ class PresetDataBase {
       ),
       Training(
         title: "Vital Energy",
-        phases: [
-          Phase(reps: 3, 
-          steps: [
-            Step(duration: 2.5, stepType: StepType.inhale, increment: StepIncrement(value: 10, type: IncrementType.percentage), breathDepth: BreathDepth.shallow, breathType: BreathType.costal),
-            Step(duration: 3.14, stepType: StepType.retention),
-            Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
-            Step(duration: 3, stepType: StepType.recovery),
+        trainingStages: [
+          TrainingStage(reps: 3,
+          breathingPhases: [
+            BreathingPhase(duration: 2.5, breathingPhaseType: BreathingPhaseType.inhale, increment: BreathingPhaseIncrement(value: 10, type: BreathingPhaseIncrementType.percentage), breathDepth: BreathDepth.shallow, breathType: BreathType.costal),
+            BreathingPhase(duration: 3.14, breathingPhaseType: BreathingPhaseType.retention),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.exhale, increment: BreathingPhaseIncrement(value: 50, type: BreathingPhaseIncrementType.percentage)),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 0,
           name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
@@ -78,25 +78,25 @@ class PresetDataBase {
          ),
       Training(
       title: "Breath Mastery",
-      phases: [
-        Phase(
+      trainingStages: [
+        TrainingStage(
           reps: 2,
-          steps: [
-            Step(duration: 2.5,stepType: StepType.inhale,increment: StepIncrement(value: 10, type: IncrementType.percentage),breathDepth: BreathDepth.deep, breathType: BreathType.diaphragmatic),
-            Step(duration: 3.5, stepType: StepType.retention),
-            Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 1, type: IncrementType.value)),
-            Step(duration: 3, stepType: StepType.recovery),
+          breathingPhases: [
+            BreathingPhase(duration: 2.5, breathingPhaseType: BreathingPhaseType.inhale, increment: BreathingPhaseIncrement(value: 10, type: BreathingPhaseIncrementType.percentage), breathDepth: BreathDepth.deep, breathType: BreathType.diaphragmatic),
+            BreathingPhase(duration: 3.5, breathingPhaseType: BreathingPhaseType.retention),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.exhale, increment: BreathingPhaseIncrement(value: 1, type: BreathingPhaseIncrementType.value)),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 10,
           name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 1"
         ),
-        Phase(
+        TrainingStage(
           reps: 1,
-          steps: [
-            Step(duration: 5.0, stepType: StepType.inhale, increment: StepIncrement(value: 15, type: IncrementType.percentage), breathDepth: BreathDepth.deep, breathType: BreathType.diaphragmatic),
-            Step(duration: 4, stepType: StepType.retention),
-            Step(duration: 3, stepType: StepType.exhale, increment: StepIncrement(value: 50, type: IncrementType.percentage)),
-            Step(duration: 3, stepType: StepType.recovery),
+          breathingPhases: [
+            BreathingPhase(duration: 5.0, breathingPhaseType: BreathingPhaseType.inhale, increment: BreathingPhaseIncrement(value: 15, type: BreathingPhaseIncrementType.percentage), breathDepth: BreathDepth.deep, breathType: BreathType.diaphragmatic),
+            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.retention),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.exhale, increment: BreathingPhaseIncrement(value: 50, type: BreathingPhaseIncrementType.percentage)),
+            BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 0,
           name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} 2"

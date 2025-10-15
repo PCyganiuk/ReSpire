@@ -6,25 +6,25 @@ import 'package:respire/components/TrainingEditorPage/StepTile.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart'; 
 
-class PhaseTile extends StatefulWidget {
-  final Phase phase;
-  final int phaseIndex;
+class TrainingStageTile extends StatefulWidget {
+  final TrainingStage trainingStage;
+  final int trainingStageIndex;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
 
-  const PhaseTile({
+  const TrainingStageTile({
     Key? key,
-    required this.phase,
-    required this.phaseIndex,
+    required this.trainingStage,
+    required this.trainingStageIndex,
     required this.onDelete,
     required this.onUpdate,
   }) : super(key: key);
 
   @override
-  _PhaseTileState createState() => _PhaseTileState();
+  _TrainingStageTileState createState() => _TrainingStageTileState();
 }
 
-class _PhaseTileState extends State<PhaseTile> {
+class _TrainingStageTileState extends State<TrainingStageTile> {
   late TextEditingController repsController;
   late TextEditingController incrementController;
   late TextEditingController nameController;
@@ -36,8 +36,8 @@ class _PhaseTileState extends State<PhaseTile> {
   @override
   void initState() {
     super.initState();
-    repsController = TextEditingController(text: widget.phase.reps.toString());
-    incrementController = TextEditingController(text: widget.phase.increment.toString());
+    repsController = TextEditingController(text: widget.trainingStage.reps.toString());
+    incrementController = TextEditingController(text: widget.trainingStage.increment.toString());
     // Initialize with actual name or default name
     nameController = TextEditingController(text: _getInitialName());
     repsFocusNode = FocusNode();
@@ -47,7 +47,7 @@ class _PhaseTileState extends State<PhaseTile> {
       if (!(repsFocusNode?.hasFocus ?? true)) {
         final value = int.tryParse(repsController.text);
         if (value != null && value > 0) {
-          setState(() => widget.phase.reps = value);
+          setState(() => widget.trainingStage.reps = value);
         }
         widget.onUpdate();
       }
@@ -56,33 +56,33 @@ class _PhaseTileState extends State<PhaseTile> {
       if (!(incrementFocusNode?.hasFocus ?? true)) {
         final value = int.tryParse(incrementController.text);
         if (value != null && value >= 0 && value <= 100) {
-          setState(() => widget.phase.increment = value);
+          setState(() => widget.trainingStage.increment = value);
         }
         widget.onUpdate();
       }
     });
     nameFocusNode!.addListener(() {
       if (!(nameFocusNode?.hasFocus ?? true)) {
-        setState(() => widget.phase.name = nameController.text);
+        setState(() => widget.trainingStage.name = nameController.text);
         widget.onUpdate();
       }
     });
   }
 
   @override
-  void didUpdateWidget(PhaseTile oldWidget) {
+  void didUpdateWidget(TrainingStageTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.phase.reps != widget.phase.reps && !repsFocusNode!.hasFocus) {
-      repsController.text = widget.phase.reps.toString();
+    if (oldWidget.trainingStage.reps != widget.trainingStage.reps && !repsFocusNode!.hasFocus) {
+      repsController.text = widget.trainingStage.reps.toString();
     }
-    if (oldWidget.phase.increment != widget.phase.increment && !incrementFocusNode!.hasFocus) {
-      incrementController.text = widget.phase.increment.toString();
+    if (oldWidget.trainingStage.increment != widget.trainingStage.increment && !incrementFocusNode!.hasFocus) {
+      incrementController.text = widget.trainingStage.increment.toString();
     }
-    if (oldWidget.phase.name != widget.phase.name && !nameFocusNode!.hasFocus) {
+    if (oldWidget.trainingStage.name != widget.trainingStage.name && !nameFocusNode!.hasFocus) {
       nameController.text = _getInitialName();
     }
-    // Update if phase index changed (reordering)
-    if (oldWidget.phaseIndex != widget.phaseIndex && !nameFocusNode!.hasFocus) {
+    // Update if training stage index changed (reordering)
+    if (oldWidget.trainingStageIndex != widget.trainingStageIndex && !nameFocusNode!.hasFocus) {
       nameController.text = _getInitialName();
     }
   }
@@ -98,28 +98,28 @@ class _PhaseTileState extends State<PhaseTile> {
     super.dispose();
   }
 
-  void addStep() {
+  void addBreathingPhase() {
     setState(() {
-      widget.phase.steps.add(
-        respire.Step(
+      widget.trainingStage.breathingPhases.add(
+        respire.BreathingPhase(
           duration: 5.0,
-          stepType: respire.StepType.inhale,
+          breathingPhaseType: respire.BreathingPhaseType.inhale,
         ),
       );
     });
-    // Clear focus when adding new step to prevent keyboard conflicts
+    // Clear focus when adding new breathing phase to prevent keyboard conflicts
     FocusScope.of(context).unfocus();
     widget.onUpdate();
   }
 
-  void removeStep(int index) async{
+  void removeBreathingPhase(int index) async{
       bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.StepTile.remove_step_dialog_title")),
+          title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_title")),
           backgroundColor: Colors.white,
-          content: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.StepTile.remove_step_dialog_content")),
+          content: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_content")),
           actions: [
             TextButton(
               onPressed: () {
@@ -140,39 +140,39 @@ class _PhaseTileState extends State<PhaseTile> {
 
     if (confirmDelete ?? false) {
       setState(() {
-      widget.phase.steps.removeAt(index);
+      widget.trainingStage.breathingPhases.removeAt(index);
     });
       widget.onUpdate();
     }
   }
 
-  void updateStep(int index, respire.Step newStep) {
+  void updateBreathingPhase(int index, respire.BreathingPhase newBreathingPhase) {
     setState(() {
-      widget.phase.steps[index] = newStep;
+      widget.trainingStage.breathingPhases[index] = newBreathingPhase;
     });
     widget.onUpdate();
   }
 
-  void reorderStep(int oldIndex, int newIndex) {
+  void reorderBreathingPhase(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) newIndex -= 1;
-      final step = widget.phase.steps.removeAt(oldIndex);
-      widget.phase.steps.insert(newIndex, step);
+      final breathingPhase = widget.trainingStage.breathingPhases.removeAt(oldIndex);
+      widget.trainingStage.breathingPhases.insert(newIndex, breathingPhase);
     });
     widget.onUpdate();
   }
 
   String _getInitialName() {
-    final trimmed = widget.phase.name.trim();
+    final trimmed = widget.trainingStage.name.trim();
     if (trimmed.isNotEmpty) {
       return trimmed;
     }
     // Return the default generated name
     final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_stage_name");
     if (template.contains('{number}')) {
-      return template.replaceAll('{number}', (widget.phaseIndex + 1).toString());
+      return template.replaceAll('{number}', (widget.trainingStageIndex + 1).toString());
     }
-    return 'Stage ${widget.phaseIndex + 1}';
+    return 'Stage ${widget.trainingStageIndex + 1}';
   }
 
   @override
@@ -239,7 +239,7 @@ class _PhaseTileState extends State<PhaseTile> {
                           ),
                           onChanged: (value) {
                             setState(() {
-                              widget.phase.name = value;
+                              widget.trainingStage.name = value;
                             });
                           },
                           onEditingComplete: () {
@@ -298,7 +298,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int newValue = (currentValue - 1).clamp(1, 999);
                             repsController.text = newValue.toString();
                             setState(() {
-                              widget.phase.reps = newValue;
+                              widget.trainingStage.reps = newValue;
                             });
                             widget.onUpdate();
                           },
@@ -315,7 +315,7 @@ class _PhaseTileState extends State<PhaseTile> {
                       ),
                       Expanded(
                         child: TextField(
-                          key: ValueKey('reps_${widget.phase.hashCode}'),
+                          key: ValueKey('reps_${widget.trainingStage.hashCode}'),
                           controller: repsController,
                           focusNode: repsFocusNode,
                           keyboardType: TextInputType.number,
@@ -337,7 +337,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int? newReps = int.tryParse(value);
                             if (newReps != null && newReps > 0) {
                               setState(() {
-                                widget.phase.reps = newReps;
+                                widget.trainingStage.reps = newReps;
                               });
                             }
                           },
@@ -359,7 +359,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int newValue = (currentValue + 1).clamp(1, 999);
                             repsController.text = newValue.toString();
                             setState(() {
-                              widget.phase.reps = newValue;
+                              widget.trainingStage.reps = newValue;
                             });
                             widget.onUpdate();
                           },
@@ -414,7 +414,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int newValue = (currentValue - 1).clamp(0, 100);
                             incrementController.text = newValue.toString();
                             setState(() {
-                              widget.phase.increment = newValue;
+                              widget.trainingStage.increment = newValue;
                             });
                             widget.onUpdate();
                           },
@@ -431,7 +431,7 @@ class _PhaseTileState extends State<PhaseTile> {
                       ),
                       Expanded(
                         child: TextField(
-                          key: ValueKey('increment_${widget.phase.hashCode}'),
+                          key: ValueKey('increment_${widget.trainingStage.hashCode}'),
                           controller: incrementController,
                           focusNode: incrementFocusNode,
                           keyboardType: TextInputType.number,
@@ -453,7 +453,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int? newIncrement = int.tryParse(value);
                             if (newIncrement != null && newIncrement >= 0 && newIncrement <= 100) {
                               setState(() {
-                                widget.phase.increment = newIncrement;
+                                widget.trainingStage.increment = newIncrement;
                               });
                             }
                           },
@@ -475,7 +475,7 @@ class _PhaseTileState extends State<PhaseTile> {
                             int newValue = (currentValue + 1).clamp(0, 100);
                             incrementController.text = newValue.toString();
                             setState(() {
-                              widget.phase.increment = newValue;
+                              widget.trainingStage.increment = newValue;
                             });
                             widget.onUpdate();
                           },
@@ -505,7 +505,7 @@ class _PhaseTileState extends State<PhaseTile> {
             child: ReorderableListView(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              onReorder: reorderStep,
+              onReorder: reorderBreathingPhase,
                proxyDecorator: (Widget child, int index, Animation<double> animation) {
                 return Material(
                   color: Colors.transparent,  
@@ -513,22 +513,22 @@ class _PhaseTileState extends State<PhaseTile> {
                 );
               },
               children: [
-                for (int index = 0; index < widget.phase.steps.length; index++)
-                  StepTile(
-                    key: ValueKey(widget.phase.steps[index]),
-                    step: widget.phase.steps[index],
-                    onStepChanged: (newStep) => updateStep(index, newStep),
-                    onDelete: () => removeStep(index),
+                for (int index = 0; index < widget.trainingStage.breathingPhases.length; index++)
+                  BreathingPhaseTile(
+                    key: ValueKey(widget.trainingStage.breathingPhases[index]),
+                    breathingPhase: widget.trainingStage.breathingPhases[index],
+                    onBreathingPhaseChanged: (newBreathingPhase) => updateBreathingPhase(index, newBreathingPhase),
+                    onDelete: () => removeBreathingPhase(index),
                     onUpdate: widget.onUpdate,
                   ),
               ],
             ),
           ),
           TextButton.icon(
-            onPressed: addStep,
+            onPressed: addBreathingPhase,
             icon: Icon(Icons.add, color: darkerblue),
             label: Text(
-              translationProvider.getTranslation("TrainingEditorPage.TrainingTab.PhaseTile.add_phase_button_label"),
+              translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.add_breathing_phase_button_label"),
               style: TextStyle(
                 color: darkerblue,
                 fontWeight: FontWeight.bold,

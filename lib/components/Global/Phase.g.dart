@@ -6,26 +6,26 @@ part of 'Phase.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PhaseAdapter extends TypeAdapter<Phase> {
+class TrainingStageAdapter extends TypeAdapter<TrainingStage> {
   @override
   final int typeId = 2;
 
   @override
-  Phase read(BinaryReader reader) {
+  TrainingStage read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Phase(
+    return TrainingStage(
       reps: fields[1] as int,
       increment: fields[2] as int,
-      steps: (fields[3] as List).cast<Step>(),
+      breathingPhases: (fields[3] as List).cast<BreathingPhase>(),
       name: fields[0] as String ? ?? '',
-    )..phaseBackgroundSound = fields[4] as String?;
+    )..trainingStageBackgroundSound = fields[4] as String?;
   }
 
   @override
-  void write(BinaryWriter writer, Phase obj) {
+  void write(BinaryWriter writer, TrainingStage obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -35,9 +35,9 @@ class PhaseAdapter extends TypeAdapter<Phase> {
       ..writeByte(2)
       ..write(obj.increment)
       ..writeByte(3)
-      ..write(obj.steps)
+      ..write(obj.breathingPhases)
       ..writeByte(4)
-      ..write(obj.phaseBackgroundSound);
+      ..write(obj.trainingStageBackgroundSound);
   }
 
   @override
@@ -46,7 +46,7 @@ class PhaseAdapter extends TypeAdapter<Phase> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PhaseAdapter &&
+      other is TrainingStageAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

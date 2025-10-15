@@ -5,7 +5,7 @@ import 'package:respire/components/Global/StepIncrement.dart';
 part 'Step.g.dart';
 
 @HiveType(typeId: 3)
-enum StepType { 
+enum BreathingPhaseType { 
   @HiveField(0)
   inhale, 
   
@@ -51,16 +51,16 @@ enum BreathDepth {
 
 
 @HiveType(typeId: 6)
-class Step {
+class BreathingPhase {
   
   @HiveField(0)
   final double duration; // in seconds
   
   @HiveField(1)
-  StepIncrement? increment;
+  BreathingPhaseIncrement? increment;
   
   @HiveField(2)
-  StepType stepType;
+  BreathingPhaseType breathingPhaseType;
   
   @HiveField(3)
   BreathType? breathType;
@@ -69,19 +69,19 @@ class Step {
   BreathDepth? breathDepth;
 
   @HiveField(5)
-  PhaseSounds sounds = PhaseSounds();
+  BreathingPhaseSounds sounds = BreathingPhaseSounds();
 
-  Step({
+  BreathingPhase({
     required this.duration,
     this.increment,
-    this.stepType = StepType.inhale,
+    this.breathingPhaseType = BreathingPhaseType.inhale,
     this.breathType,
     this.breathDepth,
-    PhaseSounds? sounds,
+    BreathingPhaseSounds? sounds,
     });
 
-    ///Calculate the Step's duration in `rep` repetition. The returned value is in seconds.
-    double getStepDuration(int rep)
+    ///Calculate the BreathingPhase's duration in `rep` repetition. The returned value is in seconds.
+    double getBreathingPhaseDuration(int rep)
     {
       if (increment == null || increment!.value == 0 || rep == 0)
       {
@@ -91,12 +91,12 @@ class Step {
       
       switch(increment!.type)
       {
-        case IncrementType.percentage:
+        case BreathingPhaseIncrementType.percentage:
         {
            return duration * (1 + (increment!.value / 100) * rep);
         }
 
-        case IncrementType.value:
+        case BreathingPhaseIncrementType.value:
         {
           return duration + (rep*increment!.value);
         }

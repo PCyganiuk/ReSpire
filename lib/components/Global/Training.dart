@@ -16,7 +16,7 @@ class Training {
   String description;
 
   @HiveField(2)
-  List<Phase> phases;
+  List<TrainingStage> trainingStages;
 
   @HiveField(3)
   Sounds sounds = Sounds();
@@ -32,14 +32,14 @@ class Training {
 
   Training({
     required this.title,
-    required this.phases,
+    required this.trainingStages,
     this.description = ''
   });
 
-  // Call this method after loading or modifying the training to ensure that all phases and steps have the correct background sounds.
+  // Call this method after loading or modifying the training to ensure that all training stages and breathing phases have the correct background sounds.
   void propagateBackgroundSounds() {
-    for (var phase in phases) {
-      phase.propabateBackgroundSound(globalBackgroundSound);
+    for (var trainingStage in trainingStages) {
+      trainingStage.propagateBackgroundSound(globalBackgroundSound);
     }
   }
 }

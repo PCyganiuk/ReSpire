@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 part 'Phase.g.dart';
 
 @HiveType(typeId: 2)
-class Phase {
+class TrainingStage {
 
   @HiveField(0)
   String id = Uuid().v4();
@@ -20,32 +20,32 @@ class Phase {
   int increment;
   
   @HiveField(4)
-  List<Step> steps;
+  List<BreathingPhase> breathingPhases;
 
   @HiveField(5)
-  String? phaseBackgroundSound;
+  String? trainingStageBackgroundSound; // Is this correct?
 
-  Phase({
+  TrainingStage({
     required this.reps,
     required this.increment,
-    required this.steps,
+    required this.breathingPhases,
     this.name = '',
   });
 
-  void addStep(Step step)
+  void addBreathingPhase(BreathingPhase breathingPhase)
   {
-    steps.add(step);
+    breathingPhases.add(breathingPhase);
   }
 
-  void propabateBackgroundSound(String? globalBackgroundSound) {
-    // Replace the phase background sound with the global one if it exists
+  void propagateBackgroundSound(String? globalBackgroundSound) {
+    // Replace the breathing phase background sound with the global one if it exists
     if (globalBackgroundSound != null) {
-      phaseBackgroundSound = globalBackgroundSound;
+      trainingStageBackgroundSound = globalBackgroundSound;
     }
-
-    // Set the background sound for each step in the phase
-    for (var step in steps) {
-      step.sounds.background = phaseBackgroundSound;
+  
+    // Set the background sound for each breathing phase
+    for (var breathingPhase in breathingPhases) {
+      breathingPhase.sounds.background = trainingStageBackgroundSound;
     }
   }
 }

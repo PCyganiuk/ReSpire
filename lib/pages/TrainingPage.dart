@@ -22,7 +22,7 @@ class TrainingPage extends StatefulWidget {
 
 class _TrainingPageState extends State<TrainingPage> {
   late Training training;
-  late List<Phase> phases;
+  late List<TrainingStage> trainingStages;
   bool _expanded = false;
   TranslationProvider translationProvider = TranslationProvider();
 
@@ -30,7 +30,7 @@ class _TrainingPageState extends State<TrainingPage> {
   void initState() {
     super.initState();
     training = widget.db.presetList[widget.index];
-    phases = training.phases;
+    trainingStages = training.trainingStages;
   }
 
   Widget shareButton() {
@@ -202,9 +202,9 @@ class _TrainingPageState extends State<TrainingPage> {
             ? Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: Column(
-                  children: phases.asMap().entries.map((entry) {
+                  children: trainingStages.asMap().entries.map((entry) {
                     final index = entry.key;
-                    final phase = entry.value;
+                    final trainingStage = entry.value;
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: 6),
                       child: Card(
@@ -218,7 +218,7 @@ class _TrainingPageState extends State<TrainingPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _phaseDisplayName(phase, index),
+                                _trainingStageDisplayName(trainingStage, index), /// ???
                                 style: TextStyle(
                                   color: darkerblue,
                                   fontWeight: FontWeight.w700,
@@ -227,14 +227,14 @@ class _TrainingPageState extends State<TrainingPage> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${phase.reps} ${translationProvider.getTranslation("TrainingPage.TrainingOverview.increment")}: ${phase.increment} [s]',
+                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.reps} ${translationProvider.getTranslation("TrainingPage.TrainingOverview.increment")}: ${trainingStage.increment} [s]',
                                 style: TextStyle(
                                     color: darkerblue,
                                     fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 8),
                               Column(
-                                children: phase.steps.map((step) {
+                                children: trainingStage.breathingPhases.map((breathingPhase) {
                                   return Container(
                                     margin: EdgeInsets.symmetric(vertical: 4),
                                     padding: EdgeInsets.all(10),
@@ -248,14 +248,14 @@ class _TrainingPageState extends State<TrainingPage> {
                                             child: Row(
                                           children: [
                                             Text(
-                                              translationProvider.getTranslation("StepType.${step.stepType.name}"),
+                                              translationProvider.getTranslation("StepType.${breathingPhase.breathingPhaseType.name}"),
                                               style: TextStyle(
                                                   color: darkerblue,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Spacer(),
                                             Text(
-                                              '${step.duration} s',
+                                              '${breathingPhase.duration} s',
                                               style: TextStyle(
                                                   color: darkerblue,
                                                   fontWeight: FontWeight.bold),
@@ -280,8 +280,8 @@ class _TrainingPageState extends State<TrainingPage> {
     );
   }
 
-  String _phaseDisplayName(Phase phase, int index) {
-    final trimmed = phase.name.trim();
+  String _trainingStageDisplayName(TrainingStage trainingStage, int index) {
+    final trimmed = trainingStage.name.trim();
     if (trimmed.isNotEmpty) {
       return trimmed;
     }

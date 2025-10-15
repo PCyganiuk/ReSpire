@@ -4,7 +4,7 @@ import 'package:respire/components/BreathingPage/AnimatedCircle.dart';
 import 'package:respire/components/BreathingPage/InstructionSlider.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Training.dart';
-import 'package:respire/components/Global/Step.dart' as training_step;
+import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
@@ -21,7 +21,7 @@ class _BreathingPageState extends State<BreathingPage> {
   late TrainingParser parser;
   late TrainingController controller;
   int second = 0;
-  int steps = 0;
+  int breathingPhases = 0;
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
@@ -29,7 +29,7 @@ class _BreathingPageState extends State<BreathingPage> {
     super.initState();
     parser = TrainingParser(training: widget.training);
     controller = TrainingController(parser);
-    steps = parser.countSteps();
+    breathingPhases = parser.countBreathingPhases();
   }
 
   @override
@@ -95,8 +95,8 @@ class _BreathingPageState extends State<BreathingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: ValueListenableBuilder<Queue<training_step.Step?>>(
-          valueListenable: controller.stepsQueue,
+        leading: ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
+          valueListenable: controller.breathingPhasesQueue,
           builder: (context, queue, _) {
             return IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -133,7 +133,7 @@ class _BreathingPageState extends State<BreathingPage> {
           SizedBox(height: 16),
 
           ValueListenableBuilder<String>(
-            valueListenable: controller.currentPhaseName,
+            valueListenable: controller.currentBreathingPhaseName,
             builder: (context, stageName, _) {
               final trimmed = stageName.trim();
               final hasLabel = trimmed.isNotEmpty;
@@ -181,25 +181,25 @@ class _BreathingPageState extends State<BreathingPage> {
           ),
 
           //instructions
-          ValueListenableBuilder<Queue<training_step.Step?>>(
-            valueListenable: controller.stepsQueue,
-            builder: (context, stepsQueue, _) {
+          ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
+            valueListenable: controller.breathingPhasesQueue,
+            builder: (context, breathingPhasesQueue, _) {
               return ValueListenableBuilder<int>(
-                valueListenable: controller.stepsCount,
+                valueListenable: controller.breathingPhasesCount,
                 builder: (context, change, _) {
                   return InstructionSlider(
-                      stepsQueue: stepsQueue, change: change);
+                      breathingPhasesQueue: breathingPhasesQueue, change: change);
                 },
               );
             },
           ),
 
-          //step counter
+          //breathing phase counter
           ValueListenableBuilder<int>(
-            valueListenable: controller.stepsCount,
-            builder: (context, stepsDone, _) {
+            valueListenable: controller.breathingPhasesCount,
+            builder: (context, breathingPhasesDone, _) {
               return Text(
-                '${stepsDone <= steps ? stepsDone : steps} / $steps',
+                '${breathingPhasesDone <= breathingPhases ? breathingPhasesDone : breathingPhases} / $breathingPhases',
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               );
@@ -228,14 +228,14 @@ class _BreathingPageState extends State<BreathingPage> {
                           ),
 
                           //animated circle
-                          ValueListenableBuilder<Queue<training_step.Step?>>(
-                              valueListenable: controller.stepsQueue,
-                              builder: (context, steps, _) {
+                          ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
+                              valueListenable: controller.breathingPhasesQueue,
+                              builder: (context, breathingPhases, _) {
                                 return ValueListenableBuilder<bool>(
                                     valueListenable: controller.isPaused,
                                     builder: (context, isPaused, _) {
                                       return AnimatedCircle(
-                                          step: steps.first,
+                                          breathingPhase: breathingPhases.first,
                                           isPaused: isPaused);
                                     });
                               }),

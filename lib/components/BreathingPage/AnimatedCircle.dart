@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/Step.dart' as training_step;
+import 'package:respire/components/Global/Step.dart' as breathing_phase;
 
 class AnimatedCircle extends StatefulWidget {
-  final training_step.Step? step;
+  final breathing_phase.BreathingPhase? breathingPhase;
   final bool isPaused;
 
-  const AnimatedCircle({super.key, required this.step, required this.isPaused});
+  const AnimatedCircle({super.key, required this.breathingPhase, required this.isPaused});
 
   @override
   State<StatefulWidget> createState() => _AnimatedCircleState();
@@ -22,7 +22,7 @@ class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProvid
   void initState() {
     super.initState();
 
-    duration = widget.step == null ? 0 : (widget.step!.duration * 1000).toInt();
+    duration = widget.breathingPhase == null ? 0 : (widget.breathingPhase!.duration * 1000).toInt();
 
     _controller = AnimationController(
       duration: Duration(milliseconds: duration),
@@ -35,11 +35,11 @@ class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProvid
     _controller.duration = Duration(milliseconds: duration);
 
     _controller.value = 0.0;
-    
-    if (!widget.isPaused && widget.step != null) {
-      if (widget.step!.stepType == training_step.StepType.inhale) {
+
+    if (!widget.isPaused && widget.breathingPhase != null) {
+      if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.inhale) {
         _controller.forward(from: 0.0);
-      } else if (widget.step!.stepType == training_step.StepType.exhale) {
+      } else if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.exhale) {
         _controller.reverse(from: 1.0);
       }
     }
@@ -49,16 +49,16 @@ class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProvid
   void didUpdateWidget(covariant AnimatedCircle oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.step != oldWidget.step && widget.step!=null) {
-      log("${widget.step?.stepType.name}");
+    if (widget.breathingPhase != oldWidget.breathingPhase && widget.breathingPhase != null) {
+      log("${widget.breathingPhase?.breathingPhaseType.name}");
 
-      duration = widget.step == null ? 0 : (widget.step!.duration * 1000).toInt();
+      duration = widget.breathingPhase == null ? 0 : (widget.breathingPhase!.duration * 1000).toInt();
       _controller.duration = Duration(milliseconds: duration);
 
-      if (!widget.isPaused && widget.step != null) {
-        if (widget.step!.stepType == training_step.StepType.inhale) {
+      if (!widget.isPaused && widget.breathingPhase != null) {
+        if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.inhale) {
           _controller.forward(from: 0.0);
-        } else if (widget.step!.stepType == training_step.StepType.exhale) {
+        } else if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.exhale) {
           _controller.reverse(from: 1.0);
         }
       } else {
@@ -66,14 +66,14 @@ class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProvid
       }
     }
 
-    // Reakcja na pauzę/wznowienie (jeśli step się nie zmienia)
+    // Reakcja na pauzę/wznowienie (jeśli breathing phase się nie zmienia)
     if (widget.isPaused && !oldWidget.isPaused) {
       _controller.stop();
     } else if (!widget.isPaused && oldWidget.isPaused) {
-      if (widget.step != null) {
-        if (widget.step!.stepType == training_step.StepType.inhale) {
+      if (widget.breathingPhase != null) {
+        if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.inhale) {
           _controller.forward();
-        } else if (widget.step!.stepType == training_step.StepType.exhale) {
+        } else if (widget.breathingPhase!.breathingPhaseType == breathing_phase.BreathingPhaseType.exhale) {
           _controller.reverse();
         }
       }

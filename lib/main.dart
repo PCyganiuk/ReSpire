@@ -28,17 +28,17 @@ Future<void> initialize() async
   // If any changes in loaded data occur, uncomment the following
   // line to delete the data and load it again
   await Hive.deleteBoxFromDisk('respire'); // disable deleting local storage to retain presets between restarts
-  Hive.registerAdapter(StepTypeAdapter());
+  Hive.registerAdapter(BreathingPhaseAdapter());
+  Hive.registerAdapter(BreathingPhaseTypeAdapter());
   Hive.registerAdapter(BreathTypeAdapter());
   Hive.registerAdapter(BreathDepthAdapter());
-  Hive.registerAdapter(IncrementTypeAdapter());
-  Hive.registerAdapter(StepIncrementAdapter());
-  Hive.registerAdapter(StepAdapter());
-  Hive.registerAdapter(PhaseAdapter());
+  Hive.registerAdapter(BreathingPhaseIncrementTypeAdapter());
+  Hive.registerAdapter(BreathingPhaseIncrementAdapter());
+  Hive.registerAdapter(TrainingStageAdapter());
   Hive.registerAdapter(TrainingAdapter());
   Hive.registerAdapter(SoundsAdapter());
   Hive.registerAdapter(SettingsAdapter());
-  Hive.registerAdapter(PhaseSoundsAdapter());
+  Hive.registerAdapter(BreathingPhaseSoundsAdapter());
   Hive.registerAdapter(TrainingSoundsAdapter());
   await Hive.openBox('respire');
   await Hive.openBox('userShortSounds');

@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/Step.dart' as training_step;
+import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/components/Global/Step.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
@@ -14,10 +14,10 @@ class InstructionBlock {
 
 class InstructionSlider extends StatefulWidget {
 
-  Queue<training_step.Step?> stepsQueue = Queue<training_step.Step?>();
+  Queue<breathing_phase.BreathingPhase?> breathingPhasesQueue = Queue<breathing_phase.BreathingPhase?>();
   int change; 
 
-  InstructionSlider({super.key, required this.stepsQueue, required this.change});
+  InstructionSlider({super.key, required this.breathingPhasesQueue, required this.change});
 
   @override
   State<InstructionSlider> createState() => InstructionSliderState();
@@ -49,8 +49,8 @@ class InstructionSliderState extends State<InstructionSlider>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    addNewStep(widget.stepsQueue.elementAt(1), 1.0);
-    addNewStep(widget.stepsQueue.elementAt(2), 2.0);
+    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(1), 1.0);
+    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2), 2.0);
 
 
     _controller.addStatusListener((status) {
@@ -73,7 +73,7 @@ class InstructionSliderState extends State<InstructionSlider>
     if(oldWidget.change != widget.change) {
       _controller.forward();
       if(_blocks.last.text!=translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text")) {
-        addNewStep(widget.stepsQueue.elementAt(2), 2.0);
+        addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2), 2.0);
       }
     }
   }
@@ -84,11 +84,11 @@ class InstructionSliderState extends State<InstructionSlider>
   //   }
   // }
 
-  void addNewStep(training_step.Step? step, double position) {
-    String stepName = step==null ? translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text") : _stepType(step);
+  void addNewBreathingPhase(breathing_phase.BreathingPhase? breathingPhase, double position) {
+    String breathingPhaseName = breathingPhase==null ? translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text") : _breathingPhaseType(breathingPhase);
     _blocks.add(
       InstructionBlock(
-        text: stepName, 
+        text: breathingPhaseName, 
         position: position)
     );
   }
@@ -98,38 +98,38 @@ class InstructionSliderState extends State<InstructionSlider>
     return str[0].toUpperCase() + str.substring(1);
   }
 
-   String _breathDepth(training_step.Step? step) {
-    if (step!.breathDepth == null) return "";
-    return _firstToUpperCase(step.breathDepth!.name);
+   String _breathDepth(breathing_phase.BreathingPhase? breathingPhase) {
+    if (breathingPhase!.breathDepth == null) return "";
+    return _firstToUpperCase(breathingPhase.breathDepth!.name);
   }
 
-  String _breathType(training_step.Step? step) {
-    if (step!.breathType == null) return "";
-    return _firstToUpperCase(translationProvider.getTranslation("StepType.${step.breathType!.name}"));
+  String _breathType(breathing_phase.BreathingPhase? breathingPhase) {
+    if (breathingPhase!.breathType == null) return "";
+    return _firstToUpperCase(translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathType!.name}"));
   }
 
-  String _stepType(training_step.Step? step) {
-    if (step == null) return "";
+  String _breathingPhaseType(breathing_phase.BreathingPhase? breathingPhase) {
+    if (breathingPhase == null) return "";
 
-    String str = translationProvider.getTranslation("StepType.${step.stepType.name}");
+    String str = translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathingPhaseType.name}");
 
-    switch (step.stepType) {
+    switch (breathingPhase.breathingPhaseType) {
 
-      case StepType.inhale:
-      case StepType.exhale:
-        if (step.breathType!=null) {
-          str += "\n${_breathType(step)}";
+      case breathing_phase.BreathingPhaseType.inhale:
+      case breathing_phase.BreathingPhaseType.exhale:
+        if (breathingPhase.breathType!=null) {
+          str += "\n${_breathType(breathingPhase)}";
         }
-        if (step.breathDepth!=null) {
-          str += "\n${_breathDepth(step)}";
+        if (breathingPhase.breathDepth!=null) {
+          str += "\n${_breathDepth(breathingPhase)}";
         }
         break;
 
       default:
         break;  
     }
-    
-    str += "\n${step.duration} s";
+
+    str += "\n${breathingPhase.duration} s";
     return str;
   }
 

@@ -6,28 +6,28 @@ part of 'Step.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class StepAdapter extends TypeAdapter<Step> {
+class BreathingPhaseAdapter extends TypeAdapter<BreathingPhase> {
   @override
   final int typeId = 6;
 
   @override
-  Step read(BinaryReader reader) {
+  BreathingPhase read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Step(
+    return BreathingPhase(
       duration: fields[0] as double,
-      increment: fields[1] as StepIncrement?,
-      stepType: fields[2] as StepType,
+      increment: fields[1] as BreathingPhaseIncrement?,
+      breathingPhaseType: fields[2] as BreathingPhaseType,
       breathType: fields[3] as BreathType?,
       breathDepth: fields[4] as BreathDepth?,
-      sounds: fields[5] as PhaseSounds?,
+      sounds: fields[5] as BreathingPhaseSounds?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Step obj) {
+  void write(BinaryWriter writer, BreathingPhase obj) {
     writer
       ..writeByte(6)
       ..writeByte(0)
@@ -35,7 +35,7 @@ class StepAdapter extends TypeAdapter<Step> {
       ..writeByte(1)
       ..write(obj.increment)
       ..writeByte(2)
-      ..write(obj.stepType)
+      ..write(obj.breathingPhaseType)
       ..writeByte(3)
       ..write(obj.breathType)
       ..writeByte(4)
@@ -50,44 +50,44 @@ class StepAdapter extends TypeAdapter<Step> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is StepAdapter &&
+      other is BreathDepthAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class StepTypeAdapter extends TypeAdapter<StepType> {
+class BreathingPhaseTypeAdapter extends TypeAdapter<BreathingPhaseType> {
   @override
   final int typeId = 3;
 
   @override
-  StepType read(BinaryReader reader) {
+  BreathingPhaseType read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return StepType.inhale;
+        return BreathingPhaseType.inhale;
       case 1:
-        return StepType.exhale;
+        return BreathingPhaseType.exhale;
       case 2:
-        return StepType.retention;
+        return BreathingPhaseType.retention;
       case 3:
-        return StepType.recovery;
+        return BreathingPhaseType.recovery;
       default:
-        return StepType.inhale;
+        return BreathingPhaseType.inhale;
     }
   }
 
   @override
-  void write(BinaryWriter writer, StepType obj) {
+  void write(BinaryWriter writer, BreathingPhaseType obj) {
     switch (obj) {
-      case StepType.inhale:
+      case BreathingPhaseType.inhale:
         writer.writeByte(0);
         break;
-      case StepType.exhale:
+      case BreathingPhaseType.exhale:
         writer.writeByte(1);
         break;
-      case StepType.retention:
+      case BreathingPhaseType.retention:
         writer.writeByte(2);
         break;
-      case StepType.recovery:
+      case BreathingPhaseType.recovery:
         writer.writeByte(3);
         break;
     }
@@ -99,7 +99,7 @@ class StepTypeAdapter extends TypeAdapter<StepType> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is StepTypeAdapter &&
+      other is BreathingPhaseTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

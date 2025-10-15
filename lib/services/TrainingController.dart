@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
-import 'package:respire/components/Global/Step.dart' as training_step;
+import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/components/Global/TrainingSounds.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TextToSpeechService.dart';
@@ -11,25 +11,25 @@ import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 class TrainingController {
   Timer? _timer;
   final TrainingParser parser;
-  final ValueNotifier<Queue<training_step.Step?>> stepsQueue =
-      ValueNotifier(Queue<training_step.Step?>());
-  final Queue<String?> _phaseNameQueue = Queue<String?>();
+  final ValueNotifier<Queue<breathing_phase.BreathingPhase?>> breathingPhasesQueue =
+      ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
+  final Queue<String?> _breathingPhaseNameQueue = Queue<String?>();
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
-  final ValueNotifier<int> stepsCount = ValueNotifier(0);
-  final ValueNotifier<String> currentPhaseName = ValueNotifier('');
+  final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
+  final ValueNotifier<String> currentBreathingPhaseName = ValueNotifier('');
 
   final int _updateInterval = 100; //in milliseconds
-  final int _stepDelayDuration = 600; //in milliseconds
+  final int _breathingPhaseDelayDuration = 600; //in milliseconds
 
   int _remainingTime = 0; //in milliseconds
   int _nextRemainingTime = 0; //in milliseconds
-  int _newStepRemainingTime = 0; //in milliseconds
+  int _newBreathingPhaseRemainingTime = 0; //in milliseconds
 
-  int _stepDelayRemainingTime = 600; //in milliseconds
+  int _breathingPhaseDelayRemainingTime = 600; //in milliseconds
 
   bool _finished = false;
-  bool _stepDelay = true;
+  bool _breathingPhaseDelay = true;
   int _stopTimer = 2;
 
   late TrainingSounds _sounds;
@@ -44,31 +44,31 @@ class TrainingController {
     soundManager.stopAllSounds();
     _remainingTime = parser.training.settings.preparationDuration * 1000;
     _sounds = parser.training.trainingSounds;
-    _preloadSteps();
+    _preloadBreathingPhases();
     _start();
   }
 
-  void _preloadSteps() {
-    stepsQueue.value.add(null);
-    _phaseNameQueue.add(null);
-    _updateCurrentPhaseLabel();
-    _fetchNextStep();
-    _nextRemainingTime = _newStepRemainingTime;
-    _fetchNextStep();
+  void _preloadBreathingPhases() {
+    breathingPhasesQueue.value.add(null);
+    _breathingPhaseNameQueue.add(null);
+    _updateCurrentBreathingPhaseLabel();
+    _fetchNextBreathingPhase();
+    _nextRemainingTime = _newBreathingPhaseRemainingTime;
+    _fetchNextBreathingPhase();
   }
 
-  void _fetchNextStep() {
+  void _fetchNextBreathingPhase() {
     var instructionData = parser.nextInstruction();
     if (instructionData == null) {
       _finished = true;
-      stepsQueue.value.add(null);
-      _phaseNameQueue.add(null);
+      breathingPhasesQueue.value.add(null);
+      _breathingPhaseNameQueue.add(null);
       return;
     }
-    stepsQueue.value.add(instructionData["step"]);
-    _phaseNameQueue.add(_resolvePhaseName(
-        instructionData["phaseName"] as String?, parser.phaseID));
-    _newStepRemainingTime = instructionData["remainingTime"];
+    breathingPhasesQueue.value.add(instructionData["breathingPhase"]);
+    _breathingPhaseNameQueue.add(_resolveBreathingPhaseName(
+        instructionData["breathingPhaseName"] as String?, parser.breathingPhaseID));
+    _newBreathingPhaseRemainingTime = instructionData["remainingTime"];
   }
 
   void pause() {
@@ -101,13 +101,13 @@ class TrainingController {
     }
   }
 
-  void _playPrePhaseSound(training_step.Step step) {
-    String? sound = step.sounds.prePhase;
+  void _playPreBreathingPhaseSound(breathing_phase.BreathingPhase breathingPhase) {
+    String? sound = breathingPhase.sounds.preBreathingPhase;
     switch (sound) {
       case "Voice":
-        String stepName =
-            translationProvider.getTranslation("StepType.${step.stepType.name}");
-        TextToSpeechService().speak(stepName);
+        String breathingPhaseName =
+            translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathingPhaseType.name}");
+        TextToSpeechService().speak(breathingPhaseName);
         break;
       case "None":
         break;
@@ -119,11 +119,11 @@ class TrainingController {
         break;
     }
   }
-  
-  Future<void> _handleBackgroundSoundChange(training_step.Step step, String? currentBackgroundSound) async {
-    if (currentBackgroundSound != step.sounds.background) {
-      await soundManager.pauseSoundFadeOut(currentBackgroundSound,(_stepDelayDuration / 2).toInt());
-      soundManager.playSoundFadeIn(step.sounds.background, (_stepDelayDuration / 2).toInt());
+
+  Future<void> _handleBackgroundSoundChange(breathing_phase.BreathingPhase breathingPhase, String? currentBackgroundSound) async {
+    if (currentBackgroundSound != breathingPhase.sounds.background) {
+      await soundManager.pauseSoundFadeOut(currentBackgroundSound,(_breathingPhaseDelayRemainingTime / 2).toInt());
+      soundManager.playSoundFadeIn(breathingPhase.sounds.background, (_breathingPhaseDelayRemainingTime / 2).toInt());
     }
   }
 
@@ -152,65 +152,65 @@ class TrainingController {
         _remainingTime = 0; // finish this segment
       }
 
-      // step delay for reading the name (enter delay when main time finished)
-      if (_remainingTime == 0 && _stepDelay && _stopTimer != 0) {
-        stepsCount.value++;
-        if (stepsQueue.value.elementAt(1) != null) {
-          if (_phaseNameQueue.length > 1 && _phaseNameQueue.elementAt(1) != null) {
-            _updateCurrentPhaseLabel(peekNext: true);
+      // breathing phase delay for reading the name (enter delay when main time finished)
+      if (_remainingTime == 0 && _breathingPhaseDelay && _stopTimer != 0) {
+        breathingPhasesCount.value++;
+        if (breathingPhasesQueue.value.elementAt(1) != null) {
+          if (_breathingPhaseNameQueue.length > 1 && _breathingPhaseNameQueue.elementAt(1) != null) {
+            _updateCurrentBreathingPhaseLabel(peekNext: true);
           }
         } else {
-          currentPhaseName.value = '';
+          currentBreathingPhaseName.value = '';
         }
-        if (stepsQueue.value.elementAt(1) != null) {
+        if (breathingPhasesQueue.value.elementAt(1) != null) {
           second.value = 0;
-          training_step.Step step = stepsQueue.value.elementAt(1)!;
-          _handleBackgroundSoundChange(step, currentBackgroundSound);
-          _playPrePhaseSound(step);
-          currentBackgroundSound = step.sounds.background;
+          breathing_phase.BreathingPhase breathingPhase = breathingPhasesQueue.value.elementAt(1)!;
+          _handleBackgroundSoundChange(breathingPhase, currentBackgroundSound);
+          _playPreBreathingPhaseSound(breathingPhase);
+          currentBackgroundSound = breathingPhase.sounds.background;
         }
-        _stepDelay = false; 
-      } else if (_remainingTime == 0 && _stepDelayRemainingTime > 0) {
+        _breathingPhaseDelay = false;
+      } else if (_remainingTime == 0 && _breathingPhaseDelayRemainingTime > 0) {
         // decrement delay with elapsed time
-        if (_stepDelayRemainingTime > elapsed) {
-          _stepDelayRemainingTime -= elapsed;
+        if (_breathingPhaseDelayRemainingTime > elapsed) {
+          _breathingPhaseDelayRemainingTime -= elapsed;
         } else {
-          _stepDelayRemainingTime = 0;
+          _breathingPhaseDelayRemainingTime = 0;
         }
       }
 
       // end of delay period, decide next action
-      if (_remainingTime == 0 && _stepDelayRemainingTime == 0) {
+      if (_remainingTime == 0 && _breathingPhaseDelayRemainingTime == 0) {
         if (_finished) {
           if (_stopTimer == 0) {
             second.value = 0;
             _timer?.cancel();
           } else {
-            stepsQueue.value.removeFirst();
-            stepsQueue.value.add(null);
-            stepsQueue.value =
-                Queue<training_step.Step?>.from(stepsQueue.value);
+            breathingPhasesQueue.value.removeFirst();
+            breathingPhasesQueue.value.add(null);
+            breathingPhasesQueue.value =
+                Queue<breathing_phase.BreathingPhase?>.from(breathingPhasesQueue.value);
             _remainingTime = _nextRemainingTime;
             previousSecond = _remainingTime ~/ 1000;
             _stopTimer--;
-            _stepDelay = true;
-            _stepDelayRemainingTime = _stepDelayDuration;
+            _breathingPhaseDelay = true;
+            _breathingPhaseDelayRemainingTime = _breathingPhaseDelayDuration;
           }
-        } else if (!_stepDelay) {
-          // start new step
-          stepsQueue.value.removeFirst();
+        } else if (!_breathingPhaseDelay) {
+          // start new breathing phase
+          breathingPhasesQueue.value.removeFirst();
           _remainingTime = _nextRemainingTime;
-          if (_phaseNameQueue.isNotEmpty) {
-            _phaseNameQueue.removeFirst();
+          if (_breathingPhaseNameQueue.isNotEmpty) {
+            _breathingPhaseNameQueue.removeFirst();
           }
-          _nextRemainingTime = _newStepRemainingTime;
+          _nextRemainingTime = _newBreathingPhaseRemainingTime;
           previousSecond = _remainingTime ~/ 1000;
-          _fetchNextStep();
-          stepsQueue.value =
-              Queue<training_step.Step?>.from(stepsQueue.value);
-          _updateCurrentPhaseLabel();
-          _stepDelay = true;
-          _stepDelayRemainingTime = _stepDelayDuration;
+          _fetchNextBreathingPhase();
+          breathingPhasesQueue.value =
+              Queue<breathing_phase.BreathingPhase?>.from(breathingPhasesQueue.value);
+          _updateCurrentBreathingPhaseLabel();
+          _breathingPhaseDelay = true;
+          _breathingPhaseDelayRemainingTime = _breathingPhaseDelayDuration;
         }
       }
     });
@@ -220,38 +220,38 @@ class TrainingController {
     TextToSpeechService().stopSpeaking();
     soundManager.stopAllSounds();
     _timer?.cancel();
-    currentPhaseName.dispose();
+    currentBreathingPhaseName.dispose();
   }
 
-  String _resolvePhaseName(String? rawName, int phaseIndex) {
+  String _resolveBreathingPhaseName(String? rawName, int breathingPhaseIndex) {
     final cleaned = rawName?.trim();
     if (cleaned != null && cleaned.isNotEmpty) {
       return cleaned;
     }
-    return _defaultStageName(phaseIndex);
+    return _defaultStageName(breathingPhaseIndex);
   }
 
-  void _updateCurrentPhaseLabel({bool peekNext = false}) {
+  void _updateCurrentBreathingPhaseLabel({bool peekNext = false}) {
     String? name;
     if (peekNext) {
-      if (_phaseNameQueue.length > 1) {
-        name = _phaseNameQueue.elementAt(1);
+      if (_breathingPhaseNameQueue.length > 1) {
+        name = _breathingPhaseNameQueue.elementAt(1);
       } else {
         name = null;
       }
     } else {
-      if (_phaseNameQueue.isEmpty) {
+      if (_breathingPhaseNameQueue.isEmpty) {
         name = null;
       } else {
-        name = _phaseNameQueue.first;
+        name = _breathingPhaseNameQueue.first;
       }
     }
 
     final trimmed = name?.trim();
     if (trimmed == null || trimmed.isEmpty) {
-      currentPhaseName.value = '';
+      currentBreathingPhaseName.value = '';
     } else {
-      currentPhaseName.value = trimmed;
+      currentBreathingPhaseName.value = trimmed;
     }
   }
 

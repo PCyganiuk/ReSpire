@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   void addPreset() {
     //TODO: Implement preset adding (dedicated page + controllers)
     db.presetList
-        .add(Training(title: titleController.text, phases: List.empty()));
+        .add(Training(title: titleController.text, trainingStages: List.empty()));
     setState(() {});
     clearValues();
     db.updateDataBase();
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   void editPreset(int index) {
     //TODO: Implement preset editing (dedicated page + controllers)
     db.presetList[index] =
-        Training(title: titleController.text, phases: List.empty());
+        Training(title: titleController.text, trainingStages: List.empty());
     setState(() {});
     clearValues();
     db.updateDataBase();
@@ -215,15 +215,15 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                 builder: (context) => TrainingEditorPage(
                                   training:
-                                      Training(title: translationProvider.getTranslation("HomePage.default_training_title"), phases: []),
+                                      Training(title: translationProvider.getTranslation("HomePage.default_training_title"), trainingStages: []),
                                 ),
                               ),
                             );
 
-                            // Only persist if user added at least one step in any phase
+                            // Only persist if user added at least one breathing phase in any training stage
                             if (newTraining != null &&
-                                newTraining.phases
-                                    .any((phase) => phase.steps.isNotEmpty)) {
+                                newTraining.trainingStages
+                                    .any((trainingStage) => trainingStage.breathingPhases.isNotEmpty)) {
                               setState(() {
                                 db.presetList.add(newTraining);
                                 db.updateDataBase();

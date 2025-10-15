@@ -9,12 +9,12 @@ class Sounds {
   // // Sound for counting during exercises
   // String? countingSound;
 
-  // // Global switch phase sound to be used across all training
+  // // Global switch breathing phase sound to be used across all training
   // String? globalSound;
 
-  // // Sounds for each phase type
-  // Map<StepType, String?> stepTypeSounds = {
-  //   for (var type in StepType.values) type: null
+  // // Sounds for each breathing phase type
+  // Map<BreathingPhaseType, String?> breathingPhaseSounds = {
+  //   for (var type in BreathingPhaseType.values) type: null
   // };
 
   // // Preparation and ending tracks for the training session
@@ -28,9 +28,9 @@ class Sounds {
   // // key - stage uuid, value - sound name
   // Map<String, String?> stageTracks = {};
   
-  // // Audio files for each phase type
-  // Map<StepType, String?> stepTypeTracks = {
-  //   for (var type in StepType.values) type: null
+  // // Audio files for each breathing phase type
+  // Map<BreathingPhaseType, String?> breathingPhaseTracks = {
+  //   for (var type in BreathingPhaseType.values) type: null
   // };
 
   @HiveField(0)

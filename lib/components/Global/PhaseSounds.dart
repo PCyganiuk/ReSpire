@@ -3,16 +3,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 part 'PhaseSounds.g.dart';
 
 @HiveType(typeId: 11)
-class PhaseSounds {
+class BreathingPhaseSounds {
   
   @HiveField(0)
-  String? prePhase;
+  String? preBreathingPhase;
 
   @HiveField(1)
   String? background;
 
-  PhaseSounds({
-    this.prePhase,
+  BreathingPhaseSounds({
+    this.preBreathingPhase,
     this.background
   });
 }

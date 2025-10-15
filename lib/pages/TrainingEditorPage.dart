@@ -25,7 +25,7 @@ class TrainingEditorPage extends StatefulWidget {
 }
 
 class _TrainingEditorPageState extends State<TrainingEditorPage> {
-  late List<Phase> phases;
+  late List<TrainingStage> trainingStages;
   late Settings settings;
   late TextEditingController preparationController;
   late TextEditingController descriptionController;
@@ -35,36 +35,36 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   int _selectedTab = 0;
   late Sounds _sounds;
 
-  //Next step sound options
-  late Map<String,String?> _showNextStepSoundOptions = {};
+  //Next breathing phase sound options
+  late Map<String,String?> _showNextBreathingPhaseSoundOptions = {};
 
    //Background sound options
   late Map<String,String?> _showBackgroundSoundOptions = {};
   
   // Other tab state
-  bool _showNextStepToggle = false;
+  bool _showNextBreathingPhaseToggle = false;
   bool _showChartToggle = false;
-  bool _showStepColorsToggle = false;
+  bool _showBreathingPhaseColorsToggle = false;
 
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
   void initState() {
     super.initState();
-    _initializeStepSoundOptions();
+    _initializeBreathingPhaseSoundOptions();
     _initializeBackgroundSoundOptions();
-    phases = widget.training.phases;
+    trainingStages = widget.training.trainingStages;
     _sounds = widget.training.sounds;
     descriptionController = TextEditingController(text: widget.training.description);
     preparationController = TextEditingController(text: widget.training.settings.preparationDuration.toString());
   }
 
-  void _initializeStepSoundOptions() {
-    _showNextStepSoundOptions = {
-      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.none"): null,
-      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.voice"): "voice",
-      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.global"): "global",
-      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.for_each_phase"): "phase",
+  void _initializeBreathingPhaseSoundOptions() {
+    _showNextBreathingPhaseSoundOptions = {
+      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.none"): null,
+      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.voice"): "voice",
+      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"): "global",
+      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.for_each_phase"): "phase",
     };
   }
       void _initializeBackgroundSoundOptions() {
@@ -72,7 +72,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.none"): null,
       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"): "global",
       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.stages"): "stages",
-      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.breathing_phases"): "breathing_phases",
+      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.breathing_phases"): "breathing_phases", // ????
     };
   }
 
@@ -81,9 +81,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     print("Training saved: ${widget.training.title}");
   }
 
-  void addPhase() {
+  void addTrainingStage() {
     setState(() {
-      phases.add(Phase(reps: 3, steps: [], increment: 0, name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} ${phases.length + 1}"));
+      trainingStages.add(TrainingStage(reps: 3, breathingPhases: [], increment: 0, name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage")} ${trainingStages.length + 1}"));
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -91,18 +91,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-      // Clear any active focus when adding new phase to prevent keyboard issues
+      // Clear any active focus when adding new breathing phase to prevent keyboard issues
       FocusScope.of(context).unfocus();
     });
   }
 
-  void removePhase(int index) async {
+  void removeTrainingStage(int index) async {
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.remove_phase_dialog_title")),
-          content: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.remove_phase_dialog_content")),
+          title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.remove_training_stage_dialog_title")),
+          content: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.remove_training_stage_dialog_content")),
           actions: [
             TextButton(
               onPressed: () {
@@ -123,16 +123,16 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
     if (confirmDelete ?? false) {
       setState(() {
-        phases.removeAt(index);
+        trainingStages.removeAt(index);
       });
     }
   }
 
-  void reorderPhase(int oldIndex, int newIndex) {
+  void reorderTrainingStage(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) newIndex -= 1;
-      final phase = phases.removeAt(oldIndex);
-      phases.insert(newIndex, phase);
+      final trainingStage = trainingStages.removeAt(oldIndex);
+      trainingStages.insert(newIndex, trainingStage);
     });
   }
 
@@ -297,18 +297,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 child: _selectedTab == 0
                     ? ReorderableListView(
                         scrollController: _scrollController,
-                        onReorder: reorderPhase,
+                        onReorder: reorderTrainingStage,
                         proxyDecorator: (child, idx, anim) => Material(color: Colors.transparent, child: child), //removes shadow when dragging tile
                         padding: EdgeInsets.only(bottom: 80),
                         children: [
-                          for (int index = 0; index < phases.length; index++)
-                            PhaseTile(
-                              key: ValueKey('phase_$index'),
-                              phase: phases[index],
-                              phaseIndex: index,
-                              onDelete: () => removePhase(index),
+                          for (int index = 0; index < trainingStages.length; index++)
+                            TrainingStageTile(
+                              key: ValueKey('stage_$index'),
+                              trainingStage: trainingStages[index],
+                              trainingStageIndex: index,
+                              onDelete: () => removeTrainingStage(index),
                               onUpdate: () {
-                                setState(() => widget.training.phases = phases);
+                                setState(() => widget.training.trainingStages = trainingStages);
                               },
                             ),
                         ],
@@ -334,7 +334,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     Row(
                                         children: [
                                           Text(
-                                            translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.title"),
+                                            translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.title"),
                                             style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
                                           ),
                                           SizedBox(width: 8),
@@ -358,7 +358,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                       ),
                                                     ), 
                                                   value: _sounds.nextSound, 
-                                                  items: _showNextStepSoundOptions.map((key, value) {
+                                                  items: _showNextBreathingPhaseSoundOptions.map((key, value) {
                                                     return MapEntry(key, DropdownMenuItem(value: value, child: Text(key)));
                                                   }).values.toList(),
                                                   onChanged: (v) => setState(() => _sounds.nextSound = v))],
@@ -368,13 +368,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       Column(
                                           children: [
                                             if(_sounds.nextSound=="global") ...[
-                                              SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextPhaseSounds.global"), selectedValue: _sounds.nextGlobalSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextGlobalSound = v; }))
+                                              SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"), selectedValue: _sounds.nextGlobalSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextGlobalSound = v; }))
                                             ] 
                                             else
-                                            ...[SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.nextInhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextInhaleSound = v; })),
-                                            SoundSelectionRow(label: translationProvider.getTranslation("StepType.retention"), selectedValue: _sounds.nextRetentionSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRetentionSound = v; })),
-                                            SoundSelectionRow(label: translationProvider.getTranslation("StepType.exhale"), selectedValue: _sounds.nextExhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextExhaleSound = v; })),
-                                            SoundSelectionRow(label: translationProvider.getTranslation("StepType.recovery"), selectedValue: _sounds.nextRecoverySound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRecoverySound = v ; })),
+                                            ...[SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.inhale"), selectedValue: _sounds.nextInhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextInhaleSound = v; })),
+                                            SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.retention"), selectedValue: _sounds.nextRetentionSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRetentionSound = v; })),
+                                            SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.exhale"), selectedValue: _sounds.nextExhaleSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextExhaleSound = v; })),
+                                            SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.recovery"), selectedValue: _sounds.nextRecoverySound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextRecoverySound = v ; })),
                                           ],
                                           ],
                                         ),
@@ -437,15 +437,15 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"), selectedValue: _sounds.backgroundSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.backgroundSound = v; }))
                                                 ] 
                                                 else if(_sounds.backgroundOptionSound=="breathing_phases")
-                                                ...[SoundSelectionRow(label: translationProvider.getTranslation("StepType.inhale"), selectedValue: _sounds.inhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.inhaleSound = v; })),
-                                                SoundSelectionRow(label: translationProvider.getTranslation("StepType.retention"), selectedValue: _sounds.retentionSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.retentionSound = v; })),
-                                                SoundSelectionRow(label: translationProvider.getTranslation("StepType.exhale"), selectedValue: _sounds.exhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.exhaleSound = v; })),
-                                                SoundSelectionRow(label: translationProvider.getTranslation("StepType.recovery"), selectedValue: _sounds.recoverySound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.recoverySound = v ; })),
+                                                ...[SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.inhale"), selectedValue: _sounds.inhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.inhaleSound = v; })),
+                                                SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.retention"), selectedValue: _sounds.retentionSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.retentionSound = v; })),
+                                                SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.exhale"), selectedValue: _sounds.exhaleSound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.exhaleSound = v; })),
+                                                SoundSelectionRow(label: translationProvider.getTranslation("BreathingPhaseType.recovery"), selectedValue: _sounds.recoverySound, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.recoverySound = v ; })),
                                                 ]
                                                 else ...[
-                                                  for (int i = 0; i < phases.length; i++)
+                                                  for (int i = 0; i < trainingStages.length; i++)
                                                     SoundSelectionRow(
-                                                      label: phases[i].name, 
+                                                      label: trainingStages[i].name, 
                                                       selectedValue: (_sounds.backgroundStagesSounds != null &&
                                                                       _sounds.backgroundStagesSounds!.length > i)
                                                                   ? _sounds.backgroundStagesSounds![i]
@@ -454,9 +454,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                       onChanged: (v) {
                                                         setState(() {
                                                           if (_sounds.backgroundStagesSounds == null) {
-                                                            _sounds.backgroundStagesSounds = List<String?>.filled(phases.length, null).cast<String>();
-                                                          } else if (_sounds.backgroundStagesSounds!.length < phases.length) {
-                                                            _sounds.backgroundStagesSounds!.length = phases.length;
+                                                            _sounds.backgroundStagesSounds = List<String?>.filled(trainingStages.length, null).cast<String>();
+                                                          } else if (_sounds.backgroundStagesSounds!.length < trainingStages.length) {
+                                                            _sounds.backgroundStagesSounds!.length = trainingStages.length;
                                                           }
                                                           _sounds.backgroundStagesSounds![i] = v;
                                                         });
@@ -515,24 +515,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       },
                                     ),
                                     SizedBox(height: 12),
-                                    SwitchListTile(title: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.next_step_label")), value: _showNextStepToggle, activeColor: darkerblue, inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
+                                    SwitchListTile(title: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.next_breathing_phase_label")), value: _showNextBreathingPhaseToggle, activeColor: darkerblue, inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
                                       WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
                                         if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
                                           return mediumblue;
                                         } return null;}), 
-                                      onChanged: null),//(v) => setState(() => _showNextStepToggle = v)),
+                                      onChanged: null),//(v) => setState(() => _showNextBreathingPhaseToggle = v)),
                                     SwitchListTile(title: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.chart_label")), value: _showChartToggle, activeColor: darkerblue, inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
                                       WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
                                         if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
                                           return mediumblue;
                                         } return null;}),
                                       onChanged: null), //(v) => setState(() => _showChartToggle = v)),
-                                    SwitchListTile(title: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.step_colors_label")), value: _showStepColorsToggle, activeColor: darkerblue,inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
+                                    SwitchListTile(title: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.breathing_phase_colors_label")), value: _showBreathingPhaseColorsToggle, activeColor: darkerblue,inactiveTrackColor: Colors.white, inactiveThumbColor: Colors.grey, trackOutlineColor: 
                                       WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
                                         if (!states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
                                           return mediumblue;
                                         } return null;}),
-                                      onChanged: null),//(v) => setState(() => _showStepColorsToggle = v)),
+                                      onChanged: null),//(v) => setState(() => _showBreathingPhaseColorsToggle = v)),
                                     ListTile(
                                       title: Text(
                                         translationProvider.getTranslation("TrainingEditorPage.OtherTab.preparation_duration_label")
@@ -609,7 +609,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         ),
         floatingActionButton: _selectedTab == 0
              ? FloatingActionButton.extended(
-                 onPressed: addPhase,
+                 onPressed: addTrainingStage,
                  backgroundColor: darkerblue,
                  label: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.add_stage_button_label"), style: TextStyle(color: Colors.white)),
                  icon: Icon(Icons.add, color: Colors.white),

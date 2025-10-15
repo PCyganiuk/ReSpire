@@ -6,24 +6,24 @@ part of 'StepIncrement.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class StepIncrementAdapter extends TypeAdapter<StepIncrement> {
+class BreathingPhaseIncrementAdapter extends TypeAdapter<BreathingPhaseIncrement> {
   @override
   final int typeId = 8;
 
   @override
-  StepIncrement read(BinaryReader reader) {
+  BreathingPhaseIncrement read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return StepIncrement(
+    return BreathingPhaseIncrement(
       value: fields[0] as double,
-      type: fields[1] as IncrementType,
+      type: fields[1] as BreathingPhaseIncrementType,
     );
   }
 
   @override
-  void write(BinaryWriter writer, StepIncrement obj) {
+  void write(BinaryWriter writer, BreathingPhaseIncrement obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
@@ -38,34 +38,34 @@ class StepIncrementAdapter extends TypeAdapter<StepIncrement> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is StepIncrementAdapter &&
+      other is BreathingPhaseIncrementAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class IncrementTypeAdapter extends TypeAdapter<IncrementType> {
+class BreathingPhaseIncrementTypeAdapter extends TypeAdapter<BreathingPhaseIncrementType> {
   @override
   final int typeId = 7;
 
   @override
-  IncrementType read(BinaryReader reader) {
+  BreathingPhaseIncrementType read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return IncrementType.percentage;
+        return BreathingPhaseIncrementType.percentage;
       case 1:
-        return IncrementType.value;
+        return BreathingPhaseIncrementType.value;
       default:
-        return IncrementType.percentage;
+        return BreathingPhaseIncrementType.percentage;
     }
   }
 
   @override
-  void write(BinaryWriter writer, IncrementType obj) {
+  void write(BinaryWriter writer, BreathingPhaseIncrementType obj) {
     switch (obj) {
-      case IncrementType.percentage:
+      case BreathingPhaseIncrementType.percentage:
         writer.writeByte(0);
         break;
-      case IncrementType.value:
+      case BreathingPhaseIncrementType.value:
         writer.writeByte(1);
         break;
     }
@@ -77,7 +77,7 @@ class IncrementTypeAdapter extends TypeAdapter<IncrementType> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is IncrementTypeAdapter &&
+      other is BreathingPhaseIncrementTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -44,17 +44,17 @@
             "edit_title_dialog_title":"Edytuj nazwę treningu",
             "edit_title_dialog_hint":"Wpisz nazwę treningu",
             "error":"Tytuł nie może być pusty",
-            "remove_phase_dialog_title":"Usunąć fazę?",
-            "remove_phase_dialog_content":"Na pewno chcesz usunąć fazę?",
+            "remove_training_stage_dialog_title":"Usunąć fazę treningu?",
+            "remove_training_stage_dialog_content":"Na pewno chcesz usunąć fazę treningu?",
             "add_stage_button_label":"Dodaj etap treningu",
             "default_stage_name":"Etap {number}",
-            
-            "PhaseTile":{
+
+            "TrainingStageTile":{
                 "name":"Nazwa etapu",
                 "name_placeholder":"Wpisz nazwę etapu",
                 "reps":"Powtórzenia",
                 "increment":"Przyrost (s)",
-                "add_phase_button_label":"Dodaj fazę oddechu"
+                "add_breathing_phase_button_label":"Dodaj fazę oddechu"
             },
 
             "BreathingPhaseTile":{
@@ -69,12 +69,12 @@
             "TrainingSounds":{
                 "title":"Dźwięki treningu",
                 "counting_sound": "Odliczanie",
-                "NextPhaseSounds":{
-                    "title":"Następna faza",
+                "NextBreathingPhaseSounds":{
+                    "title":"Następna faza oddechu",
                     "none": "Brak",
                     "voice":"Lektor",
                     "global":"Globalnie",
-                    "for_each_phase":"Dla każdej fazy"
+                    "for_each_breathing_phase":"Dla każdej fazy oddechu"
                 }
             },
 
@@ -86,8 +86,8 @@
                     "title": "Muzyka w tle",
                     "global": "Dla całego treningu",
                     "stages": "Dla etapów",
-                    "breathing_phases": "Dla faz",
-                    "breathing_phases_label": "Fazy",
+                    "breathing_phases": "Dla fazy oddechu",
+                    "breathing_phases_label": "Fazy oddechu",
                     "none": "Brak"
                 }
             },

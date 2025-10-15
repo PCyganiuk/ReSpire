@@ -54,7 +54,7 @@
                 "name_placeholder":"Enter training stage name",
                 "reps":"Reps",
                 "increment":"Inc (s)",
-                "add_training_stage_button_label":"Add breathing training stage"
+                "add_breathing_phase_button_label":"Add breathing phase"
             },
 
             "BreathingPhaseTile":{
@@ -69,11 +69,11 @@
             "TrainingSounds":{
                 "title": "Training sounds",
                 "counting_sound": "Counting",
-                "NextTrainingStageSounds":{
-                    "title":"Next training stage",
+                "NextBreathingPhaseSounds":{
+                    "title":"Next breathing phase",
                     "global":"Global",
                     "voice":"Lector",
-                    "for_each_training_stage":"For each training stage"
+                    "for_each_breathing_phase":"For each breathing phase"
                 }
             },
 
@@ -85,8 +85,8 @@
                     "title": "Background",
                     "global": "For whole training",
                     "training_stages": "For training stages",
-                    "breathing_phases": "For phases",
-                    "breathing_phases_label": "Phases",
+                    "breathing_phases": "For breathing phases",
+                    "breathing_phases_label": "Breathing Phases",
                     "none": "None"
                 }
             },

@@ -18,7 +18,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
     };
     return Training(
       title: fields[0] as String,
-      phases: (fields[2] as List).cast<Phase>(),
+      trainingStages: (fields[2] as List).cast<TrainingStage>(),
       description: fields[1] as String,
     )
       ..sounds = fields[3] as Sounds
@@ -36,7 +36,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
       ..writeByte(1)
       ..write(obj.description)
       ..writeByte(2)
-      ..write(obj.phases)
+      ..write(obj.trainingStages)
       ..writeByte(3)
       ..write(obj.sounds)
       ..writeByte(4)

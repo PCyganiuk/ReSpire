@@ -152,21 +152,21 @@ class SoundManager implements ISoundManager {
 
     await loadSound(soundName!);
     var player = _audioPlayers[soundName]!;
-    final int stepDuration = 50;
+    final int breathingPhaseDuration = 50;
     player.setVolume(0.0);
 
-    int steps = (fadeInDuration / stepDuration).ceil();
-    double volumeStep = 1.0 / steps;
+    int breathingPhases = (fadeInDuration / breathingPhaseDuration).ceil();
+    double volumeBreathingPhase = 1.0 / breathingPhases;
 
     await playSound(soundName);
 
-    for (int i=0; i<steps; i++)
+    for (int i=0; i<breathingPhases; i++)
     {
-      double newVolume = player.volume + volumeStep;
+      double newVolume = player.volume + volumeBreathingPhase;
       if (newVolume > 1.0) newVolume = 1.0;
-      log("Fade in: Volume step: $newVolume");
+      log("Fade in: Volume breathing phase: $newVolume");
       await player.setVolume(newVolume);
-      await Future.delayed(Duration(milliseconds: stepDuration));
+      await Future.delayed(Duration(milliseconds: breathingPhaseDuration));
     }
   }
 
@@ -213,18 +213,18 @@ class SoundManager implements ISoundManager {
     }
     
     var player = _audioPlayers[soundName]!;
-    final int stepDuration = 50;
+    final int breathingPhaseDuration = 50;
 
-    int steps = (fadeOutDuration / stepDuration).ceil();
-    double volumeStep = 1.0 / steps;
+    int breathingPhases = (fadeOutDuration / breathingPhaseDuration).ceil();
+    double volumeBreathingPhase = 1.0 / breathingPhases;
 
-    for(int i=0; i<steps; i++)
+    for(int i=0; i<breathingPhases; i++)
     {
-      double newVolume = player.volume - volumeStep;
+      double newVolume = player.volume - volumeBreathingPhase;
       if (newVolume < 0.0) newVolume = 0.0;
-      log("Fade out: Volume step: $newVolume");
+      log("Fade out: Volume breathing phase: $newVolume");
       await player.setVolume(newVolume);
-      await Future.delayed(Duration(milliseconds: stepDuration));
+      await Future.delayed(Duration(milliseconds: breathingPhaseDuration));
     }
     await pauseSound(soundName!);
     await player.setVolume(1.0);
