@@ -27,6 +27,8 @@ class _BreathingPageState extends State<BreathingPage> {
   @override
   void initState() {
     super.initState();
+    // Ensure sounds are properly propagated to breathing phases
+    widget.training.updateSounds();
     parser = TrainingParser(training: widget.training);
     controller = TrainingController(parser);
     breathingPhases = parser.countBreathingPhases();
@@ -133,7 +135,7 @@ class _BreathingPageState extends State<BreathingPage> {
           SizedBox(height: 16),
 
           ValueListenableBuilder<String>(
-            valueListenable: controller.currentBreathingPhaseName,
+            valueListenable: controller.currentTrainingStageName,
             builder: (context, stageName, _) {
               final trimmed = stageName.trim();
               final hasLabel = trimmed.isNotEmpty;
