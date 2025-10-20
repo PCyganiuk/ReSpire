@@ -47,7 +47,7 @@
             "add_training_stage_button_label":"Add training stage",
             "remove_training_stage_dialog_title":"Remove training stage?",
             "remove_training_stage_dialog_content":"Are you sure you want to remove this training stage?",
-            "default_training_stage_name":"Training stage {number}",
+            "default_training_stage_name":"Training stage",
 
             "TrainingStageTile":{
                 "name":"Training stage name",

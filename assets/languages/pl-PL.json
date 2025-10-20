@@ -24,7 +24,7 @@
         "description_placeholder_prefix":"Dodaj opis dla treningu",
         "TrainingOverview":{
             "title":"Przegląd treningu",
-            "stage":"Etap",
+            "training_stage":"Etap treningu",
             "reps":"Powtórzenia",
             "increment":"Przyrost"
         },
@@ -46,8 +46,8 @@
             "error":"Tytuł nie może być pusty",
             "remove_training_stage_dialog_title":"Usunąć fazę treningu?",
             "remove_training_stage_dialog_content":"Na pewno chcesz usunąć fazę treningu?",
-            "add_stage_button_label":"Dodaj etap treningu",
-            "default_stage_name":"Etap {number}",
+            "add_training_stage_button_label":"Dodaj etap treningu",
+            "default_training_stage_name":"Etap treningu",
 
             "TrainingStageTile":{
                 "name":"Nazwa etapu",
@@ -105,9 +105,9 @@
         "OtherTab":{
             "training_description_label":"Opis treningu",
             "training_description_hint":"Wpisz opis treningu...",
-            "next_training_stage_label":"Kolejna faza treningu",
+            "next_breathing_phase_label":"Kolejna faza oddechu",
             "chart_label":"Wykres",
-            "training_stage_colors_label":"Kolory faz treningu",
+            "breathing_phase_colors_label":"Kolory faz oddechu",
             "preparation_duration_label":"Długość trwania fazy przygotowania (s)"
         }
     },
@@ -116,8 +116,8 @@
         "exit_popup_title":"Wyjdź",
         "exit_popup_message":"Zakończyć trening?\nJeśli naciśniesz \"Tak\" twój trening zostanie przerwany.",
         "circle_paused_text":"Wznów",
-        "current_training_stage_label":"Aktualny etap",
-        "default_stage_name":"Etap {number}",
+        "current_training_stage_label":"Aktualny etap treningu",
+        "default_training_stage_name":"Etap treningu {number}",
         
         "InstructionSlider":{
             "get_ready_block_text":"Przygotuj się",
