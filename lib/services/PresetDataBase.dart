@@ -92,7 +92,7 @@ class PresetDataBase {
               BreathingPhase(duration: 1, breathingPhaseType: BreathingPhaseType.recovery),
             ],
             increment: 0,
-            name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} 1"
+            name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
           )
         ]
       )..sounds.globalBackgroundSound.path = "Birds"
@@ -111,8 +111,8 @@ class PresetDataBase {
             BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 0,
-          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} 1"
-          )
+              name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
+              )
         ]
       )..sounds.globalBackgroundSound.path = "Rain"
        ..sounds.preparationTrack.path = "Ainsa"
@@ -131,7 +131,7 @@ class PresetDataBase {
             BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 10,
-          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} 1"
+          name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
         ),
         TrainingStage(
           reps: 1,
@@ -142,7 +142,7 @@ class PresetDataBase {
             BreathingPhase(duration: 3, breathingPhaseType: BreathingPhaseType.recovery),
           ],
           increment: 0,
-          name: "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} 2"
+          name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 2"
         ),
       ],
     )..sounds.globalBackgroundSound.path = "Ainsa"

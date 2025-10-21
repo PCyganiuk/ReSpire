@@ -246,7 +246,7 @@ class _TrainingPageState extends State<TrainingPage> {
                                             child: Row(
                                           children: [
                                             Text(
-                                              translationProvider.getTranslation("StepType.${breathingPhase.breathingPhaseType.name}"),
+                                              translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathingPhaseType.name}"),
                                               style: TextStyle(
                                                   color: darkerblue,
                                                   fontWeight: FontWeight.bold),

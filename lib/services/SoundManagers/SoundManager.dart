@@ -16,13 +16,17 @@ class SoundManager implements ISoundManager {
     "Ainsa":"sounds/Ainsa.mp3",
     "Rain":"sounds/rain.mp3",
     "Ocean":"sounds/ocean-waves.mp3",
-    
+    "Chanting 1":"sounds/buddhist-chanting.mp3",
+    "Chanting 2":"sounds/chanting.mp3",
+    "Low hz":"sounds/low-hz.mp3",
+    "Solfeggio Frequency":"sounds/solfeggio-frequency.mp3",
   };
 
   static final Map<String,String?> _shortSounds = {
     "Notification":"sounds/new-notification.mp3",
     "Whistle Up":"sounds/whistle-up.mp3",
     "Whistle Down":"sounds/whistle-down.mp3",
+    "Gong":"sounds/gong.mp3",
   };
 
 
@@ -63,11 +67,11 @@ class SoundManager implements ISoundManager {
       return false;
     }
     AudioPlayer audioPlayer = AudioPlayer();
-    setPlayerSettings(audioPlayer);
+
+    setupAudioPlayer(audioPlayer, soundName);
 
     bool isAsset = _availableSounds[soundName]!.startsWith("sounds/");
     try{
-
       if(isAsset){
         await audioPlayer.setSource(AssetSource(_availableSounds[soundName]!));
       }
@@ -84,32 +88,33 @@ class SoundManager implements ISoundManager {
     }
   }
 
-  void setPlayerSettings(AudioPlayer audioPlayer) {
-    audioPlayer.setAudioContext(createAudioContext());
+  void setupAudioPlayer(AudioPlayer audioPlayer, String soundName) {
+    //Loops the audio
     audioPlayer.setReleaseMode(ReleaseMode.stop);
-    audioPlayer.onPlayerComplete.listen((event) async {
-        await audioPlayer.seek(Duration.zero);
+    
+    // Get total duration once it’s available
+    Duration? totalDuration;
+    audioPlayer.onDurationChanged.listen((d) {
+      totalDuration = d;
     });
-  }
 
-  AudioContext createAudioContext() {
-    return AudioContext(
-    android: AudioContextAndroid(
-      isSpeakerphoneOn: true,
-      stayAwake: true,
-      contentType: AndroidContentType.music,
-      usageType: AndroidUsageType.media,
-      // This is the most important part.
-      // It tells the player not to request focus, so it won't interrupt others.
-      audioFocus: AndroidAudioFocus.none,
-    ),
-    iOS: AudioContextIOS(
-      category: AVAudioSessionCategory.playback,
-      options: {
-        AVAudioSessionOptions.mixWithOthers,
-      },
-    ),
-  );
+    //Setup fade out when the audio completes
+    bool isFadingOut = false;
+    audioPlayer.onPositionChanged.listen((currentPosition) async {
+      if(isFadingOut) return;
+      if (totalDuration != null) {
+        if (totalDuration!.inMilliseconds - currentPosition.inMilliseconds <= 2000) {
+          isFadingOut = true;
+          await fadeOut(soundName, 1800);
+
+          // Reset audio after fade completes
+          await audioPlayer.seek(Duration.zero);
+          await audioPlayer.setVolume(1.0);
+          await audioPlayer.resume();
+        }
+        isFadingOut = false;
+      }
+    });
   }
 
   ///Lists all sounds that are currently loaded in the service.
@@ -204,14 +209,10 @@ class SoundManager implements ISoundManager {
     await _audioPlayers[soundName]!.stop();
   }
 
-  ///Pauses the provided sound with a fade-out effect.\
-  ///[fadeOutDuration] is the duration of the effect in milliseconds.
-  @override
-  Future<void> pauseSoundFadeOut(String? soundName, int fadeOutDuration) async{
-    if(_availableSounds[soundName] == null || !_audioPlayers.containsKey(soundName)) {
+  Future<void> fadeOut(String? soundName, int fadeOutDuration) async {
+    if(_availableSounds[soundName] == null) {
       return;
     }
-    
     var player = _audioPlayers[soundName]!;
     final int breathingPhaseDuration = 50;
 
@@ -226,10 +227,15 @@ class SoundManager implements ISoundManager {
       await player.setVolume(newVolume);
       await Future.delayed(Duration(milliseconds: breathingPhaseDuration));
     }
-    await pauseSound(soundName!);
     await player.setVolume(1.0);
   }
 
+  ///Pauses the provided sound with a fade-out effect.\
+  ///[fadeOutDuration] is the duration of the effect in milliseconds.
+  Future<void> pauseSoundFadeOut(String? soundName, int fadeOutDuration) async{
+    fadeOut(soundName, fadeOutDuration);
+    await pauseSound(soundName!);
+  }
 
   ///Stops all sounds that are currently playing.
   ///This will not unload the sounds, just stop and reset them.
