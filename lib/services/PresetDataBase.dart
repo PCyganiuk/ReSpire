@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/Phase.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Step.dart';
 import 'package:respire/components/Global/StepIncrement.dart';
@@ -48,26 +49,26 @@ class PresetDataBase {
   
   void _migrateSounds() {
     for (var training in presetList) {
-      bool hasNoSounds = training.sounds.preparationTrack.path == null &&
-                         training.sounds.globalBackgroundSound.path == null;
+      bool hasNoSounds = training.sounds.preparationTrack.type == SoundType.none &&
+                         training.sounds.globalBackgroundSound.type == SoundType.none;
       
       if (hasNoSounds) {
         int index = presetList.indexOf(training);
         switch (index % 3) {
           case 0:
-            training.sounds.globalBackgroundSound.path = "Birds";
-            training.sounds.preparationTrack.path = "Ocean";
-            training.sounds.endingTrack.path = "Rain";
+            training.sounds.globalBackgroundSound.name = "Birds";
+            training.sounds.preparationTrack.name = "Ocean";
+            training.sounds.endingTrack.name = "Rain";
             break;
           case 1:
-            training.sounds.globalBackgroundSound.path = "Rain";
-            training.sounds.preparationTrack.path = "Ainsa";
-            training.sounds.endingTrack.path = "Ocean";
+            training.sounds.globalBackgroundSound.name = "Rain";
+            training.sounds.preparationTrack.name = "Ainsa";
+            training.sounds.endingTrack.name = "Ocean";
             break;
           case 2:
-            training.sounds.globalBackgroundSound.path = "Ainsa";
-            training.sounds.preparationTrack.path = "Birds";
-            training.sounds.endingTrack.path = "Ocean";
+            training.sounds.globalBackgroundSound.name = "Ainsa";
+            training.sounds.preparationTrack.name = "Birds";
+            training.sounds.endingTrack.name = "Ocean";
             break;
         }
         training.sounds.backgroundSoundScope = SoundScope.global;
@@ -95,9 +96,9 @@ class PresetDataBase {
             name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
           )
         ]
-      )..sounds.globalBackgroundSound.path = "Birds"
-       ..sounds.preparationTrack.path = "Ocean"
-       ..sounds.endingTrack.path = "Rain"
+      )..sounds.globalBackgroundSound.name = "Birds"
+       ..sounds.preparationTrack.name = "Ocean"
+       ..sounds.endingTrack.name = "Rain"
        ..sounds.backgroundSoundScope = SoundScope.global
        ..updateSounds(),
       Training(
@@ -114,9 +115,9 @@ class PresetDataBase {
               name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
               )
         ]
-      )..sounds.globalBackgroundSound.path = "Rain"
-       ..sounds.preparationTrack.path = "Ainsa"
-       ..sounds.endingTrack.path = "Ocean"
+      )..sounds.globalBackgroundSound.name = "Rain"
+       ..sounds.preparationTrack.name = "Ainsa"
+       ..sounds.endingTrack.name = "Ocean"
        ..sounds.backgroundSoundScope = SoundScope.global
        ..updateSounds(),
       Training(
@@ -145,9 +146,9 @@ class PresetDataBase {
           name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 2"
         ),
       ],
-    )..sounds.globalBackgroundSound.path = "Ainsa"
-     ..sounds.preparationTrack.path = "Birds"
-     ..sounds.endingTrack.path = "Ocean"
+    )..sounds.globalBackgroundSound.name = "Ainsa"
+     ..sounds.preparationTrack.name = "Birds"
+     ..sounds.endingTrack.name = "Ocean"
      ..sounds.backgroundSoundScope = SoundScope.global
      ..updateSounds(),
     ];

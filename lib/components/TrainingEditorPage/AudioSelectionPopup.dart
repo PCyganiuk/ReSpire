@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/TrainingEditorPage/AudioListTile.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/SoundManagers/SingleSoundManager.dart';
@@ -9,8 +10,9 @@ import 'package:respire/theme/Colors.dart';
 
 class AudioSelectionPopup extends StatefulWidget {
   final SoundListType listType;
+  final bool includeVoiceOption;
   final String? selectedValue;
-  const AudioSelectionPopup({super.key, required this.listType, required this.selectedValue});
+  const AudioSelectionPopup({super.key, required this.listType, required this.selectedValue, required this.includeVoiceOption});
 
   @override
   State<AudioSelectionPopup> createState() => _AudioSelectionPopupState();
@@ -32,13 +34,15 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
   @override
   Widget build(BuildContext context) {
     
-    final Map<String,String> userItemsMap = 
+    final Map<String,SoundAsset> userItemsMap = 
       widget.listType == SoundListType.longSounds
           ? UserSoundsDatabase().userLongSounds
           : UserSoundsDatabase().userShortSounds;
 
     final itemsMap = {
-      _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.None"): null,
+      _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.None"):SoundAsset(type: SoundType.none),
+      if (widget.includeVoiceOption)
+        _translationProvider.getTranslation("TrainingEditorPage.SoundsTab.Voice"):SoundAsset(type: SoundType.voice),
       ..._soundManager.getSounds(widget.listType)
     };
 
@@ -80,7 +84,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
 
                 //preloaded items
                 if (index < items.length) {
-                  final entry = items[index];
+                  final entry = items[index].value;
                   return _tileForPresetEntry(entry);
                 }
 
@@ -90,7 +94,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
 
                 // user items
                 final userIndex = index - items.length - (userItems.isNotEmpty ? 1 : 0);
-                final entry = userItems[userIndex];
+                final entry = userItems[userIndex].value;
                 return _tileForUserEntry(entry);
               },
             ),
@@ -106,7 +110,9 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
       );
 
     if (result != null && result.files.single.path != null) {
-      MapEntry<String, String> newSound = MapEntry(result.files.single.name, result.files.single.path!);
+      SoundAsset newSound = SoundAsset(name: result.files.single.name, path: result.files.single.path!, type: 
+        widget.listType == SoundListType.longSounds ? SoundType.melody : SoundType.cue
+      );
 
       widget.listType == SoundListType.longSounds
           ? UserSoundsDatabase().addLongSound(newSound)
@@ -116,36 +122,36 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
     }
   }
 
-  Widget _tileForPresetEntry(MapEntry<String, String?> entry) {
+  Widget _tileForPresetEntry(SoundAsset asset) {
     return ValueListenableBuilder<String?>(
       valueListenable: _soundManager.currentlyPlaying,
       builder: (context, currentlyPlaying, _) {
         return AudioListTile(
-          key: ValueKey(entry.key),
-          entry: entry,
-          isPlaying: currentlyPlaying == entry.key,
-          isSelected: widget.selectedValue == entry.key || widget.selectedValue == entry.value,
-          onPlayToggle: () => _togglePlay(entry.key),
-          onTap: () => Navigator.of(context).pop(entry.key),
+          key: ValueKey(asset.name),
+          entry: asset,
+          isPlaying: currentlyPlaying == asset.name,
+          isSelected: widget.selectedValue == asset.name,
+          onPlayToggle: () => _togglePlay(asset.name),
+          onTap: () => Navigator.of(context).pop(asset),
         );
       },
     );
   }
 
-  Widget _tileForUserEntry(MapEntry<String, String?> entry) {
+  Widget _tileForUserEntry(SoundAsset asset) {
     return ValueListenableBuilder<String?>(
       valueListenable: _soundManager.currentlyPlaying,
       builder: (context, currentlyPlaying, _) {
         return AudioListTile(
-          key: ValueKey(entry.key),
-          entry: entry,
-          isPlaying: currentlyPlaying == entry.key,
-          isSelected: widget.selectedValue == entry.key || widget.selectedValue == entry.value,
-          onPlayToggle: () => _togglePlay(entry.key),
-          onTap: () => Navigator.of(context).pop(entry.key),
+          key: ValueKey(asset),
+          entry: asset,
+          isPlaying: currentlyPlaying == asset.name,
+          isSelected: widget.selectedValue == asset.name,
+          onPlayToggle: () => _togglePlay(asset.name),
+          onTap: () => Navigator.of(context).pop(asset),
           isRemovable: true,
           onRemove: () {
-            UserSoundsDatabase().removeSound(entry.key, SoundListType.longSounds);
+            UserSoundsDatabase().removeSound(asset.name, SoundListType.longSounds);
             setState(() {});
           },
         );

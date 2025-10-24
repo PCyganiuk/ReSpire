@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 
 class AudioListTile extends StatelessWidget {
-  final MapEntry<String, String?> entry;
+  final SoundAsset entry;
   final bool isPlaying;
   final VoidCallback onTap;
   final VoidCallback onPlayToggle;
@@ -20,7 +21,6 @@ class AudioListTile extends StatelessWidget {
     this.onRemove = _defaultOnRemove,
   });
 
-  static const List<String?> specialValues = [null, "voice"];
   static void _defaultOnRemove() {}
 
   @override
@@ -37,8 +37,8 @@ class AudioListTile extends StatelessWidget {
           textColor: Colors.black,
           titleTextStyle: isSelected ? TextStyle(fontWeight: FontWeight.bold):TextStyle(fontWeight: FontWeight.normal),
           selectedTileColor: Color.fromARGB(99, 156, 156, 156),
-          leading: IconButton(onPressed: onPlayToggle, iconSize:35, icon: isSpecialValue(entry.value) ? Icon(Icons.volume_off, color: Colors.grey) : isPlaying ? Icon(Icons.pause, color: Colors.red) : Icon(Icons.play_arrow, color: Colors.green)),
-          title: Text(entry.key, overflow: TextOverflow.clip, maxLines: 1,),
+          leading: IconButton(onPressed: onPlayToggle, iconSize:35, icon: getTileIcon(entry)),
+          title: Text(entry.name, overflow: TextOverflow.clip, maxLines: 1,),
           trailing: isRemovable ? IconButton(onPressed: () => _removeUserEntry(context, onRemove), icon: Icon(Icons.delete, color: Colors.red)) : null,
           onTap: onTap,
         ),
@@ -46,8 +46,14 @@ class AudioListTile extends StatelessWidget {
     );
   }
 
-  bool isSpecialValue(String? value) {
-    return specialValues.contains(value);
+  Icon getTileIcon(SoundAsset asset) {
+    if (asset.type == SoundType.voice) {
+      return Icon(Icons.record_voice_over, color: Colors.blue);
+    } else if (asset.type == SoundType.none) {
+      return Icon(Icons.volume_off, color: Colors.grey);
+    } else {
+      return isPlaying ? Icon(Icons.pause, color: Colors.red) : Icon(Icons.play_arrow, color: Colors.green);
+    }
   }
 
   void _removeUserEntry(BuildContext context, VoidCallback onConfirmed) {
@@ -56,7 +62,7 @@ class AudioListTile extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text("Remove Sound"),
-          content: Text("Are you sure you want to remove '${entry.key}'?"),
+          content: Text("Are you sure you want to remove '${entry.name}'?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(), // cancel

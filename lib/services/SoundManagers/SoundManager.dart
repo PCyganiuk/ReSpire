@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/PresetDataBase.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
@@ -11,28 +12,28 @@ class SoundManager implements ISoundManager {
     log("SoundManager initialized.");
   }
 
-  static final Map<String,String?> _longSounds = {
-    "Birds":"sounds/birds.mp3",
-    "Ainsa":"sounds/Ainsa.mp3",
-    "Rain":"sounds/rain.mp3",
-    "Ocean":"sounds/ocean-waves.mp3",
-    "Chanting 1":"sounds/buddhist-chanting.mp3",
-    "Chanting 2":"sounds/chanting.mp3",
-    "Low hz":"sounds/low-hz.mp3",
-    "Solfeggio Frequency":"sounds/solfeggio-frequency.mp3",
+  static final Map<String,SoundAsset> _longSounds = {
+    "Birds":SoundAsset(name:"Birds", path:"sounds/birds.mp3", type:SoundType.melody),
+    "Ainsa":SoundAsset(name:"Ainsa", path:"sounds/Ainsa.mp3", type:SoundType.melody),
+    "Rain":SoundAsset(name:"Rain", path:"sounds/rain.mp3", type:SoundType.melody),
+    "Ocean":SoundAsset(name:"Ocean", path:"sounds/ocean-waves.mp3", type:SoundType.melody),
+    "Chanting 1":SoundAsset(name:"Chanting 1", path:"sounds/buddhist-chanting.mp3", type:SoundType.melody),
+    "Chanting 2":SoundAsset(name:"Chanting 2", path:"sounds/chanting.mp3", type:SoundType.melody),
+    "Low hz":SoundAsset(name:"Low hz", path:"sounds/low-hz.mp3", type:SoundType.melody),
+    "Solfeggio Frequency":SoundAsset(name:"Solfeggio Frequency", path:"sounds/solfeggio-frequency.mp3", type:SoundType.melody),
   };
 
-  static final Map<String,String?> _shortSounds = {
-    "Notification":"sounds/new-notification.mp3",
-    "Whistle Up":"sounds/whistle-up.mp3",
-    "Whistle Down":"sounds/whistle-down.mp3",
-    "Gong":"sounds/gong.mp3",
+  static final Map<String,SoundAsset> _shortSounds = {
+    "Notification":SoundAsset(name:"Notification", path:"sounds/new-notification.mp3", type:SoundType.cue),
+    "Whistle Up":SoundAsset(name:"Whistle Up", path:"sounds/whistle-up.mp3", type:SoundType.cue),
+    "Whistle Down":SoundAsset(name:"Whistle Down", path:"sounds/whistle-down.mp3", type:SoundType.cue),
+    "Gong":SoundAsset(name:"Gong", path:"sounds/gong.mp3", type:SoundType.cue),
   };
 
 
   ///A map of available sounds in the assets folder.\
   ///The keys are the sound names, and the values are the paths to the sound files.
-  static final Map<String,String?> _availableSounds = {
+  static final Map<String,SoundAsset> _availableSounds = {
     ..._longSounds,
     ..._shortSounds,
     ...UserSoundsDatabase().userLongSounds,
@@ -42,7 +43,7 @@ class SoundManager implements ISoundManager {
   final HashMap<String,AudioPlayer> _audioPlayers = HashMap<String,AudioPlayer>();
 
   @override
-  Map<String, String?> getSounds(SoundListType type) {
+  Map<String, SoundAsset> getSounds(SoundListType type) {
     switch (type) {
       case SoundListType.longSounds:
         return _longSounds;
@@ -70,13 +71,13 @@ class SoundManager implements ISoundManager {
 
     setupAudioPlayer(audioPlayer, soundName);
 
-    bool isAsset = _availableSounds[soundName]!.startsWith("sounds/");
+    bool isAsset = _availableSounds[soundName]!.path!.startsWith("sounds/");
     try{
       if(isAsset){
-        await audioPlayer.setSource(AssetSource(_availableSounds[soundName]!));
+        await audioPlayer.setSource(AssetSource(_availableSounds[soundName]!.path!));
       }
       else {
-        await audioPlayer.setSource(DeviceFileSource(_availableSounds[soundName]!));
+        await audioPlayer.setSource(DeviceFileSource(_availableSounds[soundName]!.path!));
       }
 
       _audioPlayers[soundName] = audioPlayer;
@@ -89,7 +90,6 @@ class SoundManager implements ISoundManager {
   }
 
   void setupAudioPlayer(AudioPlayer audioPlayer, String soundName) {
-    //Loops the audio
     audioPlayer.setReleaseMode(ReleaseMode.stop);
     
     // Get total duration once it’s available

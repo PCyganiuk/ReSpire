@@ -16,7 +16,7 @@ class Sounds {
 
   /// Background sound for the entire training session
   @HiveField(2)
-  SoundAsset globalBackgroundSound = SoundAsset(type: SoundType.melody);
+  SoundAsset globalBackgroundSound = SoundAsset();
 
 
   /// Scope of the next sound played between breathing phases.
@@ -29,16 +29,16 @@ class Sounds {
 
   /// Preparation and ending tracks for the training session
   @HiveField(5)
-  SoundAsset preparationTrack = SoundAsset(type: SoundType.melody);
+  SoundAsset preparationTrack = SoundAsset();
   @HiveField(6)
-  SoundAsset endingTrack = SoundAsset(type: SoundType.melody);
+  SoundAsset endingTrack = SoundAsset();
 
   /// Scope of the background audio during the training session
   @HiveField(7)
   SoundScope backgroundSoundScope = SoundScope.global;
   /// Background audio for the entire training session
   @HiveField(8)
-  SoundAsset trainingBackgroundTrack = SoundAsset(type: SoundType.melody);
+  SoundAsset trainingBackgroundTrack = SoundAsset();
 
   // === STAGE LEVEL ===
 
@@ -53,52 +53,52 @@ class Sounds {
   /// Short sounds for each breathing phase type that indicate the transition
   @HiveField(10)
   Map<BreathingPhaseType, SoundAsset> breathingPhaseCues = {
-    for (var type in BreathingPhaseType.values) type: SoundAsset(type: SoundType.cue)
+    for (var type in BreathingPhaseType.values) type: SoundAsset()
   };
 
   
   /// Longer audio files for each breathing phase type
   @HiveField(11)
   Map<BreathingPhaseType, SoundAsset> breathingPhaseBackgrounds = {
-    for (var type in BreathingPhaseType.values) type: SoundAsset(type: SoundType.melody)
+    for (var type in BreathingPhaseType.values) type: SoundAsset()
   };
 
 
   void clearUserSound(String soundName) {
-    if (countingSound.path == soundName) {
-      countingSound.path = null;
+    if (countingSound.name == soundName) {
+      countingSound.name = null;
     }
-    if (globalBackgroundSound.path == soundName) {
-      globalBackgroundSound.path = null;
+    if (globalBackgroundSound.name == soundName) {
+      globalBackgroundSound.name = null;
     }
-    if (nextSound.path == soundName) {
-      nextSound.path = null;
+    if (nextSound.name == soundName) {
+      nextSound.name = null;
     }
-    if (preparationTrack.path == soundName) {
-      preparationTrack.path = null;
+    if (preparationTrack.name == soundName) {
+      preparationTrack.name = null;
     }
-    if (endingTrack.path == soundName) {
-      endingTrack.path = null;
+    if (endingTrack.name == soundName) {
+      endingTrack.name = null;
     }
-    if (trainingBackgroundTrack.path == soundName) {
-      trainingBackgroundTrack.path = null;
+    if (trainingBackgroundTrack.name == soundName) {
+      trainingBackgroundTrack.name = null;
     }
 
     for (var stage in stageTracks.keys) {
-      if (stageTracks[stage]!.path == soundName) {
-        stageTracks[stage]!.path = null;
+      if (stageTracks[stage]!.name == soundName) {
+        stageTracks[stage]!.name = null;
       }
     }
 
     breathingPhaseCues.forEach((key, value) {
-      if (value.path == soundName) {
-        breathingPhaseCues[key]!.path = null;
+      if (value.name == soundName) {
+        breathingPhaseCues[key]!.name = null;
       }
     });
 
     breathingPhaseBackgrounds.forEach((key, value) {
-      if (value.path == soundName) {
-        breathingPhaseBackgrounds[key]!.path = null;
+      if (value.name == soundName) {
+        breathingPhaseBackgrounds[key]!.name = null;
       }
     });
   }

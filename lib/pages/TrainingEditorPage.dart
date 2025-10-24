@@ -302,7 +302,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.title"),
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound.path, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound.path = v; })),
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound = v; }), includeVoiceOption: true),
                                     Row(
                                         children: [
                                           Text(
@@ -340,7 +340,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             if(_sounds.nextSoundScope == SoundScope.global)
                                               ((){
                                                 _sounds.nextSound.type = SoundType.cue;
-                                                return SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"), selectedValue: _sounds.nextSound.path, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextSound.path = v; }));})()
+                                                return SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"), selectedValue: _sounds.nextSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextSound = v; }), includeVoiceOption: true);})()
                                             else if (_sounds.nextSoundScope == SoundScope.perPhase)
                                               ...buildPhaseSoundRows(SoundListType.shortSounds)
                                           ],
@@ -363,8 +363,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.title"),
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"), selectedValue: _sounds.preparationTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationTrack.path = v; })),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"), selectedValue: _sounds.endingTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.endingTrack.path = v; })),
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"), selectedValue: _sounds.preparationTrack, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationTrack = v; }), includeVoiceOption: true),
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"), selectedValue: _sounds.endingTrack, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.endingTrack = v; }), includeVoiceOption: true),
                                     Row(
                                         children: [
                                           Text(
@@ -399,7 +399,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         Column(
                                               children: [
                                                 if(_sounds.backgroundSoundScope == SoundScope.global) ...[
-                                                  SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"), selectedValue: _sounds.trainingBackgroundTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.trainingBackgroundTrack.path = v; }))
+                                                  SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"), selectedValue: _sounds.trainingBackgroundTrack, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.trainingBackgroundTrack = v; }), includeVoiceOption: true)
                                                 ] 
                                                 else if(_sounds.backgroundSoundScope == SoundScope.perPhase)
                                                   ...buildPhaseSoundRows(SoundListType.longSounds)
@@ -658,16 +658,17 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     return [
       for (final phase in BreathingPhaseType.values)
         SoundSelectionRow(
+          includeVoiceOption: false,
           label: translationProvider.getTranslation("BreathingPhaseType.${phase.name}"),
           selectedValue: type == SoundListType.longSounds? 
-            _sounds.breathingPhaseBackgrounds[phase]?.path :
-            _sounds.breathingPhaseCues[phase]?.path,
+            _sounds.breathingPhaseBackgrounds[phase]! :
+            _sounds.breathingPhaseCues[phase]!,
           soundListType: type,
           onChanged: (v) {
             setState(() {
               type == SoundListType.longSounds ?
-                _sounds.breathingPhaseBackgrounds[phase] =  SoundAsset(type: SoundType.melody, path: v) :
-                _sounds.breathingPhaseCues[phase] = SoundAsset(type: SoundType.cue, path: v);
+                _sounds.breathingPhaseBackgrounds[phase] =  v :
+                _sounds.breathingPhaseCues[phase] = v;
             });
           },
         ),
@@ -678,13 +679,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     return [
       for (final stage in trainingStages)
         SoundSelectionRow(
+          includeVoiceOption: false,
           label: translationProvider.getTranslation(stage.name),
-          selectedValue: _sounds.stageTracks[stage.id]?.path,
+          selectedValue: _sounds.stageTracks[stage.id]!,
           soundListType: SoundListType.longSounds,
           onChanged: (v) {
             setState(() {
-              _sounds.stageTracks[stage.id] = 
-                SoundAsset(type: SoundType.melody, path: v);
+              _sounds.stageTracks[stage.id] = v;
             });
           },
         ),

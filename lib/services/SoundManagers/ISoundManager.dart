@@ -1,4 +1,6 @@
 // We define the enum here so it's coupled with the interface that uses it.
+import 'package:respire/components/Global/SoundAsset.dart';
+
 enum SoundListType {
   longSounds,
   shortSounds,
@@ -6,7 +8,7 @@ enum SoundListType {
 
 abstract class ISoundManager {
   /// Returns a map of sounds for a given type (long or short).
-  Map<String, String?> getSounds(SoundListType type);
+  Map<String, SoundAsset> getSounds(SoundListType type);
 
   /// Pre-loads a sound into memory for faster playback.
   /// Returns true if successful.

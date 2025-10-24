@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/TrainingEditorPage/AudioSelectionPopup.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
-import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
 class SoundSelectionRow extends StatelessWidget {
   final String label;
-  final String? selectedValue;
+  final SoundAsset selectedValue;
   final SoundListType soundListType;
-  final ValueChanged<String> onChanged;
+  final bool includeVoiceOption;
+  final ValueChanged<SoundAsset> onChanged;
   final TextStyle? labelStyle;
 
   const SoundSelectionRow({
@@ -15,51 +16,58 @@ class SoundSelectionRow extends StatelessWidget {
     required this.label,
     required this.selectedValue,
     required this.soundListType,
+    required this.includeVoiceOption,
     required this.onChanged,
     this.labelStyle,
   });
 
   Future<void> _openPopup(BuildContext context) async {
-    final result = await showDialog<String>(
+    final result = await showDialog<SoundAsset>(
       context: context,
       builder: (_) => AudioSelectionPopup(
+        includeVoiceOption: includeVoiceOption,
         listType: soundListType,
-        selectedValue: selectedValue,
+        selectedValue: selectedValue.name,
       ),
     );
 
-    if (result != null && result.isNotEmpty) {
+    if (result != null) {
       onChanged(result);
     }
   }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: labelStyle ?? TextStyle()),
-       ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 150), // adjust as needed
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                selectedValue ??
-                    TranslationProvider()
-                        .getTranslation("TrainingEditorPage.SoundsTab.None"),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        Text(label, style: labelStyle ?? const TextStyle()),
+
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 150),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () => _openPopup(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      selectedValue.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.music_note, size: 20),
+                ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.music_note),
-              onPressed: () => _openPopup(context),
-            ),
-          ],
+          ),
         ),
-      ),]
+      ],
     );
   }
 }

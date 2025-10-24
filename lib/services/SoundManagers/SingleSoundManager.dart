@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
@@ -39,6 +40,16 @@ class SingleSoundManager extends SoundManager {
   void stopAllSounds() {
     super.stopAllSounds();
     currentlyPlaying.value = null;
+  }
+
+  @override
+  void setupAudioPlayer(AudioPlayer audioPlayer, String soundName) {
+    audioPlayer.setReleaseMode(ReleaseMode.stop);
+    audioPlayer.onPlayerComplete.listen((event) {
+      if (currentlyPlaying.value == soundName) {
+        currentlyPlaying.value = null;
+      }
+    });
   }
 
   @override

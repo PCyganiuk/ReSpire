@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 
@@ -13,35 +14,35 @@ class UserSoundsDatabase {
   final _shortBox = Hive.box('userShortSounds');
   final _longBox = Hive.box('userLongSounds');
 
-  final Map<String, String> _userShortSounds = {};
-  final Map<String, String> _userLongSounds = {};
+  final Map<String, SoundAsset> _userShortSounds = {};
+  final Map<String, SoundAsset> _userLongSounds = {};
 
-  Map<String,String> get userShortSounds => Map.unmodifiable(_userShortSounds);
-  Map<String,String> get userLongSounds => Map.unmodifiable(_userLongSounds);
+  Map<String,SoundAsset> get userShortSounds => Map.unmodifiable(_userShortSounds);
+  Map<String,SoundAsset> get userLongSounds => Map.unmodifiable(_userLongSounds);
 
   void loadData()
   {
     final storedMap = _shortBox.get('userShortSounds');
     if (storedMap is Map) {
-      _userShortSounds.addAll(storedMap.cast<String, String>());
+      _userShortSounds.addAll(storedMap.cast<String, SoundAsset>());
     }
 
     final storedMapLong = _longBox.get('userLongSounds');
     if (storedMapLong is Map) {
-      _userLongSounds.addAll(storedMapLong.cast<String, String>());
+      _userLongSounds.addAll(storedMapLong.cast<String, SoundAsset>());
     }
   }
 
-  void addShortSound(MapEntry<String, String> sound) {
-    if (!_userShortSounds.containsKey(sound.key)) {
-      _userShortSounds[sound.key] = sound.value;
+  void addShortSound(SoundAsset sound) {
+    if (!_userShortSounds.containsKey(sound.name)) {
+      _userShortSounds[sound.name] = sound;
       updateDatabase();
     }
   }
 
-  void addLongSound(MapEntry<String, String> sound) {
-    if (!_userLongSounds.containsKey(sound.key)) {
-      _userLongSounds[sound.key] = sound.value;
+  void addLongSound(SoundAsset sound) {
+    if (!_userLongSounds.containsKey(sound.name)) {
+      _userLongSounds[sound.name] = sound;
       updateDatabase();
     }
   }

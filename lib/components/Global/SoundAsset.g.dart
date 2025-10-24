@@ -18,14 +18,16 @@ class SoundAssetAdapter extends TypeAdapter<SoundAsset> {
     };
     return SoundAsset(
       path: fields[1] as String?,
-      type: fields[2] as SoundType?,
-    );
+      type: fields[2] as SoundType,
+    ).._name = fields[0] as String?;
   }
 
   @override
   void write(BinaryWriter writer, SoundAsset obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj._name)
       ..writeByte(1)
       ..write(obj.path)
       ..writeByte(2)

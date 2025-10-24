@@ -122,7 +122,7 @@ class TrainingController {
       case SoundType.none:
         break;
       default:
-        soundManager.playSound(_sounds.countingSound.path);
+        soundManager.playSound(_sounds.countingSound.name);
         break;
     }
   }
@@ -156,7 +156,7 @@ class TrainingController {
   void _start() {
     int previousSecond = _remainingTime ~/ 1000;
     DateTime lastTick = DateTime.now();
-    String? currentBackgroundSound = _sounds.preparationTrack.path;
+    String? currentBackgroundSound = _sounds.preparationTrack.name;
     _currentSound = currentBackgroundSound;
     soundManager.playSound(currentBackgroundSound);
     
@@ -218,8 +218,8 @@ class TrainingController {
           if (_stopTimer == 0) {
             second.value = 0;
             end=true;
-            _handleBackgroundSoundChange(_sounds.endingTrack.path, currentBackgroundSound, 500);
-            currentBackgroundSound = _sounds.endingTrack.path;
+            _handleBackgroundSoundChange(_sounds.endingTrack.name, currentBackgroundSound, 500);
+            currentBackgroundSound = _sounds.endingTrack.name;
             _currentSound = currentBackgroundSound;
             //_timer?.cancel();
           } else {
