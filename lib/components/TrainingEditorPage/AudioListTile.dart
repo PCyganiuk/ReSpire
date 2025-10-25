@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
 
+///A tile within `AudioSelectionPopup`
 class AudioListTile extends StatelessWidget {
   final SoundAsset entry;
   final bool isPlaying;

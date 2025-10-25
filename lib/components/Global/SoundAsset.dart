@@ -6,16 +6,16 @@ part 'SoundAsset.g.dart';
 @HiveType(typeId: 13)
 class SoundAsset {
   @HiveField(0)
-  String? _name;
+  String _name;
 
   @HiveField(1)
-  String? path;
+  String path;
 
   @HiveField(2)
   SoundType type;
 
   SoundAsset({
-    String? name = '',
+    String name = '',
     this.path = '',
     this.type = SoundType.none,
   }) : _name = name;
@@ -26,11 +26,16 @@ class SoundAsset {
     } else if (type == SoundType.voice) {
       return TranslationProvider().getTranslation("TrainingEditorPage.SoundsTab.Voice");
     }
-    return _name ?? '';
+    return _name;
   }
 
-  set name(String? value) {
+  set name(String value) {
     _name = value;
+  }
+
+  @override
+  String toString() {
+    return 'SoundAsset{name: $name, path: $path, type: $type}';
   }
 }
 

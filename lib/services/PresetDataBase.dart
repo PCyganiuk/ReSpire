@@ -50,23 +50,23 @@ class PresetDataBase {
   void _migrateSounds() {
     for (var training in presetList) {
       bool hasNoSounds = training.sounds.preparationTrack.type == SoundType.none &&
-                         training.sounds.globalBackgroundSound.type == SoundType.none;
+                         training.sounds.trainingBackgroundTrack.type == SoundType.none;
       
       if (hasNoSounds) {
         int index = presetList.indexOf(training);
         switch (index % 3) {
           case 0:
-            training.sounds.globalBackgroundSound.name = "Birds";
+            training.sounds.trainingBackgroundTrack.name = "Birds";
             training.sounds.preparationTrack.name = "Ocean";
             training.sounds.endingTrack.name = "Rain";
             break;
           case 1:
-            training.sounds.globalBackgroundSound.name = "Rain";
+            training.sounds.trainingBackgroundTrack.name = "Rain";
             training.sounds.preparationTrack.name = "Ainsa";
             training.sounds.endingTrack.name = "Ocean";
             break;
           case 2:
-            training.sounds.globalBackgroundSound.name = "Ainsa";
+            training.sounds.trainingBackgroundTrack.name = "Ainsa";
             training.sounds.preparationTrack.name = "Birds";
             training.sounds.endingTrack.name = "Ocean";
             break;
@@ -96,7 +96,7 @@ class PresetDataBase {
             name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
           )
         ]
-      )..sounds.globalBackgroundSound.name = "Birds"
+      )..sounds.trainingBackgroundTrack.name = "Birds"
        ..sounds.preparationTrack.name = "Ocean"
        ..sounds.endingTrack.name = "Rain"
        ..sounds.backgroundSoundScope = SoundScope.global
@@ -115,7 +115,7 @@ class PresetDataBase {
               name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
               )
         ]
-      )..sounds.globalBackgroundSound.name = "Rain"
+      )..sounds.trainingBackgroundTrack.name = "Rain"
        ..sounds.preparationTrack.name = "Ainsa"
        ..sounds.endingTrack.name = "Ocean"
        ..sounds.backgroundSoundScope = SoundScope.global
@@ -146,7 +146,7 @@ class PresetDataBase {
           name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 2"
         ),
       ],
-    )..sounds.globalBackgroundSound.name = "Ainsa"
+    )..sounds.trainingBackgroundTrack.name = "Ainsa"
      ..sounds.preparationTrack.name = "Birds"
      ..sounds.endingTrack.name = "Ocean"
      ..sounds.backgroundSoundScope = SoundScope.global

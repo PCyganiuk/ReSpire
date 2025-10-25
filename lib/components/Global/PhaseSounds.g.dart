@@ -17,8 +17,8 @@ class BreathingPhaseSoundsAdapter extends TypeAdapter<BreathingPhaseSounds> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return BreathingPhaseSounds(
-      preBreathingPhase: fields[0] as String?,
-      background: fields[1] as String?,
+      preBreathingPhase: fields[0] as SoundAsset?,
+      background: fields[1] as SoundAsset?,
     );
   }
 

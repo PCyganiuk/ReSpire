@@ -128,19 +128,18 @@ class TrainingController {
   }
 
   void _playPreBreathingPhaseSound(breathing_phase.BreathingPhase breathingPhase) {
-    String? sound = breathingPhase.sounds.preBreathingPhase;
-    switch (sound) {
-      case "Voice":
+    switch (breathingPhase.sounds.preBreathingPhase.type) {
+      case SoundType.voice:
         String breathingPhaseName =
             translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathingPhaseType.name}");
         TextToSpeechService().speak(breathingPhaseName);
         break;
-      case "None":
+      case SoundType.none:
         break;
       default:
-        soundManager.playSound(sound);
+        soundManager.playSound(breathingPhase.sounds.preBreathingPhase.name);
         Future.delayed(const Duration(seconds: 1), () {
-          soundManager.stopSound(sound);
+          soundManager.stopSound(breathingPhase.sounds.preBreathingPhase.name);
         });
         break;
     }
@@ -195,11 +194,11 @@ class TrainingController {
           //second.value = 0;
           breathing_phase.BreathingPhase breathingPhase = breathingPhasesQueue.value.elementAt(1)!;
           _handleBackgroundSoundChange(
-            breathingPhase.sounds.background, 
+            breathingPhase.sounds.background.name, 
             currentBackgroundSound, 
             (_breathingPhaseDelayRemainingTime / 2).toInt());
           _playPreBreathingPhaseSound(breathingPhase);
-          currentBackgroundSound = breathingPhase.sounds.background;
+          currentBackgroundSound = breathingPhase.sounds.background.name;
           _currentSound = currentBackgroundSound;
         }
         _breathingPhaseDelay = false;

@@ -17,9 +17,9 @@ class SoundAssetAdapter extends TypeAdapter<SoundAsset> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SoundAsset(
-      path: fields[1] as String?,
+      path: fields[1] as String,
       type: fields[2] as SoundType,
-    ).._name = fields[0] as String?;
+    ).._name = fields[0] as String;
   }
 
   @override

@@ -18,45 +18,42 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
     };
     return Sounds()
       ..countingSound = fields[1] as SoundAsset
-      ..globalBackgroundSound = fields[2] as SoundAsset
-      ..nextSoundScope = fields[3] as SoundScope
-      ..nextSound = fields[4] as SoundAsset
-      ..preparationTrack = fields[5] as SoundAsset
-      ..endingTrack = fields[6] as SoundAsset
-      ..backgroundSoundScope = fields[7] as SoundScope
-      ..trainingBackgroundTrack = fields[8] as SoundAsset
-      ..stageTracks = (fields[9] as Map).cast<String, SoundAsset>()
+      ..nextSoundScope = fields[2] as SoundScope
+      ..nextSound = fields[3] as SoundAsset
+      ..preparationTrack = fields[4] as SoundAsset
+      ..endingTrack = fields[5] as SoundAsset
+      ..backgroundSoundScope = fields[6] as SoundScope
+      ..trainingBackgroundTrack = fields[7] as SoundAsset
+      ..stageTracks = (fields[8] as Map).cast<String, SoundAsset>()
       ..breathingPhaseCues =
-          (fields[10] as Map).cast<BreathingPhaseType, SoundAsset>()
+          (fields[9] as Map).cast<BreathingPhaseType, SoundAsset>()
       ..breathingPhaseBackgrounds =
-          (fields[11] as Map).cast<BreathingPhaseType, SoundAsset>();
+          (fields[10] as Map).cast<BreathingPhaseType, SoundAsset>();
   }
 
   @override
   void write(BinaryWriter writer, Sounds obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(10)
       ..writeByte(1)
       ..write(obj.countingSound)
       ..writeByte(2)
-      ..write(obj.globalBackgroundSound)
-      ..writeByte(3)
       ..write(obj.nextSoundScope)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.nextSound)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.preparationTrack)
-      ..writeByte(6)
+      ..writeByte(5)
       ..write(obj.endingTrack)
-      ..writeByte(7)
+      ..writeByte(6)
       ..write(obj.backgroundSoundScope)
-      ..writeByte(8)
+      ..writeByte(7)
       ..write(obj.trainingBackgroundTrack)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.stageTracks)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.breathingPhaseCues)
-      ..writeByte(11)
+      ..writeByte(10)
       ..write(obj.breathingPhaseBackgrounds);
   }
 

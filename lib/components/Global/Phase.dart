@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/Step.dart';
 import 'package:uuid/uuid.dart';
 
@@ -34,14 +35,14 @@ class TrainingStage {
     breathingPhases.add(breathingPhase);
   }
 
-  void propagateNextSound(String? nextSound) {
+  void propagateNextSound(SoundAsset nextSound) {
     // Set the next sound for each breathing phase
     for (var breathingPhase in breathingPhases) {
       breathingPhase.sounds.preBreathingPhase = nextSound;
     }
   }
 
-  void propagateBackgroundSound(String? globalBackgroundSound) {  
+  void propagateBackgroundSound(SoundAsset globalBackgroundSound) {  
     // Set the background sound for each breathing phase
     for (var breathingPhase in breathingPhases) {
       breathingPhase.sounds.background = globalBackgroundSound;

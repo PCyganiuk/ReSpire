@@ -339,7 +339,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                           children: [
                                             if(_sounds.nextSoundScope == SoundScope.global)
                                               ((){
-                                                _sounds.nextSound.type = SoundType.cue;
                                                 return SoundSelectionRow(label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"), selectedValue: _sounds.nextSound, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.nextSound = v; }), includeVoiceOption: true);})()
                                             else if (_sounds.nextSoundScope == SoundScope.perPhase)
                                               ...buildPhaseSoundRows(SoundListType.shortSounds)
@@ -681,7 +680,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         SoundSelectionRow(
           includeVoiceOption: false,
           label: translationProvider.getTranslation(stage.name),
-          selectedValue: _sounds.stageTracks[stage.id]!,
+          selectedValue: _sounds.stageTracks[stage.id] ?? SoundAsset(),
           soundListType: SoundListType.longSounds,
           onChanged: (v) {
             setState(() {

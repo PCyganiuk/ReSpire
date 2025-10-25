@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 
@@ -43,10 +44,10 @@ class SingleSoundManager extends SoundManager {
   }
 
   @override
-  void setupAudioPlayer(AudioPlayer audioPlayer, String soundName) {
+  void setupLoopingAudioPlayer(AudioPlayer audioPlayer, SoundAsset soundAsset) {
     audioPlayer.setReleaseMode(ReleaseMode.stop);
     audioPlayer.onPlayerComplete.listen((event) {
-      if (currentlyPlaying.value == soundName) {
+      if (currentlyPlaying.value == soundAsset.name) {
         currentlyPlaying.value = null;
       }
     });

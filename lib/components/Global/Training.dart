@@ -40,11 +40,8 @@ class Training {
         break;
 
       case SoundScope.global:
-        if(sounds.nextSound.name != null &&
-          sounds.nextSound.name!.isNotEmpty) {
-          for (var stage in trainingStages) {
-            stage.propagateNextSound(sounds.nextSound.name);
-          }
+        for (var stage in trainingStages) {
+          stage.propagateNextSound(sounds.nextSound);
         }
         break; 
 
@@ -53,16 +50,16 @@ class Training {
           for (var phase in trainingStages[i].breathingPhases){
             switch(phase.breathingPhaseType) {
               case BreathingPhaseType.inhale:
-                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.inhale]!.name;
+                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.inhale]!;
                 break;
               case BreathingPhaseType.retention:
-                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.retention]!.name;
+                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.retention]!;
                 break;
               case BreathingPhaseType.exhale:
-                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.exhale]!.name;
+                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.exhale]!;
                 break;
               case BreathingPhaseType.recovery:
-                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.recovery]!.name;
+                phase.sounds.preBreathingPhase = sounds.breathingPhaseCues[BreathingPhaseType.recovery]!;
                 break;
             }
           }
@@ -77,17 +74,14 @@ class Training {
         break;
 
       case SoundScope.global:
-        if(sounds.globalBackgroundSound.name != null &&
-          sounds.globalBackgroundSound.name!.isNotEmpty) {
-          for (var stage in trainingStages) {
-            stage.propagateBackgroundSound(sounds.globalBackgroundSound.name);
-          }
+        for (var stage in trainingStages) {
+          stage.propagateBackgroundSound(sounds.trainingBackgroundTrack);
         }
         break; 
 
       case SoundScope.perStage:
         for (int i=0; i<trainingStages.length; i++) {
-          trainingStages[i].propagateBackgroundSound(sounds.stageTracks[trainingStages[i].id]!.name);
+          trainingStages[i].propagateBackgroundSound(sounds.stageTracks[trainingStages[i].id]!);
         }
         break; 
 
@@ -97,16 +91,16 @@ class Training {
           for (var phase in trainingStages[i].breathingPhases){
             switch(phase.breathingPhaseType) {
               case BreathingPhaseType.inhale:
-                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.inhale]!.name;
+                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.inhale]!;
                 break;
               case BreathingPhaseType.retention:
-                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.retention]!.name;
+                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.retention]!;
                 break;
               case BreathingPhaseType.exhale:
-                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.exhale]!.name;
+                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.exhale]!;
                 break;
               case BreathingPhaseType.recovery:
-                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.recovery]!.name;
+                phase.sounds.background = sounds.breathingPhaseBackgrounds[BreathingPhaseType.recovery]!;
                 break;
             }
           }

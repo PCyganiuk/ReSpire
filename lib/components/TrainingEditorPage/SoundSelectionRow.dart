@@ -3,6 +3,7 @@ import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/TrainingEditorPage/AudioSelectionPopup.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 
+///A row containing a name of a sound and the `AudioSelectionPopup`
 class SoundSelectionRow extends StatelessWidget {
   final String label;
   final SoundAsset selectedValue;
@@ -36,7 +37,7 @@ class SoundSelectionRow extends StatelessWidget {
     }
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

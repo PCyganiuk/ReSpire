@@ -8,9 +8,8 @@ import 'package:respire/services/PresetDataBase.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 
 class SoundManager implements ISoundManager {
-  SoundManager(){
-    log("SoundManager initialized.");
-  }
+  SoundManager(){}
+
 
   static final Map<String,SoundAsset> _longSounds = {
     "Birds":SoundAsset(name:"Birds", path:"sounds/birds.mp3", type:SoundType.melody),
@@ -68,16 +67,22 @@ class SoundManager implements ISoundManager {
       return false;
     }
     AudioPlayer audioPlayer = AudioPlayer();
+    
+    SoundAsset asset = _availableSounds[soundName]!;
+    
+    if (asset.type == SoundType.cue) {
+      setupLowLatencyAudioPlayer(audioPlayer, asset);
+    } else {
+      setupLoopingAudioPlayer(audioPlayer, asset);
+    }
 
-    setupAudioPlayer(audioPlayer, soundName);
-
-    bool isAsset = _availableSounds[soundName]!.path!.startsWith("sounds/");
+    bool isAsset = asset.path.startsWith("sounds/");
     try{
       if(isAsset){
-        await audioPlayer.setSource(AssetSource(_availableSounds[soundName]!.path!));
+        await audioPlayer.setSource(AssetSource(asset.path));
       }
       else {
-        await audioPlayer.setSource(DeviceFileSource(_availableSounds[soundName]!.path!));
+        await audioPlayer.setSource(DeviceFileSource(asset.path));
       }
 
       _audioPlayers[soundName] = audioPlayer;
@@ -89,9 +94,36 @@ class SoundManager implements ISoundManager {
     }
   }
 
-  void setupAudioPlayer(AudioPlayer audioPlayer, String soundName) {
-    audioPlayer.setReleaseMode(ReleaseMode.stop);
-    
+  void _commonAudioPlayerSetup(AudioPlayer audioPlayer) {
+  // Shared audio context to allow multiple sounds simultaneously
+  audioPlayer.setAudioContext(
+    AudioContext(
+      android: AudioContextAndroid(
+        isSpeakerphoneOn: false,
+        stayAwake: false,
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {AVAudioSessionOptions.mixWithOthers},
+      ),
+    ),
+  );
+
+  audioPlayer.setReleaseMode(ReleaseMode.stop);
+}
+
+  void setupLowLatencyAudioPlayer(AudioPlayer audioPlayer, SoundAsset asset) {
+    _commonAudioPlayerSetup(audioPlayer);
+    audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+  }
+
+  void setupLoopingAudioPlayer(AudioPlayer audioPlayer, SoundAsset asset) {
+    _commonAudioPlayerSetup(audioPlayer);
+    audioPlayer.setPlayerMode(PlayerMode.mediaPlayer);
+
     // Get total duration once it’s available
     Duration? totalDuration;
     audioPlayer.onDurationChanged.listen((d) {
@@ -105,7 +137,7 @@ class SoundManager implements ISoundManager {
       if (totalDuration != null) {
         if (totalDuration!.inMilliseconds - currentPosition.inMilliseconds <= 2000) {
           isFadingOut = true;
-          await fadeOut(soundName, 1800);
+          await fadeOut(asset.name, 1800);
 
           // Reset audio after fade completes
           await audioPlayer.seek(Duration.zero);
@@ -144,7 +176,18 @@ class SoundManager implements ISoundManager {
       return;
     }
     log("Playing sound: $soundName");
-    await _audioPlayers[soundName]!.resume();
+
+    var player = _audioPlayers[soundName]!;
+    if (_availableSounds[soundName]!.type == SoundType.cue) {
+      await player.play(player.source!);
+      _audioPlayers.remove(soundName);
+      // let's hope garbage collector takes care of the audio player
+      // there is no way to get the audio duration from a low latency audio player
+      // nor can we set up a listener for onComplete (see documentation)
+      // we would have to store the durations which is too much of a hustle.
+    } else {
+      await player.resume();
+    }
   }
 
   ///Plays a sound from a file in the assets folder with a fade-in effect.\
@@ -232,6 +275,7 @@ class SoundManager implements ISoundManager {
 
   ///Pauses the provided sound with a fade-out effect.\
   ///[fadeOutDuration] is the duration of the effect in milliseconds.
+  @override
   Future<void> pauseSoundFadeOut(String? soundName, int fadeOutDuration) async{
     fadeOut(soundName, fadeOutDuration);
     await pauseSound(soundName!);
@@ -268,5 +312,13 @@ class SoundManager implements ISoundManager {
       _audioPlayers.remove(soundName);
     }
     PresetDataBase().clearUserSound(soundName);
+  }
+
+  void dispose() {
+    for (var player in _audioPlayers.values) {
+      player.dispose();
+    }
+    _audioPlayers.clear();
+    log("SoundManager disposed and audio focus released.");
   }
 }
