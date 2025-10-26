@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
@@ -302,53 +304,63 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.title"),
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound.path, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound.path = v; })),
-                                    Row(
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"), selectedValue: _sounds.countingSound.path, soundListType: SoundListType.shortSounds, onChanged:(v) => setState(() { _sounds.countingSound.path = v; })),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(vertical: 4),
+                                      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                  ),
+                                  child: Column (
+                                    children: [
+                                      Row(
                                         children: [
-                                          Text(
-                                            translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.title"),
-                                            style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                                          ),
-                                          SizedBox(width: 8),
+                                          Expanded(child:
                                           DropdownButton2<SoundScope>(
                                             buttonStyleData: ButtonStyleData(
                                               height: 35,
-                                              width: 160,
                                               elevation: 2,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(16),
-                                                  border: Border.all(color: darkerblue),
-                                              ),
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                              width: MediaQuery.of(context).size.width,
                                             ),
                                             underline: SizedBox(),
                                             iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
-                                              dropdownStyleData: DropdownStyleData(       
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                  border: Border.all(color: darkerblue),
-                                                ),
-                                              ), 
+                                            dropdownStyleData: DropdownStyleData(       
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(color: darkerblue),
+                                              ),
+                                            ), 
                                             isExpanded: true,
                                             selectedItemBuilder: (context) {
                                               return SoundScopeX.nextPhaseScopeValues.map((e) {
                                                 return Container(
                                                 alignment: Alignment.centerLeft,
                                                 child: Text(
-                                                  e.name,
+                                                  translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.title")+e.name,
                                                   overflow: TextOverflow.ellipsis,
                                                   maxLines: 1,
                                                   softWrap: false,
-                                                  style: TextStyle(fontSize: 12),
+                                                  style: TextStyle(fontSize: 14, color: darkerblue, fontWeight: FontWeight.bold),
                                                 ),
                                                 );
                                               }).toList();
                                             },
                                               value: _sounds.nextSoundScope,
-                                              items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(child: Text(e.name, style: TextStyle(fontSize: 12)), value: e)).toList(),
-                                              onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))],
+                                              items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14)))).toList(),
+                                              onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))),],
                                     ),
                                     
                                     if (_sounds.nextSoundScope != SoundScope.none)...[
@@ -363,6 +375,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                           ],
                                         ),
                                     ]
+                                  ],
+                                  ),
+                                  ),
                                   ],
                                 ),
                               ),
@@ -380,33 +395,43 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.title"),
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                     ),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"), selectedValue: _sounds.preparationTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationTrack.path = v; })),
-                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"), selectedValue: _sounds.endingTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.endingTrack.path = v; })),
-                                    Row(
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"), selectedValue: _sounds.preparationTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.preparationTrack.path = v; })),
+                                    SoundSelectionRow(labelStyle: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14), label: translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"), selectedValue: _sounds.endingTrack.path, soundListType: SoundListType.longSounds, onChanged:(v) => setState(() { _sounds.endingTrack.path = v; })),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(vertical: 4),
+                                      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
                                         children: [
-                                          Text(
-                                            translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.title"),
-                                            style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                                          ),
-                                          SizedBox(width: 8),
+                                          Expanded(child:
                                           DropdownButton2<SoundScope>(
                                             buttonStyleData: ButtonStyleData(
-                                              height: 35,
-                                              width: 160,
+                                              height:35,
                                               elevation: 2,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(16),
-                                                  border: Border.all(color: darkerblue),
-                                              ),
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                              width: MediaQuery.of(context).size.width
                                             ),
                                                   underline: SizedBox(),
                                                   iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
                                                     dropdownStyleData: DropdownStyleData(       
                                                       decoration: BoxDecoration(
                                                         color: Colors.white,
-                                                        borderRadius: BorderRadius.circular(12),
+                                                        borderRadius: BorderRadius.circular(16),
                                                         border: Border.all(color: darkerblue),
                                                       ),
                                                     ), 
@@ -416,18 +441,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                       return Container(
                                                       alignment: Alignment.centerLeft,
                                                       child: Text(
-                                                        e.name,
+                                                        translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.title")+e.name,
                                                         overflow: TextOverflow.ellipsis,
                                                         maxLines: 1,
                                                         softWrap: false,
-                                                        style: TextStyle(fontSize: 12),
+                                                        style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14),
                                                       ),
                                                       );
                                                     }).toList();
                                                   },
                                                   value: _sounds.backgroundSoundScope, 
-                                                  items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 12)))).toList(),
-                                                  onChanged: (v) => setState(() => _sounds.backgroundSoundScope = v!))],
+                                                  items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14)))).toList(),
+                                                  onChanged: (v) => setState(() => _sounds.backgroundSoundScope = v!))),],
                                       ),
                                       if (_sounds.backgroundSoundScope != SoundScope.none)...[
                                         Column(
@@ -444,7 +469,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         ),
                                     ],
                                     ],
-                                  
+                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

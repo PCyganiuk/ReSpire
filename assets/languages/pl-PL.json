@@ -70,11 +70,11 @@
                 "title":"Dźwięki treningu",
                 "counting_sound": "Odliczanie",
                 "NextBreathingPhaseSounds":{
-                    "title":"Następna faza oddechu",
-                    "none": "Brak dźwięku",
-                    "voice":"Lektor",
-                    "global":"Globalnie",
-                    "for_each_breathing_phase":"Każda faza oddechu"
+                    "title":"Następna faza oddechu: ",
+                    "none": "brak dźwięku",
+                    "voice":"lektor",
+                    "global":"Ogólny dźwięk zmiany fazy",
+                    "for_each_breathing_phase":"dźwięk zmiany dla każdej fazy"
                 }
             },
 
@@ -83,12 +83,12 @@
                 "preparation_music":"Przygotowanie",
                 "ending_music":"Zakończenie",
                 "Background_music":{
-                    "title": "Muzyka w tle",
+                    "title": "Muzyka w tle: ",
                     "global": "Dla całego treningu",
-                    "training_stages": "Dla etapów",
-                    "breathing_phases": "Dla faz oddechu",
+                    "training_stages": "dla etapów",
+                    "breathing_phases": "dla faz oddechu",
                     "breathing_phases_label": "Fazy oddechu",
-                    "none": "Brak"
+                    "none": "brak"
                 }
             },
 
@@ -145,10 +145,10 @@
     },
 
     "SoundScope":{
-        "none":"Brak",
-        "voice":"Lektor",
-        "global":"Na cały trening",
-        "perStage":"Dla etapów treningu",
-        "perPhase":"Dla każdej fazy oddechowej"
+        "none":"brak",
+        "voice":"lektor",
+        "global":"na cały trening",
+        "perStage":"dla etapów treningu",
+        "perPhase":"dla każdej fazy oddechowej"
     }
 }
