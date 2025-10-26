@@ -6,7 +6,7 @@ import 'package:respire/components/Global/Step.dart';
 import 'package:respire/components/Global/Training.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Settings.dart';
-import 'package:respire/components/TrainingEditorPage/PhaseTile.dart';
+import 'package:respire/components/TrainingEditorPage/TrainingStageTile.dart';
 import 'package:respire/components/TrainingEditorPage/SoundSelectionRow.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
@@ -316,23 +316,40 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               width: 160,
                                               elevation: 2,
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(12),
                                                 color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(color: darkerblue),
                                               ),
                                               padding: const EdgeInsets.symmetric(horizontal: 12),
                                             ),
-                                                  underline: SizedBox(),
-                                                  iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
-                                                    dropdownStyleData: DropdownStyleData(       
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                    ), 
-                                                  value: _sounds.nextSoundScope,
-                                                  items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(child: Text(e.name), value: e)).toList(),
-                                                  onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))],
-                                      ),
+                                            underline: SizedBox(),
+                                            iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
+                                              dropdownStyleData: DropdownStyleData(       
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(color: darkerblue),
+                                                ),
+                                              ), 
+                                            isExpanded: true,
+                                            selectedItemBuilder: (context) {
+                                              return SoundScopeX.nextPhaseScopeValues.map((e) {
+                                                return Container(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  e.name,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  softWrap: false,
+                                                  style: TextStyle(fontSize: 12),
+                                                ),
+                                                );
+                                              }).toList();
+                                            },
+                                              value: _sounds.nextSoundScope,
+                                              items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(child: Text(e.name, style: TextStyle(fontSize: 12)), value: e)).toList(),
+                                              onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))],
+                                    ),
                                     
                                     if (_sounds.nextSoundScope != SoundScope.none)...[
                                       Column(
@@ -375,11 +392,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                           DropdownButton2<SoundScope>(
                                             buttonStyleData: ButtonStyleData(
                                               height: 35,
-                                              width: 200,
+                                              width: 160,
                                               elevation: 2,
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(12),
                                                 color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(color: darkerblue),
                                               ),
                                               padding: const EdgeInsets.symmetric(horizontal: 12),
                                             ),
@@ -389,10 +407,26 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                       decoration: BoxDecoration(
                                                         color: Colors.white,
                                                         borderRadius: BorderRadius.circular(12),
+                                                        border: Border.all(color: darkerblue),
                                                       ),
                                                     ), 
+                                                  isExpanded: true,
+                                                  selectedItemBuilder: (context) {
+                                                    return SoundScope.values.map((e) {
+                                                      return Container(
+                                                      alignment: Alignment.centerLeft,
+                                                      child: Text(
+                                                        e.name,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        maxLines: 1,
+                                                        softWrap: false,
+                                                        style: TextStyle(fontSize: 12),
+                                                      ),
+                                                      );
+                                                    }).toList();
+                                                  },
                                                   value: _sounds.backgroundSoundScope, 
-                                                  items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name))).toList(),
+                                                  items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 12)))).toList(),
                                                   onChanged: (v) => setState(() => _sounds.backgroundSoundScope = v!))],
                                       ),
                                       if (_sounds.backgroundSoundScope != SoundScope.none)...[

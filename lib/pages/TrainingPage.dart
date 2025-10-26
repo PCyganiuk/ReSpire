@@ -218,7 +218,7 @@ class _TrainingPageState extends State<TrainingPage> {
                               Text(
                                 _trainingStageDisplayName(trainingStage, index), /// ???
                                 style: TextStyle(
-                                  color: darkerblue,
+                                  color: greenblue,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),
