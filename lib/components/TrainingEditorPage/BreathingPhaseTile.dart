@@ -147,7 +147,7 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
                 Text(
                   translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.time"),
                   style: TextStyle(
-                    color: darkerblue,
+                    color: greenblue,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),
@@ -265,7 +265,7 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
                   Text(
                     translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.type"),
                     style: TextStyle(
-                      color: darkerblue,
+                      color: greenblue,
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
                     ),
@@ -294,6 +294,7 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: darkerblue),
                         ),
                       ),
                       items: respire.BreathingPhaseType.values
@@ -317,7 +318,7 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
             ),
             SizedBox(width: 4),
             IconButton(
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
               icon: Icon(Icons.delete, color: darkerblue, size: 20),
               onPressed: widget.onDelete,
             ),

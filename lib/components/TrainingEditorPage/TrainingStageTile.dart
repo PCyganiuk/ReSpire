@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Step.dart' as respire;
-import 'package:respire/components/TrainingEditorPage/StepTile.dart';
+import 'package:respire/components/TrainingEditorPage/BreathingPhaseTile.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart'; 
 
@@ -256,6 +256,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                 ),
                 SizedBox(width: 8),
                 IconButton(
+                  padding: EdgeInsets.fromLTRB(0, 18, 0, 0),
                   icon: Icon(Icons.delete, color: darkerblue),
                   onPressed: widget.onDelete,
                 ),
