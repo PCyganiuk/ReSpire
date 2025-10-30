@@ -50,15 +50,15 @@
             "default_training_stage_name":"Training stage",
 
             "TrainingStageTile":{
-                "name":"Training stage name",
+                "name":" Training stage name",
                 "name_placeholder":"Enter training stage name",
-                "reps":"Reps",
-                "increment":"Inc (s)",
+                "reps":" Reps",
+                "increment":" Inc (s)",
                 "add_breathing_phase_button_label":"Add breathing phase"
             },
 
             "BreathingPhaseTile":{
-                "time":"Time (s)",
+                "time":" Time (s)",
                 "type":"Type",
                 "remove_breathing_phase_dialog_title":"Remove breathing phase?",
                 "remove_breathing_phase_dialog_content":"Are you sure you want to remove this breathing phase?"
@@ -70,9 +70,12 @@
                 "title": "Training sounds",
                 "counting_sound": "Counting",
                 "NextBreathingPhaseSounds":{
-                    "title":"Next breathing phase",
-                    "global":"Global",
-                    "for_each_breathing_phase":"Each breathing phase"
+
+                    "title":"Next breathing phase: ",
+                    "none": "no sound",
+                    "global":"Global phase change sound",
+                    "voice":"lector",
+                    "for_each_breathing_phase":"change sound for each phase"
                 }
             },
 
@@ -81,10 +84,10 @@
                 "preparation_music":"Preparation",
                 "ending_music":"Ending",
                 "Background_music":{
-                    "title": "Background music",
+                    "title": "Background music: ",
                     "global": "For whole training",
-                    "training_stages": "For training stages",
-                    "breathing_phases": "For breathing phases",
+                    "training_stages": "for training stages",
+                    "breathing_phases": "for breathing phases",
                     "breathing_phases_label": "Breathing phases"
                 }
             },
@@ -112,6 +115,16 @@
             "left_frequency_label":"Left ear frequency",
             "right_frequency_label":"Right ear frequency",
             "beat_frequency_label":"Beat frequency"
+        },
+
+                    
+        "Alert":{
+            "header" : "Your training is incomplete!",
+            "empty_training_message" : "Your training is empty because no breathing phases have been added. If you leave now, your training will not be saved.",
+            "empty_stages_message_first_part" : "Some stages in your workout don’t contain any breathing phases and are empty (number of stages: ",
+            "empty_stages_message_second_part" : "). If you leave now, these stages will be removed.",
+            "back_to_edition_button" : "Go back to editing",
+            "finish_edition_button" : "Leave anyway"
         }
     },
 
@@ -143,10 +156,10 @@
     },
 
     "SoundScope":{
-        "none":"None",
-        "voice":"Lector",
-        "global":"For whole training",
-        "perStage":"For training stages",
-        "perPhase":"For each breathing phase"
+        "none":"none",
+        "voice":"lector",
+        "global":"for whole training",
+        "perStage":"for training stages",
+        "perPhase":"for each breathing phase"
     }
 }
