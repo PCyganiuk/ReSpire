@@ -394,13 +394,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         children: [
                                           Text(
                                             translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.title"),
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black, overflow: TextOverflow.ellipsis),
                                           ),
                                           SoundSelectionRow(
                                             labelStyle: TextStyle(
                                                 color: darkerblue,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14),
+                                                fontSize: 14, 
+                                                overflow: TextOverflow.ellipsis),
                                             label: translationProvider
                                                 .getTranslation(
                                                     "TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"),
@@ -466,7 +467,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                           }).toList();
                                                         },
                                                         value: _sounds.nextSoundScope,
-                                                        items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14)))).toList(),
+                                                        items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis))).toList(),
                                                         onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))),
                                                   ],
                                                 ),
@@ -477,6 +478,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                         ((){
                                                           _sounds.nextSound.type = SoundType.cue;
                                                           return SoundSelectionRow(
+                                                            labelStyle: TextStyle(
+                                                                overflow: TextOverflow.ellipsis),
                                                             label: translationProvider
                                                                 .getTranslation(
                                                                     "TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"),
@@ -516,13 +519,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         children: [
                                           Text(
                                             translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.title"),
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black, overflow: TextOverflow.ellipsis),
                                           ),
                                           SoundSelectionRow(
                                             labelStyle: TextStyle(
                                                 color: darkerblue,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14),
+                                                fontSize: 14,
+                                                overflow: TextOverflow.ellipsis),
                                             label: translationProvider
                                                 .getTranslation(
                                                     "TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"),
@@ -539,7 +543,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             labelStyle: TextStyle(
                                                 color: darkerblue,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14),
+                                                fontSize: 14,
+                                                overflow: TextOverflow.ellipsis),
                                             label: translationProvider
                                                 .getTranslation(
                                                     "TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"),
@@ -599,13 +604,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                                 overflow: TextOverflow.ellipsis,
                                                                 maxLines: 1,
                                                                 softWrap: false,
-                                                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14),
+                                                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14, overflow: TextOverflow.ellipsis),
                                                               ),
                                                             );
                                                           }).toList();
                                                         },
                                                         value: _sounds.backgroundSoundScope, 
-                                                        items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14)))).toList(),
+                                                        items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis))).toList(),
                                                         onChanged: (v) => setState(() => _sounds.backgroundSoundScope = v!))),
                                                   ],
                                                 ),
@@ -614,6 +619,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                     children: [
                                                       if (_sounds.backgroundSoundScope == SoundScope.global) ...[
                                                         SoundSelectionRow(
+                                                          labelStyle: TextStyle(
+                                                                overflow: TextOverflow.ellipsis),
                                                           label: translationProvider
                                                               .getTranslation(
                                                                   "TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"),
@@ -1047,6 +1054,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       for (final phase in BreathingPhaseType.values)
         SoundSelectionRow(
           includeVoiceOption: false,
+          labelStyle: TextStyle(overflow: TextOverflow.ellipsis),
           label: translationProvider
               .getTranslation("BreathingPhaseType.${phase.name}"),
           selectedValue: type == SoundListType.longSounds
