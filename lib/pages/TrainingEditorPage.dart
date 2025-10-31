@@ -477,7 +477,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                     children: [
                                                       if(_sounds.nextSoundScope == SoundScope.global)
                                                         ((){
-                                                          _sounds.nextSound.type = SoundType.cue;
                                                           return SoundSelectionRow(
                                                             labelStyle: TextStyle(
                                                                 overflow: TextOverflow.ellipsis),
