@@ -39,6 +39,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   int _selectedTab = 0;
   late Sounds _sounds;
 
+  final int titleMaxLength = 20;
+
   // Other tab state
   bool _showNextBreathingPhaseToggle = false;
   bool _showChartToggle = false;
@@ -133,7 +135,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void showEditTitleDialog(BuildContext context) {
     final tempController = TextEditingController(text: widget.training.title);
     bool isError = false;
-    const int titleMaxLength = 20;
     showDialog(
       context: context,
       builder: (context) {
@@ -358,7 +359,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                         onReorder: reorderTrainingStage,
                         proxyDecorator: (child, idx, anim) => Material(
                             color: Colors.transparent,
-                            child: child), //removes shadow when dragging tile
+                            child: child), // Removes shadow when dragging tile
                         padding: EdgeInsets.only(bottom: 80),
                         children: [
                           for (int index = 0;

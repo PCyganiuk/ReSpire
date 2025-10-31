@@ -12,6 +12,8 @@ class TrainingStageTile extends StatefulWidget {
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
 
+  final int trainingStageNameMaxLength = 25;
+
   const TrainingStageTile({
     Key? key,
     required this.trainingStage,
@@ -168,7 +170,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
       return trimmed;
     }
     // Return the default generated name
-    final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_stage_name");
+    final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name");
     if (template.contains('{number}')) {
       return template.replaceAll('{number}', (widget.trainingStageIndex + 1).toString());
     }
@@ -227,10 +229,12 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                         child: TextField(
                           controller: nameController,
                           focusNode: nameFocusNode,
+                          maxLength: widget.trainingStageNameMaxLength,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             isDense: true,
+                            counterText: '',
                           ),
                           style: TextStyle(
                             color: darkerblue,
