@@ -78,7 +78,6 @@
                 "title": "Training sounds",
                 "counting_sound": "Counting",
                 "NextBreathingPhaseSounds":{
-
                     "title":"Next breathing phase: ",
                     "none": "no sound",
                     "global":"Global phase change sound",
