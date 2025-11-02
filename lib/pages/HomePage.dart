@@ -205,6 +205,7 @@ class _HomePageState extends State<HomePage> {
     double size = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Image.asset(
           'assets/logo_poziom.png',

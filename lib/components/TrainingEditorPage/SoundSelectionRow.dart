@@ -63,8 +63,14 @@ class SoundSelectionRow extends StatelessWidget {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: labelStyle ?? const TextStyle()),
-
+        Expanded(
+          child: Text(
+            label,
+            style: labelStyle ?? const TextStyle(),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 150),
           child: InkWell(
