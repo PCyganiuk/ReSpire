@@ -14,26 +14,6 @@ class SoundManager implements ISoundManager {
   static final longSounds = ReSpireSounds().longSounds;
   static final shortSounds = ReSpireSounds().shortSounds;
 
-  /*static final Map<String,SoundAsset> longSounds = {
-    "Birds":SoundAsset(name:"Birds", path:"sounds/birds.mp3", type:SoundType.melody),
-    "Ainsa":SoundAsset(name:"Ainsa", path:"sounds/Ainsa.mp3", type:SoundType.melody),
-    "Rain":SoundAsset(name:"Rain", path:"sounds/rain.mp3", type:SoundType.melody),
-    "Ocean":SoundAsset(name:"Ocean", path:"sounds/ocean-waves.mp3", type:SoundType.melody),
-    "Chanting 1":SoundAsset(name:"Chanting 1", path:"sounds/buddhist-chanting.mp3", type:SoundType.melody),
-    "Chanting 2":SoundAsset(name:"Chanting 2", path:"sounds/chanting.mp3", type:SoundType.melody),
-    "Low hz":SoundAsset(name:"Low hz", path:"sounds/low-hz.mp3", type:SoundType.melody),
-    "Solfeggio Frequency":SoundAsset(name:"Solfeggio Frequency", path:"sounds/solfeggio-frequency.mp3", type:SoundType.melody),
-  };
-
-  static final Map<String,SoundAsset> shortSounds = {
-    "Notification":SoundAsset(name:"Notification", path:"sounds/new-notification.mp3", type:SoundType.cue),
-    "Whistle Up":SoundAsset(name:"Whistle Up", path:"sounds/whistle-up.mp3", type:SoundType.cue),
-    "Whistle Down":SoundAsset(name:"Whistle Down", path:"sounds/whistle-down.mp3", type:SoundType.cue),
-    "Gong":SoundAsset(name:"Gong", path:"sounds/gong.mp3", type:SoundType.cue),
-    "Metronome":SoundAsset(name: "Metronome", path: "sounds/metronome.mp3", type: SoundType.cue)
-  };*/
-
-
   ///A map of available sounds in the assets folder.\
   ///The keys are the sound names, and the values are the paths to the sound files.
   static final Map<String,SoundAsset> _availableSounds = {
