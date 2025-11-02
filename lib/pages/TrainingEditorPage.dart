@@ -39,7 +39,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   int _selectedTab = 0;
   late Sounds _sounds;
 
-  final int titleMaxLength = 20;
+  final int titleMaxLength = 15;
 
   // Other tab state
   bool _showNextBreathingPhaseToggle = false;
