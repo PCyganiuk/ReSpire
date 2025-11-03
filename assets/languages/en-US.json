@@ -26,7 +26,7 @@
     "TrainingPage":{
         "start_button_label":"Start training",
         "description_placeholder":"No description provided.",
-        "description_placeholder_prefix":"Add description for training",
+        "description_placeholder_prefix":"Description for training",
         "TrainingOverview":{
             "title":"Training Overview",
             "training_stage":"Training stage",

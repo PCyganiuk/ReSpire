@@ -26,7 +26,7 @@
     "TrainingPage":{
         "start_button_label":"Rozpocznij trening",
         "description_placeholder":"Brak opisu.",
-        "description_placeholder_prefix":"Dodaj opis dla treningu",
+        "description_placeholder_prefix":"Opis dla treningu",
         "TrainingOverview":{
             "title":"Przegląd treningu",
             "training_stage":"Etap treningu",
