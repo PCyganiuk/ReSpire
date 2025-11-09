@@ -20,8 +20,10 @@ class SingleSoundManager implements ISoundManager {
     bool success = await _delegate.loadSound(soundName);
     if(!success) return;
 
-    final player = _delegate.getPlayer(soundName)!;
-    final asset = _delegate.getAsset(soundName)!;
+    final player = _delegate.getPlayer(soundName);
+    final asset = _delegate.getAsset(soundName);
+    
+    if (player == null || asset == null) return;
 
     _setupSinglePlayAudioPlayer(player, asset);
 
@@ -91,6 +93,9 @@ class SingleSoundManager implements ISoundManager {
   
   @override
   Future<bool> loadSound(String soundName) => _delegate.loadSound(soundName);
+  
+  @override
+  void refreshSoundsList() => _delegate.refreshSoundsList();
 
   AudioPlayer? getPlayer(String soundName) => _delegate.getPlayer(soundName);
 }

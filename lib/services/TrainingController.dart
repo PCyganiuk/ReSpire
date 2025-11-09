@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
 import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
+import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/services/BinauralBeatGenerator.dart';
@@ -20,6 +21,7 @@ class TrainingController {
       breathingPhasesQueue =
       ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
   final Queue<String?> _trainingStageNameQueue = Queue<String?>();
+  final Queue<String?> _trainingStageIdQueue = Queue<String?>(); // Track stage ID for each phase
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
@@ -43,30 +45,47 @@ class TrainingController {
   late Settings _settings;
 
   String? _currentSound;
+  String? _currentTrainingStageId;
   late SoundManager soundManager;
+  late PlaylistManager playlistManager;
   late BinauralBeatGenerator binauralGenerator;
+  bool _isUsingPlaylist = false;
+  bool _preparationPhaseCompleted = false;
 
   TranslationProvider translationProvider = TranslationProvider();
 
   TrainingController(this.parser) {
     soundManager = SoundManager();
     soundManager.stopAllSounds();
+    playlistManager = PlaylistManager();
     binauralGenerator = BinauralBeatGenerator();
     _remainingTime = parser.training.settings.preparationDuration * 1000;
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
     
+    // Initialize current stage ID to the first stage
+    if (parser.training.trainingStages.isNotEmpty) {
+      _currentTrainingStageId = parser.training.trainingStages[0].id;
+    }
+    
     // Binaural beats will be started after preparation phase
     dev.log('TrainingController: binauralBeatsEnabled=${_settings.binauralBeatsEnabled}');
     
     _preloadBreathingPhases();
-    _currentSound = _sounds.preparationTrack.name;
+    _currentSound = _sounds.preparationTrack.type != SoundType.none 
+        ? _sounds.preparationTrack.name 
+        : null;
+    
+    // Note: Global playlist will be started after preparation phase
+    // See _handlePreparationPhaseEnd()
+    
     _start();
   }
 
   void _preloadBreathingPhases() {
     breathingPhasesQueue.value.add(null);
     _trainingStageNameQueue.add(null);
+    _trainingStageIdQueue.add(null);
     _updateCurrentTrainingStageLabel();
     _fetchNextBreathingPhase();
     _nextRemainingTime = _newBreathingPhaseRemainingTime;
@@ -79,23 +98,36 @@ class TrainingController {
       _finishedLoadingSteps = true;
       breathingPhasesQueue.value.add(null);
       _trainingStageNameQueue.add(null);
+      _trainingStageIdQueue.add(null);
+      dev.log('TrainingController: No more phases to fetch');
       return;
     }
+    
     breathingPhasesQueue.value.add(instructionData["breathingPhase"]);
     _trainingStageNameQueue.add(_resolveTrainingStageName(
         instructionData["trainingStageName"] as String?,
         parser.trainingStageID));
+    
+    // Store the stage ID for this phase
+    String? stageId;
+    if (parser.trainingStageID < parser.training.trainingStages.length) {
+      stageId = parser.training.trainingStages[parser.trainingStageID].id;
+    }
+    _trainingStageIdQueue.add(stageId);
+    
+    dev.log('TrainingController: Fetched phase for stage: $stageId (parser.trainingStageID=${parser.trainingStageID})');
+    
     _newBreathingPhaseRemainingTime = instructionData["remainingTime"];
   }
-
-  final PlaylistManager _playlistManager = PlaylistManager();
 
   void pause() {
     isPaused.value = true;
     // to account for some longer counting sounds 
     //(that are not stored in the _currentSound)
     soundManager.stopAllSounds();
-    _playlistManager.pausePlaylist();
+    if (_isUsingPlaylist) {
+      playlistManager.pausePlaylist();
+    }
     if (_settings.binauralBeatsEnabled) {
       binauralGenerator.pause();
     }
@@ -104,9 +136,10 @@ class TrainingController {
 
   void resume() {
     isPaused.value = false;
-    if (_currentSound != null) {
+    if (_isUsingPlaylist) {
+      playlistManager.resumePlaylist();
+    } else if (_currentSound != null) {
       //soundManager.playSound(_currentSound!); //TODO: Delete once the playlist is working properly
-      _playlistManager.resumePlaylist();
     }
     if (_settings.binauralBeatsEnabled) {
       binauralGenerator.resume();
@@ -146,16 +179,63 @@ class TrainingController {
   }
 
   bool triggered = false;
+  
+  // Switch to a new stage's playlist
+  void _switchToStagePlaylist(String stageId) {
+    if (_sounds.backgroundSoundScope != SoundScope.perStage) {
+      return; // Only for per-stage mode
+    }
+    
+    // Stop any currently playing playlist
+    if (_isUsingPlaylist) {
+      playlistManager.completePlaylist();
+      _isUsingPlaylist = false;
+    }
+    
+    // Get playlist for this stage
+    if (_sounds.stagePlaylists.containsKey(stageId) && 
+        _sounds.stagePlaylists[stageId]!.isNotEmpty) {
+      final playlist = _sounds.stagePlaylists[stageId]!;
+      
+      // Start new stage playlist
+      _isUsingPlaylist = true;
+      playlistManager.playPlaylist(playlist.map((s) => s.name).toList());
+      _currentSound = null; // Clear single sound tracking
+      
+      dev.log('Switched to stage playlist: $stageId (${playlist.length} sounds)');
+    }
+  }
+  
   Future<void> _handleBackgroundSoundChange(
       String? nextBackgroundSound, int changeTime) async {
 
-    //TODO: Load and play a playlist with backgrounSoundManager.playPlaylist(list of sound names)
-    //Do it only when we change phase. Checkable in parser.trainingStageID
+    // For global playlist, it should play continuously - don't restart
+    if (_sounds.backgroundSoundScope == SoundScope.global && 
+        _sounds.trainingBackgroundPlaylist.isNotEmpty) {
+      // Playlist already started after preparation, just return
+      return;
+    }
     
+    // For per-stage playlist - handled separately in phase start, not here
+    if (_sounds.backgroundSoundScope == SoundScope.perStage) {
+      return;
+    }
+    
+    // Otherwise use single sound manager (for perPhase or single sounds)
     if (_currentSound != nextBackgroundSound) {
-      await soundManager.pauseSoundFadeOut(_currentSound, changeTime);
+      // Stop playlist if it was playing
+      if (_isUsingPlaylist) {
+        playlistManager.completePlaylist();
+        _isUsingPlaylist = false;
+      }
+      
+      if (_currentSound != null) {
+        await soundManager.pauseSoundFadeOut(_currentSound, changeTime);
+      }
       _currentSound = nextBackgroundSound;
-      soundManager.playSoundFadeIn(nextBackgroundSound, changeTime);
+      if (nextBackgroundSound != null) {
+        soundManager.playSoundFadeIn(nextBackgroundSound, changeTime);
+      }
     }
   }
 
@@ -202,6 +282,22 @@ class TrainingController {
           );
         }
         
+        // Start global playlist when first breathing phase begins (after preparation)
+        if (breathingPhasesCount.value == 1 && !_preparationPhaseCompleted) {
+          _preparationPhaseCompleted = true;
+          if (_sounds.backgroundSoundScope == SoundScope.global && 
+              _sounds.trainingBackgroundPlaylist.isNotEmpty) {
+            _isUsingPlaylist = true;
+            playlistManager.playPlaylist(
+              _sounds.trainingBackgroundPlaylist.map((s) => s.name).toList()
+            );
+          } else if (_sounds.backgroundSoundScope == SoundScope.perStage && 
+                     _currentTrainingStageId != null) {
+            // Start first stage's playlist
+            _switchToStagePlaylist(_currentTrainingStageId!);
+          }
+        }
+        
         if (breathingPhasesQueue.value.elementAt(1) != null) {
           if (_trainingStageNameQueue.length > 1 &&
               _trainingStageNameQueue.elementAt(1) != null) {
@@ -235,6 +331,13 @@ class TrainingController {
           if (_stopTimer == 0) {
             second.value = 0;
             end = true;
+            
+            // Stop playlist before playing ending track
+            if (_isUsingPlaylist) {
+              playlistManager.completePlaylist();
+              _isUsingPlaylist = false;
+            }
+            
             _handleBackgroundSoundChange(_sounds.endingTrack.name, 500);
             //_timer?.cancel();
           } else {
@@ -253,11 +356,25 @@ class TrainingController {
           }
         } else if (!_breathingPhaseDelay) {
           // start new breathing phase
+          
+          // FIRST: Get the stage ID for the phase that is NOW starting (element at index 1, which will become index 0)
+          String? newStageId;
+          if (_trainingStageIdQueue.length > 1) {
+            newStageId = _trainingStageIdQueue.elementAt(1); // The NEXT phase that's about to start
+          }
+          
+          dev.log('TrainingController: Starting new phase with stageId: $newStageId (current: $_currentTrainingStageId, queue size: ${_trainingStageIdQueue.length})');
+          
+          // THEN: Remove the completed phase
           breathingPhasesQueue.value.removeFirst();
           _remainingTime = _nextRemainingTime;
           if (_trainingStageNameQueue.isNotEmpty) {
             _trainingStageNameQueue.removeFirst();
           }
+          if (_trainingStageIdQueue.isNotEmpty) {
+            _trainingStageIdQueue.removeFirst();
+          }
+          
           _nextRemainingTime = _newBreathingPhaseRemainingTime;
           previousSecond = (_remainingTime + 1) ~/ 1000;
           _fetchNextBreathingPhase();
@@ -265,6 +382,18 @@ class TrainingController {
               Queue<breathing_phase.BreathingPhase?>.from(
                   breathingPhasesQueue.value);
           _updateCurrentTrainingStageLabel();
+          
+          // Check if stage changed and switch playlist accordingly
+          if (_sounds.backgroundSoundScope == SoundScope.perStage && newStageId != null) {
+            if (_currentTrainingStageId != newStageId) {
+              dev.log('TrainingController: ✅ Stage changed from $_currentTrainingStageId to $newStageId - SWITCHING PLAYLIST');
+              _currentTrainingStageId = newStageId;
+              _switchToStagePlaylist(_currentTrainingStageId!);
+            } else {
+              dev.log('TrainingController: ⏩ Same stage ($newStageId) - keeping playlist');
+            }
+          }
+          
           _breathingPhaseDelay = true;
           _breathingPhaseDelayRemainingTime = _breathingPhaseDelayDuration;
         }
@@ -275,6 +404,7 @@ class TrainingController {
   void dispose() {
     TextToSpeechService().stopSpeaking();
     soundManager.stopAllSounds();
+    playlistManager.completePlaylist();
     binauralGenerator.stop();
     _timer?.cancel();
     currentTrainingStageName.dispose();

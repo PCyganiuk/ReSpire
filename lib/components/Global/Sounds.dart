@@ -32,17 +32,17 @@ class Sounds {
   /// Scope of the background audio during the training session
   @HiveField(6)
   SoundScope backgroundSoundScope = SoundScope.global;
-  /// Background audio for the entire training session
+  /// Background audio playlist for the entire training session
   @HiveField(7)
-  SoundAsset trainingBackgroundTrack = SoundManager.longSounds["Birds"]!;
+  List<SoundAsset> trainingBackgroundPlaylist = [];
 
   // === STAGE LEVEL ===
 
-  /// Stage tracks for different training stages
+  /// Stage playlists for different training stages
   /// 
-  /// `key` - stage uuid, `value` - sound name
+  /// `key` - stage uuid, `value` - list of sound assets
   @HiveField(8)
-  Map<String, SoundAsset> stageTracks = {};
+  Map<String, List<SoundAsset>> stagePlaylists = {};
 
   // === BREATHING PHASE LEVEL ===
 
@@ -73,14 +73,10 @@ class Sounds {
     if (endingTrack.name == soundName) {
       endingTrack = SoundAsset();
     }
-    if (trainingBackgroundTrack.name == soundName) {
-      trainingBackgroundTrack = SoundAsset();
-    }
+    trainingBackgroundPlaylist.removeWhere((sound) => sound.name == soundName);
 
-    for (var stage in stageTracks.keys) {
-      if (stageTracks[stage]!.name == soundName) {
-        stageTracks[stage] = SoundAsset();
-      }
+    for (var stage in stagePlaylists.keys) {
+      stagePlaylists[stage]!.removeWhere((sound) => sound.name == soundName);
     }
 
     breathingPhaseCues.forEach((key, value) {

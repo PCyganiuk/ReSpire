@@ -98,14 +98,21 @@ class Training {
         break;
 
       case SoundScope.global:
-        for (var stage in trainingStages) {
-          stage.propagateBackgroundSound(sounds.trainingBackgroundTrack);
+        // For playlist, we'll use the first sound in the playlist for propagation
+        // The actual playlist playback will be handled by PlaylistManager
+        if (sounds.trainingBackgroundPlaylist.isNotEmpty) {
+          for (var stage in trainingStages) {
+            stage.propagateBackgroundSound(sounds.trainingBackgroundPlaylist.first);
+          }
         }
         break; 
 
       case SoundScope.perStage:
         for (int i=0; i<trainingStages.length; i++) {
-          trainingStages[i].propagateBackgroundSound(sounds.stageTracks[trainingStages[i].id]!);
+          final playlist = sounds.stagePlaylists[trainingStages[i].id];
+          if (playlist != null && playlist.isNotEmpty) {
+            trainingStages[i].propagateBackgroundSound(playlist.first);
+          }
         }
         break; 
 

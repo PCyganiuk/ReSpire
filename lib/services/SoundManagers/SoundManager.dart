@@ -125,30 +125,42 @@ class SoundManager implements ISoundManager {
   }
 
   Future<void> ensureSoundLoaded(String? soundName) async{
+    if (soundName == null) {
+      return;
+    }
     final asset = _availableSounds[soundName];
+    if (asset == null) {
+      return;
+    }
     
     //If cue, always remove old entry
-    if (asset!.type == SoundType.cue && _audioPlayers.containsKey(soundName)) {
-      _audioPlayers[soundName]!.dispose();
+    if (asset.type == SoundType.cue && _audioPlayers.containsKey(soundName)) {
+      var player = _audioPlayers[soundName];
+      if (player != null) {
+        player.dispose();
+      }
       _audioPlayers.remove(soundName);
     }
 
     //Load if needed
     if (!_audioPlayers.containsKey(soundName)) {
-      await loadSound(soundName!);
+      await loadSound(soundName);
     }
   }
 
   ///Plays a sound from a file in the assets folder.
   @override
   Future<void> playSound(String? soundName) async{
-    if (_availableSounds[soundName] == null){
+    if (soundName == null || _availableSounds[soundName] == null){
       return;
     }
     await ensureSoundLoaded(soundName);
     log("Playing sound: $soundName");
 
-    var player = _audioPlayers[soundName]!;
+    var player = _audioPlayers[soundName];
+    if (player == null) {
+      return;
+    }
     if (_availableSounds[soundName]!.type == SoundType.cue) {
       await player.play(player.source!);
     } else {
@@ -160,12 +172,15 @@ class SoundManager implements ISoundManager {
   ///[fadeInDuration] is the duration of the effect in milliseconds.
   @override
   Future<void> playSoundFadeIn(String? soundName, int fadeInDuration) async{
-    if(_availableSounds[soundName] == null) {
+    if(soundName == null || _availableSounds[soundName] == null) {
       return;
     }
 
-    await loadSound(soundName!);
-    var player = _audioPlayers[soundName]!;
+    await loadSound(soundName);
+    var player = _audioPlayers[soundName];
+    if (player == null) {
+      return;
+    }
     final int breathingPhaseDuration = 50;
     player.setVolume(0.0);
 
@@ -188,7 +203,7 @@ class SoundManager implements ISoundManager {
   ///Pauses a sound from a file in the assets folder if playing.
   @override
   Future<void> pauseSound(String? soundName) async {
-    if (_availableSounds[soundName] == null || !_audioPlayers.containsKey(soundName)) {
+    if (soundName == null || _availableSounds[soundName] == null || !_audioPlayers.containsKey(soundName)) {
       log("Sound: $soundName is not available.");
       return;
     }
@@ -197,14 +212,17 @@ class SoundManager implements ISoundManager {
       return;
     }
     log("Pausing sound: $soundName");
-    await _audioPlayers[soundName]!.pause();
+    var player = _audioPlayers[soundName];
+    if (player != null) {
+      await player.pause();
+    }
   }
 
   ///Stops a sound from a file in the assets folder if playing.
   ///This will stop the sound and reset it to the beginning.
   @override
   Future<void> stopSound(String? soundName) async{
-    if(_availableSounds[soundName] == null) {
+    if(soundName == null || _availableSounds[soundName] == null) {
       log("Sound: $soundName is not available.");
       return;
     }
@@ -215,14 +233,20 @@ class SoundManager implements ISoundManager {
     }
 
     log("Stopping sound: $soundName");
-    await _audioPlayers[soundName]!.stop();
+    var player = _audioPlayers[soundName];
+    if (player != null) {
+      await player.stop();
+    }
   }
 
   Future<void> fadeOut(String? soundName, int fadeOutDuration) async {
-    if(_availableSounds[soundName] == null) {
+    if(soundName == null || _availableSounds[soundName] == null) {
       return;
     }
-    var player = _audioPlayers[soundName]!;
+    var player = _audioPlayers[soundName];
+    if (player == null) {
+      return;
+    }
     final int breathingPhaseDuration = 50;
 
     int breathingPhases = (fadeOutDuration / breathingPhaseDuration).ceil();
@@ -243,8 +267,11 @@ class SoundManager implements ISoundManager {
   ///[fadeOutDuration] is the duration of the effect in milliseconds.
   @override
   Future<void> pauseSoundFadeOut(String? soundName, int fadeOutDuration) async{
-    fadeOut(soundName, fadeOutDuration);
-    await pauseSound(soundName!);
+    if (soundName == null) {
+      return;
+    }
+    await fadeOut(soundName, fadeOutDuration);
+    await pauseSound(soundName);
   }
 
   ///Stops all sounds that are currently playing.
@@ -272,7 +299,10 @@ class SoundManager implements ISoundManager {
   void removeUserSound(String soundName, SoundListType type) {
     _availableSounds.remove(soundName);
     if (_audioPlayers.containsKey(soundName)) {
-      _audioPlayers[soundName]!.dispose();
+      var player = _audioPlayers[soundName];
+      if (player != null) {
+        player.dispose();
+      }
       _audioPlayers.remove(soundName);
     }
     PresetDataBase().clearUserSound(soundName);

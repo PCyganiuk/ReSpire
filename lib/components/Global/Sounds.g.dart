@@ -23,8 +23,9 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..preparationTrack = fields[4] as SoundAsset
       ..endingTrack = fields[5] as SoundAsset
       ..backgroundSoundScope = fields[6] as SoundScope
-      ..trainingBackgroundTrack = fields[7] as SoundAsset
-      ..stageTracks = (fields[8] as Map).cast<String, SoundAsset>()
+      ..trainingBackgroundPlaylist = (fields[7] as List).cast<SoundAsset>()
+      ..stagePlaylists = (fields[8] as Map).map((dynamic k, dynamic v) =>
+          MapEntry(k as String, (v as List).cast<SoundAsset>()))
       ..breathingPhaseCues =
           (fields[9] as Map).cast<BreathingPhaseType, SoundAsset>()
       ..breathingPhaseBackgrounds =
@@ -48,9 +49,9 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..writeByte(6)
       ..write(obj.backgroundSoundScope)
       ..writeByte(7)
-      ..write(obj.trainingBackgroundTrack)
+      ..write(obj.trainingBackgroundPlaylist)
       ..writeByte(8)
-      ..write(obj.stageTracks)
+      ..write(obj.stagePlaylists)
       ..writeByte(9)
       ..write(obj.breathingPhaseCues)
       ..writeByte(10)

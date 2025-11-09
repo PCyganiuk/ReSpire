@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart';
@@ -10,6 +7,8 @@ import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/TrainingEditorPage/TrainingStageTile.dart';
 import 'package:respire/components/TrainingEditorPage/SoundSelectionRow.dart';
+import 'package:respire/components/TrainingEditorPage/PlaylistEditor.dart';
+import 'package:respire/components/TrainingEditorPage/StagePlaylistsEditor.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
@@ -621,35 +620,32 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   Column(
                                                     children: [
                                                       if (_sounds.backgroundSoundScope == SoundScope.global) ...[
-                                                      //TODO: Playlist UI implementation
-                                                      // Here create a single playlist creator - one button to add sounds to a playlist
-                                                      // Save the playlist to _sounds.trainingBackgroundTrack (maybe change the name)
-                                                      // Change the type to a list instead of a single SoundAsset
-                                                        SoundSelectionRow(
-                                                          labelStyle: TextStyle(
-                                                                overflow: TextOverflow.ellipsis),
-                                                          label: translationProvider
-                                                              .getTranslation(
-                                                                  "TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.global"),
-                                                          selectedValue: _sounds
-                                                              .trainingBackgroundTrack,
-                                                          soundListType:
-                                                              SoundListType
-                                                                  .longSounds,
-                                                          onChanged: (v) =>
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                                          child: PlaylistEditor(
+                                                            playlist: _sounds.trainingBackgroundPlaylist,
+                                                            onChanged: (newPlaylist) {
                                                               setState(() {
-                                                                _sounds.trainingBackgroundTrack =
-                                                                    v;
-                                                              }),
-                                                          includeVoiceOption: false)
+                                                                _sounds.trainingBackgroundPlaylist = newPlaylist;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
                                                       ] else if (_sounds.backgroundSoundScope == SoundScope.perPhase)
                                                         ...buildPhaseSoundRows(SoundListType.longSounds)
                                                       else if (_sounds.backgroundSoundScope == SoundScope.perStage)
-                                                      //TODO: Playlist UI implementation
-                                                      // Here create multiple playlist creators - one per stage.
-                                                      // Save the playlist to _sounds.stageTracks[stage.id] (change type to Map<String, List<SoundAsset>>)
-                                                      // would be nice if we could stick to using some builder function to prevent this ungodly code growth
-                                                        ...buildStageSoundsRows(),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                                          child: StagePlaylistsEditor(
+                                                            stages: trainingStages,
+                                                            stagePlaylists: _sounds.stagePlaylists,
+                                                            onChanged: (newStagePlaylists) {
+                                                              setState(() {
+                                                                _sounds.stagePlaylists = newStagePlaylists;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
                                                     ],
                                                   ),
                                                 ],
@@ -1077,24 +1073,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
               type == SoundListType.longSounds
                   ? _sounds.breathingPhaseBackgrounds[phase] = v
                   : _sounds.breathingPhaseCues[phase] = v;
-            });
-          },
-        ),
-    ];
-  }
-
-  List<Widget> buildStageSoundsRows() {
-    return [
-      for (final stage in trainingStages)
-        SoundSelectionRow(
-          includeVoiceOption: false,
-          labelStyle: TextStyle(overflow: TextOverflow.ellipsis),
-          label: translationProvider.getTranslation(stage.name),
-          selectedValue: _sounds.stageTracks[stage.id] ?? SoundAsset(),
-          soundListType: SoundListType.longSounds,
-          onChanged: (v) {
-            setState(() {
-              _sounds.stageTracks[stage.id] = v;
             });
           },
         ),

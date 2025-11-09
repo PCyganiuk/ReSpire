@@ -106,6 +106,13 @@
                 "user_sounds":"Dźwięki użytkownika",
                 "add_custom_sound_button_label":"Dodaj własny dźwięk"
             },
+
+            "PlaylistEditor":{
+                "empty_playlist":"Playlista jest pusta. Dodaj dźwięki za pomocą przycisku poniżej.",
+                "empty_stage_playlist":"Brak dźwięków w playliście dla tego etapu. Dodaj dźwięki, które będą odtwarzane podczas tego etapu treningu.",
+                "add_sound":"Dodaj dźwięk",
+                "user_sound":"Dźwięk użytkownika"
+            },
             
             "None":"Brak",
             "Voice":"Lektor"
