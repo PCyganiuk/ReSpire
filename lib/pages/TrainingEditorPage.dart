@@ -621,6 +621,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   Column(
                                                     children: [
                                                       if (_sounds.backgroundSoundScope == SoundScope.global) ...[
+                                                      //TODO: Playlist UI implementation
+                                                      // Here create a single playlist creator - one button to add sounds to a playlist
+                                                      // Save the playlist to _sounds.trainingBackgroundTrack (maybe change the name)
+                                                      // Change the type to a list instead of a single SoundAsset
                                                         SoundSelectionRow(
                                                           labelStyle: TextStyle(
                                                                 overflow: TextOverflow.ellipsis),
@@ -642,6 +646,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                         ...buildPhaseSoundRows(SoundListType.longSounds)
                                                       else if (_sounds.backgroundSoundScope == SoundScope.perStage)
                                                       //TODO: Playlist UI implementation
+                                                      // Here create multiple playlist creators - one per stage.
+                                                      // Save the playlist to _sounds.stageTracks[stage.id] (change type to Map<String, List<SoundAsset>>)
+                                                      // would be nice if we could stick to using some builder function to prevent this ungodly code growth
                                                         ...buildStageSoundsRows(),
                                                     ],
                                                   ),
