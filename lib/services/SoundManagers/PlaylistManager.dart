@@ -75,7 +75,7 @@ class PlaylistManager {
     }
 
     String soundName = _playlist[_currentIndex];
-    dev.log('PlaylistManager: Playing sound $_currentIndex/${_playlist.length}: $soundName');
+    dev.log('PlaylistManager: Playing sound ${_currentIndex+1}/${_playlist.length}: $soundName');
     
     final player = _delegate.getPlayer(soundName);
     

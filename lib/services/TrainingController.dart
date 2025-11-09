@@ -242,7 +242,7 @@ class TrainingController {
   void _start() {
     int previousSecond = _remainingTime ~/ 1000;
     DateTime lastTick = DateTime.now();
-    //soundManager.playSound(_currentSound); //TODO: Delete once the playlist is working properly
+    soundManager.playSound(_currentSound);
 
     //TODO: Handle distinguishing when are we playing a playlist and when a single sound. Maybe by checking the return type?
 
@@ -284,6 +284,8 @@ class TrainingController {
         
         // Start global playlist when first breathing phase begins (after preparation)
         if (breathingPhasesCount.value == 1 && !_preparationPhaseCompleted) {
+          soundManager.stopSound(_currentSound);
+          _currentSound = null;
           _preparationPhaseCompleted = true;
           if (_sounds.backgroundSoundScope == SoundScope.global && 
               _sounds.trainingBackgroundPlaylist.isNotEmpty) {

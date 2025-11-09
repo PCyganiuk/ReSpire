@@ -9,7 +9,10 @@ import 'package:respire/services/UserSoundsDataBase.dart';
 import 'package:respire/components/Global/Sounds_lists.g.dart';
 
 class SoundManager implements ISoundManager {
-  SoundManager(){}
+  
+  static final SoundManager _instance = SoundManager._internal();
+  factory SoundManager() => _instance;
+  SoundManager._internal();
 
   static final longSounds = ReSpireSounds().longSounds;
   static final shortSounds = ReSpireSounds().shortSounds;
