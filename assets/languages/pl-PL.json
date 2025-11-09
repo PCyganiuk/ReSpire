@@ -150,6 +150,11 @@
         "current_training_stage_label":"Aktualny etap treningu",
         "default_training_stage_name":"Etap treningu {number}",
         
+        "PreloadingScreen":{
+            "title":"Ładowanie audio",
+            "subtitle":"Proszę czekać, przygotowujemy sesję treningową..."
+        },
+        
         "InstructionSlider":{
             "get_ready_block_text":"Przygotuj się",
             "ending_tile_text":"Koniec"

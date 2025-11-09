@@ -150,6 +150,11 @@
         "current_training_stage_label":"Current training stage",
         "default_training_stage_name":"Training stage {number}",
 
+        "PreloadingScreen":{
+            "title":"Loading Audio",
+            "subtitle":"Please wait while we prepare your training session..."
+        },
+
         "InstructionSlider":{
             "get_ready_block_text":"Get ready",
             "ending_tile_text":"The end"
