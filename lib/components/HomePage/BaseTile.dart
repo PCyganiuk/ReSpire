@@ -30,8 +30,14 @@ class BaseTile extends StatelessWidget
           padding: EdgeInsets.all(25),
           decoration: BoxDecoration(
             color: color,
-            //borderRadius: BorderRadius.circular(20),
             borderRadius: BorderRadius.only(bottomLeft: Radius.circular(70), bottomRight: Radius.circular(35), topLeft: Radius.circular(35), topRight: Radius.circular(70)),
+          boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15), // cień
+                blurRadius: 10, // miękkość
+                offset: const Offset(0, 4), // pozycja cienia (x, y)
+              ),
+            ],
           ),
           child: child,
       ),

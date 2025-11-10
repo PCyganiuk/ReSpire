@@ -11,15 +11,17 @@ import 'package:respire/services/PresetDataBase.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/services/TrainingImportExportService.dart';
 import 'package:respire/theme/Colors.dart';
+import 'package:lottie/lottie.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final titleController = TextEditingController();
   final PresetDataBase db = PresetDataBase();
   int breathCount = 10;
@@ -29,18 +31,35 @@ class _HomePageState extends State<HomePage> {
 
   TranslationProvider translationProvider = TranslationProvider();
 
+  // AnimationControllers dla fal
+  late final AnimationController _waveController1;
+  late final AnimationController _waveController2;
+  late final AnimationController _waveController3;
+
   @override
   void initState() {
-    db.initialize();
     super.initState();
+    db.initialize();
+
+    _waveController1 =
+        AnimationController(vsync: this, duration: Duration(seconds: 6))..repeat();
+    _waveController2 =
+        AnimationController(vsync: this, duration: Duration(seconds: 8))..repeat();
+    _waveController3 =
+        AnimationController(vsync: this, duration: Duration(seconds: 5))..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveController1.dispose();
+    _waveController2.dispose();
+    _waveController3.dispose();
+    super.dispose();
   }
 
   void loadValues(int index) {
     Training entry = db.presetList[index];
-
     titleController.text = entry.title;
-
-    //TODO: Load other values
   }
 
   void clearValues() {
@@ -51,76 +70,6 @@ class _HomePageState extends State<HomePage> {
     retentionTime = 3;
   }
 
-  void addPreset() {
-    db.presetList
-        .add(Training(title: titleController.text, trainingStages: List.empty()));
-    setState(() {});
-    clearValues();
-    db.updateDataBase();
-  }
-
-  void editPreset(int index) {
-    db.presetList[index] =
-        Training(title: titleController.text, trainingStages: List.empty());
-    setState(() {});
-    clearValues();
-    db.updateDataBase();
-  }
-
-  void showNewPresetDialog({required BuildContext context}) async {
-    final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return DialogBox(
-            titleController: titleController,
-            breathCount: breathCount,
-            inhaleTime: inhaleTime,
-            exhaleTime: exhaleTime,
-            retentionTime: retentionTime,
-            onCancel: clearValues,
-          );
-        });
-
-    if (result != null) {
-      setState(() {
-        titleController.text = result['title'];
-        breathCount = result['breathCount'];
-        inhaleTime = result['inhaleTime'];
-        exhaleTime = result['exhaleTime'];
-        retentionTime = result['retentionTime'];
-      });
-    }
-  }
-
-  void showEditPresetDialog(
-      {required BuildContext context, required int index}) async {
-    loadValues(index); // Loads values to variables before showing the dialog
-
-    final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return DialogBox(
-            titleController: titleController,
-            breathCount: breathCount,
-            inhaleTime: inhaleTime,
-            exhaleTime: exhaleTime,
-            retentionTime: retentionTime,
-            onCancel: clearValues,
-          );
-        });
-
-    if (result != null) {
-      setState(() {
-        titleController.text = result['title'];
-        breathCount = result['breathCount'];
-        inhaleTime = result['inhaleTime'];
-        exhaleTime = result['exhaleTime'];
-        retentionTime = result['retentionTime'];
-      });
-    }
-  }
-
-  // Pull-to-refresh for presets
   Future<void> _refreshPresets() async {
     db.loadData();
     setState(() {});
@@ -130,33 +79,26 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => Center(child: CircularProgressIndicator()),
     );
 
     try {
       final training = await TrainingImportExportService.importTraining();
-      
       Navigator.pop(context);
-      
+
       if (training != null) {
         setState(() {
           training.updateSounds();
           db.presetList.add(training);
           db.updateDataBase();
         });
-        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:  Center( 
+            content: Center(
               child: Text(
                 translationProvider.getTranslation('HomePage.import_success'),
-                textAlign: TextAlign.center, 
-                style: const TextStyle(
-                  fontSize: 16, 
-                  color: Colors.white,
-                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
             backgroundColor: Colors.green,
@@ -165,14 +107,11 @@ class _HomePageState extends State<HomePage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:  Center( 
+            content: Center(
               child: Text(
                 translationProvider.getTranslation('HomePage.import_cancelled'),
-                textAlign: TextAlign.center, 
-                style: const TextStyle(
-                  fontSize: 16, 
-                  color: Colors.white,
-                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
             backgroundColor: lightblue,
@@ -181,13 +120,13 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       Navigator.pop(context);
-      
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(translationProvider.getTranslation('HomePage.import_error')),
-            content: Text('${translationProvider.getTranslation('HomePage.import_error_details')}:\n\n$e'),
+            content: Text(
+                '${translationProvider.getTranslation('HomePage.import_error_details')}:\n\n$e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -203,6 +142,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     double size = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
@@ -211,22 +151,12 @@ class _HomePageState extends State<HomePage> {
           'assets/logo_poziom.png',
           height: 36,
         ),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        // Deleted profile page
-        // leading: IconButton(
-        //   icon: Icon(Icons.person, color: darkerblue),
-        //   onPressed: () {
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => ProfilePage()),
-        //     );
-        //   },
-        // ),
+        backgroundColor: Colors.white,
         leading: IconButton(
-            icon: Icon(Icons.file_download_outlined, color: darkerblue),
-            onPressed: importTraining,
-            tooltip: translationProvider.getTranslation('HomePage.import_training_tooltip'),
-          ),
+          icon: Icon(Icons.file_download_outlined, color: darkerblue),
+          onPressed: importTraining,
+          tooltip: translationProvider.getTranslation('HomePage.import_training_tooltip'),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: darkerblue),
@@ -240,18 +170,74 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       backgroundColor: mediumblue,
-      body: RefreshIndicator(
-          onRefresh: _refreshPresets,
-          color: Colors.white,
-          backgroundColor: mediumblue,
-          edgeOffset: 16,
-          child: ListView.builder(
+      body: Stack(
+        children: [
+          // 🔹 Tło z falami
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Transform.rotate(
+              angle: pi,
+              child: Opacity(
+                opacity: 0.1,
+                child: Lottie.asset(
+                  'assets/wave.json',
+                  controller: _waveController1,
+                  fit: BoxFit.cover,
+                  height: 450,
+                  repeat: true,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Transform.rotate(
+              angle: pi,
+              child: Opacity(
+                opacity: 0.12,
+                child: Lottie.asset(
+                  'assets/wave.json',
+                  controller: _waveController2,
+                  fit: BoxFit.cover,
+                  height: 350,
+                  repeat: true,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Transform.rotate(
+              angle: pi,
+              child: Opacity(
+                opacity: 0.12,
+                child: Lottie.asset(
+                  'assets/wave.json',
+                  controller: _waveController3,
+                  fit: BoxFit.cover,
+                  height: 100,
+                  repeat: true,
+                ),
+              ),
+            ),
+          ),
+          RefreshIndicator(
+            onRefresh: _refreshPresets,
+            color: Colors.white,
+            backgroundColor: mediumblue,
+            edgeOffset: 16,
+            child: ListView.builder(
               padding: EdgeInsets.only(top: size * 0.022),
               itemCount: db.presetList.length + 1,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: EdgeInsets.all(
-                      size * 0.022), // padding between elements / screen
+                  padding: EdgeInsets.all(size * 0.022),
                   child: index < db.presetList.length
                       ? PresetTile(
                           values: db.presetList[index],
@@ -262,11 +248,7 @@ class _HomePageState extends State<HomePage> {
                                 builder: (context) => TrainingPage(index: index),
                               ),
                             );
-
-                            // If the user updated (removed) the training, refresh the state
-                            if (updated == true) {
-                              setState(() {});
-                            }
+                            if (updated == true) setState(() {});
                           },
                           deleteTile: (context) {
                             db.deletePreset(index);
@@ -276,8 +258,9 @@ class _HomePageState extends State<HomePage> {
                             final updatedTraining = await Navigator.push<Training>(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => TrainingEditorPage(
-                                      training: db.presetList[index])),
+                                builder: (context) =>
+                                    TrainingEditorPage(training: db.presetList[index]),
+                              ),
                             );
                             if (updatedTraining != null) {
                               setState(() {
@@ -294,16 +277,17 @@ class _HomePageState extends State<HomePage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => TrainingEditorPage(
-                                  training:
-                                      Training(title: translationProvider.getTranslation("HomePage.default_training_title"), trainingStages: []),
+                                  training: Training(
+                                    title: translationProvider.getTranslation(
+                                        "HomePage.default_training_title"),
+                                    trainingStages: [],
+                                  ),
                                 ),
                               ),
                             );
-
-                            // Only persist if user added at least one breathing phase in any training stage
                             if (newTraining != null &&
                                 newTraining.trainingStages
-                                    .any((trainingStage) => trainingStage.breathingPhases.isNotEmpty)) {
+                                    .any((stage) => stage.breathingPhases.isNotEmpty)) {
                               setState(() {
                                 db.presetList.add(newTraining);
                                 db.updateDataBase();
@@ -312,7 +296,11 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                 );
-              })),
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

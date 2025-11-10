@@ -24,6 +24,7 @@ dependencies:
   file_picker: ^10.3.2
   uuid: ^4.5.1
   path_provider: ^2.1.5
+  lottie: ^3.3.0
 
 dev_dependencies:
   flutter_test:
@@ -41,6 +42,8 @@ flutter:
     - assets/sounds/long/
     - assets/sounds/counting/
     - assets/languages/
+    - assets/podmuch.png
+    - assets/wave.json
 
   fonts:
     - family: Glacial
