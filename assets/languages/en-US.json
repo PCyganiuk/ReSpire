@@ -35,9 +35,10 @@
         },
         "delete_training_dialog_title":"Delete Training",
         "delete_training_dialog_content":"Are you sure you want to delete this training?",
-        "export_success":"Training exported successfully",
-        "export_error":"Export error",
-        "export_error_details":"An error occurred while exporting the training"
+        "export_success":"Training exported successfully.",
+        "export_error":"Export error.",
+        "export_failed":"Training was not exported.",
+        "export_error_details":"An error occurred while exporting the training."
     },
 
     "TrainingEditorPage":{

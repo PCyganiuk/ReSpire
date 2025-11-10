@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   TranslationProvider translationProvider = TranslationProvider();
 
-  // AnimationControllers dla fal
   late final AnimationController _waveController1;
   late final AnimationController _waveController2;
   late final AnimationController _waveController3;
@@ -79,7 +78,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(child: CircularProgressIndicator()),
+      builder: (context) => Center(child: CircularProgressIndicator(color: greenblue),),
     );
 
     try {

@@ -75,7 +75,7 @@ class _TrainingPageState extends State<TrainingPage> {
     return Padding(
         padding: EdgeInsets.all(10),
         child: IconButton(
-          icon: Icon(Icons.delete_outlined, color: darkerblue),
+          icon: Icon(Icons.delete_outline, color: darkerblue),
           style: IconButton.styleFrom(backgroundColor: Colors.white),
           onPressed: removeTraining,
         ));
@@ -313,13 +313,16 @@ class _TrainingPageState extends State<TrainingPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           title: Text(training.title,
-          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800)),
-              // style: TextStyle(
-              //     color: darkerblue,
-              //     fontFamily: 'Glacial',
-              //     fontSize: 20,
-              //     fontWeight: FontWeight.w800)),
+          //style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800)),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Glacial',
+                  //fontSize: 20,
+                  fontWeight: FontWeight.bold),
+                  ),
+                  //centerTitle: true,
           backgroundColor: Colors.white,
           leading: IconButton(
               icon: const Icon(
@@ -380,12 +383,28 @@ class _TrainingPageState extends State<TrainingPage> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(translationProvider.getTranslation('TrainingPage.export_success')),
+            content: Text(translationProvider.getTranslation('TrainingPage.export_success'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
           ),
         );
       }
+      else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            translationProvider.getTranslation('TrainingPage.export_failed'), 
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          backgroundColor: lightblue,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
     } catch (e) {
       if (mounted) {
         showDialog(

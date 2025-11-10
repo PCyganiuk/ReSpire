@@ -203,6 +203,7 @@ class _BreathingPageState extends State<BreathingPage> {
     
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         leading: ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
           valueListenable: controller!.breathingPhasesQueue,
           builder: (context, queue, _) {

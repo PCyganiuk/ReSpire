@@ -272,12 +272,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           title: Text(
             widget.training.title,
             style: TextStyle(
-                color: Colors.black, fontSize: 20, fontWeight: FontWeight.w800),
+                color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'Glacial',),
             overflow: TextOverflow.ellipsis,
           ),
+          centerTitle: true,
           actions: [
             IconButton(
               icon: Icon(Icons.edit, color: darkerblue),

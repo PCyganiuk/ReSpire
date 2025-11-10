@@ -37,6 +37,7 @@
         "delete_training_dialog_content":"Na pewno chcesz usunąć ten trening?",
         "export_success":"Trening został pomyślnie wyeksportowany",
         "export_error":"Błąd eksportu",
+        "export_failed":"Trening nie został wyeksportowany",
         "export_error_details":"Wystąpił błąd podczas eksportowania treningu"
     },
 
