@@ -16,14 +16,17 @@ class SoundManager implements ISoundManager {
 
   static final longSounds = ReSpireSounds().longSounds;
   static final shortSounds = ReSpireSounds().shortSounds;
+  static final countingSounds = ReSpireSounds().countingSounds;
 
   ///A map of available sounds in the assets folder.\
   ///The keys are the sound names, and the values are the paths to the sound files.
   static final Map<String,SoundAsset> _availableSounds = {
     ...longSounds,
     ...shortSounds,
+    ...countingSounds,
     ...UserSoundsDatabase().userLongSounds,
     ...UserSoundsDatabase().userShortSounds,
+    ...UserSoundsDatabase().userCountingSounds,
   };
 
   final HashMap<String,AudioPlayer> _audioPlayers = HashMap<String,AudioPlayer>();
@@ -35,6 +38,8 @@ class SoundManager implements ISoundManager {
         return longSounds;
       case SoundListType.shortSounds:
         return shortSounds;
+      case SoundListType.countingSounds:
+        return countingSounds;
     }
   }
 
@@ -66,7 +71,7 @@ class SoundManager implements ISoundManager {
     
     SoundAsset asset = _availableSounds[soundName]!;
     
-    if (asset.type == SoundType.cue && !forceCommonSetup) {
+    if ((asset.type == SoundType.cue || asset.type == SoundType.counting) && !forceCommonSetup) {
       setupLowLatencyAudioPlayer(audioPlayer);
     } else {
       _commonAudioPlayerSetup(audioPlayer);
@@ -136,9 +141,9 @@ class SoundManager implements ISoundManager {
     if (asset == null) {
       return;
     }
-    
-    //If cue, always remove old entry
-    if (asset.type == SoundType.cue && _audioPlayers.containsKey(soundName)) {
+
+    //If cue or counting, always remove old entry
+    if ((asset.type == SoundType.cue || asset.type == SoundType.counting) && _audioPlayers.containsKey(soundName)) {
       var player = _audioPlayers[soundName];
       if (player != null) {
         player.dispose();
@@ -165,7 +170,7 @@ class SoundManager implements ISoundManager {
     if (player == null) {
       return;
     }
-    if (_availableSounds[soundName]!.type == SoundType.cue) {
+    if (_availableSounds[soundName]!.type == SoundType.cue || _availableSounds[soundName]!.type == SoundType.counting) {
       await player.play(player.source!);
     } else {
       await player.resume();
@@ -296,8 +301,10 @@ class SoundManager implements ISoundManager {
     _availableSounds.clear();
     _availableSounds.addAll(longSounds);
     _availableSounds.addAll(shortSounds);
+    _availableSounds.addAll(countingSounds);
     _availableSounds.addAll(UserSoundsDatabase().userLongSounds);
     _availableSounds.addAll(UserSoundsDatabase().userShortSounds);
+    _availableSounds.addAll(UserSoundsDatabase().userCountingSounds);
   }
 
   void removeUserSound(String soundName, SoundListType type) {
