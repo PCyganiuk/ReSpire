@@ -319,7 +319,7 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
             SizedBox(width: 4),
             IconButton(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-              icon: Icon(Icons.delete, color: darkerblue, size: 20),
+              icon: Icon(Icons.delete_outlined, color: darkerblue, size: 20),
               onPressed: widget.onDelete,
             ),
           ],

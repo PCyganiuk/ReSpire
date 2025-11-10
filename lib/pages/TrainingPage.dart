@@ -75,7 +75,7 @@ class _TrainingPageState extends State<TrainingPage> {
     return Padding(
         padding: EdgeInsets.all(10),
         child: IconButton(
-          icon: Icon(Icons.delete_rounded, color: darkerblue),
+          icon: Icon(Icons.delete_outlined, color: darkerblue),
           style: IconButton.styleFrom(backgroundColor: Colors.white),
           onPressed: removeTraining,
         ));

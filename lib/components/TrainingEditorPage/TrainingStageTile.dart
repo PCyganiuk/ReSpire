@@ -271,7 +271,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                 SizedBox(width: 8),
                 IconButton(
                   padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
-                  icon: Icon(Icons.delete, color: darkerblue),
+                  icon: Icon(Icons.delete_outlined, color: darkerblue),
                   onPressed: widget.onDelete,
                 ),
               ],

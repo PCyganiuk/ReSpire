@@ -221,7 +221,7 @@ class _PlaylistEditorState extends State<PlaylistEditor> {
             : null,
         trailing: IconButton(
           icon: Icon(
-            Icons.delete,
+            Icons.delete_outlined,
             color: darkerblue,
             size: 21,
           ),

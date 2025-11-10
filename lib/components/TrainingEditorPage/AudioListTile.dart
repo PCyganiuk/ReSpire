@@ -94,7 +94,7 @@ class _AudioListTileState extends State<AudioListTile> {
                 ),
             ],
           ),
-          trailing: widget.isRemovable ? IconButton(onPressed: () => _removeUserEntry(context, widget.onRemove), icon: Icon(Icons.delete, color: Colors.red)) : null,
+          trailing: widget.isRemovable ? IconButton(onPressed: () => _removeUserEntry(context, widget.onRemove), icon: Icon(Icons.delete_outline, color: darkerblue)) : null,
           onTap: widget.onTap,
         ),
       )

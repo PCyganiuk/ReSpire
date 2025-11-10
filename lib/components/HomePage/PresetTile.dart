@@ -24,31 +24,7 @@ class PresetTile extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      startActionPane: ActionPane(
-        extentRatio: 0.25, // delete button width (0< && <1)
-          motion: StretchMotion(), 
-          children: [
-            SlidableAction(
-            borderRadius: BorderRadius.circular(180),
-            autoClose: true,
-            onPressed: editTile,
-            icon: Icons.edit,
-            backgroundColor: lightblue,
-            )]),
-      endActionPane: ActionPane(
-        extentRatio: 0.25, // delete button width (0< && <1)
-          motion: StretchMotion(), 
-          children: [
-            SlidableAction(
-            borderRadius: BorderRadius.circular(180),
-            autoClose: true,
-            onPressed: deleteTile,
-            icon: Icons.delete,
-            backgroundColor: darkerblue,
-            )]
-      ),
-      child:  BaseTile(
+    return BaseTile(
         onClick: onClick,
           child:
             Column(
@@ -89,8 +65,7 @@ class PresetTile extends StatelessWidget
               )
               ],
             )
-      )
-    );
+      );
   }
   
 }
