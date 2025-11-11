@@ -1007,14 +1007,14 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     );
   }
 
-  SoundScope? _previousBackgroundScope;
+  SoundScope _previousBackgroundScope = SoundScope.global;
   void toggleBineuralBeats(bool? value) {
     setState(() {
       if (value == true) {
         _previousBackgroundScope = _sounds.backgroundSoundScope;
         _sounds.backgroundSoundScope = SoundScope.none;
       } else {
-        _sounds.backgroundSoundScope = _previousBackgroundScope!;
+        _sounds.backgroundSoundScope = _previousBackgroundScope;
       }
       widget.training.settings.binauralBeatsEnabled = value ?? false;
     });

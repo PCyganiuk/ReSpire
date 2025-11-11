@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/Phase.dart';
 import 'package:respire/components/Global/Settings.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart';
@@ -95,6 +96,9 @@ class Training {
     // Update background sounds
     switch (sounds.backgroundSoundScope) {
       case SoundScope.none:
+        for (var stage in trainingStages) {
+            stage.propagateBackgroundSound(SoundAsset());
+        }
         break;
 
       case SoundScope.global:
