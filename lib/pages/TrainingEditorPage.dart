@@ -522,7 +522,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             margin: EdgeInsets.symmetric(vertical: 4),
                                             padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: widget.training.settings.binauralBeatsEnabled ? const Color.fromARGB(255, 218, 240, 240) : Colors.white,
                                               borderRadius: BorderRadius.circular(16),
                                               border: Border.all(
                                                 color: mediumblue,
@@ -541,11 +541,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 Row(
                                                   children: [
                                                     Expanded(child:
+                                                    Opacity(opacity: widget.training.settings.binauralBeatsEnabled ? 0.3 : 1.0,
+                                                      child:
                                                       DropdownButton2<SoundScope>(
                                                         buttonStyleData: ButtonStyleData(
                                                           height:35,
                                                           elevation: 2,
-                                                          width: MediaQuery.of(context).size.width
+                                                          width: MediaQuery.of(context).size.width,
                                                         ),
                                                         underline: SizedBox(),
                                                         iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
@@ -573,8 +575,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                         },
                                                         value: _sounds.backgroundSoundScope, 
                                                         items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis))).toList(),
-                                                        onChanged: (v) => setState(() => _sounds.backgroundSoundScope = v!))),
-                                                  ],
+                                                        onChanged: widget.training.settings.binauralBeatsEnabled ? null :(v) => setState(() => _sounds.backgroundSoundScope = v!))),
+                                                )],
                                                 ),
                                                 if (_sounds.backgroundSoundScope != SoundScope.none)...[
                                                   Column(
@@ -697,9 +699,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               }
                                               return null;
                                             }),
-                                            onChanged: (v) => setState(() =>
-                                                widget.training.settings
-                                                    .binauralBeatsEnabled = v),
+                                            onChanged: (v) => toggleBineuralBeats(v),
                                           ),
                                           if (widget.training.settings
                                               .binauralBeatsEnabled) ...[
@@ -1005,6 +1005,19 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
             : null,
       ),
     );
+  }
+
+  SoundScope? _previousBackgroundScope;
+  void toggleBineuralBeats(bool? value) {
+    setState(() {
+      if (value == true) {
+        _previousBackgroundScope = _sounds.backgroundSoundScope;
+        _sounds.backgroundSoundScope = SoundScope.none;
+      } else {
+        _sounds.backgroundSoundScope = _previousBackgroundScope!;
+      }
+      widget.training.settings.binauralBeatsEnabled = value ?? false;
+    });
   }
 
   List<Widget> buildPhaseSoundRows(SoundListType type) {
