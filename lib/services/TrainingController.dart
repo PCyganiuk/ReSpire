@@ -18,11 +18,9 @@ class TrainingController {
   Timer? _timer;
   final TrainingParser parser;
   final ValueNotifier<Queue<breathing_phase.BreathingPhase?>>
-      breathingPhasesQueue =
-      ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
+      breathingPhasesQueue = ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
   final Queue<String?> _trainingStageNameQueue = Queue<String?>();
-  final Queue<String?> _trainingStageIdQueue =
-      Queue<String?>(); // Track stage ID for each phase
+  final Queue<String?> _trainingStageIdQueue = Queue<String?>(); // Track stage ID for each phase
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
@@ -85,6 +83,7 @@ class TrainingController {
 
   void _preloadBreathingPhases() {
     breathingPhasesQueue.value.add(null);
+    _logQueue('ADD', phase: null);
     _trainingStageNameQueue.add(null);
     _trainingStageIdQueue.add(null);
     _updateCurrentTrainingStageLabel();
@@ -98,6 +97,7 @@ class TrainingController {
     if (instructionData == null) {
       _finishedLoadingSteps = true;
       breathingPhasesQueue.value.add(null);
+      _logQueue('ADD (finish)', phase: null);
       _trainingStageNameQueue.add(null);
       _trainingStageIdQueue.add(null);
       dev.log('TrainingController: No more phases to fetch');
@@ -105,6 +105,7 @@ class TrainingController {
     }
 
     breathingPhasesQueue.value.add(instructionData["breathingPhase"]);
+    _logQueue('ADD', phase: instructionData["breathingPhase"]);
     _trainingStageNameQueue.add(_resolveTrainingStageName(
         instructionData["trainingStageName"] as String?,
         parser.trainingStageID));
@@ -120,6 +121,19 @@ class TrainingController {
         'TrainingController: Fetched phase for stage: $stageId (parser.trainingStageID=${parser.trainingStageID})');
 
     _newBreathingPhaseRemainingTime = instructionData["remainingTime"];
+  }
+
+  void _logQueue(String action, {breathing_phase.BreathingPhase? phase}) {
+    final List<String> queueNames = breathingPhasesQueue.value.map((p) {
+      if (p == null) return 'null';
+      return '${p.breathingPhaseType.name} (${p.duration ~/ 1000}s)';
+    }).toList();
+
+    final phaseName = phase == null
+        ? 'null'
+        : '${phase.breathingPhaseType.name} (${phase.duration ~/ 1000}s)';
+
+    dev.log('[QUEUE] $action: $phaseName | Queue: [$queueNames]');
   }
 
   void pause() {
@@ -294,8 +308,8 @@ class TrainingController {
             breathingPhasesQueue.value.elementAt(1) != null) {
           final nextPhase = breathingPhasesQueue.value.elementAt(1)!;
           
-          if (_remainingTime <= 900 && 
-            _remainingTime > 800 &&
+          if (_remainingTime <= 600 && 
+            _remainingTime > 500 &&
             !longSoundNames.contains(nextPhase.sounds.preBreathingPhase.name)) {
             _playPreBreathingPhaseSound(nextPhase); // short sound
           } 
@@ -356,11 +370,14 @@ class TrainingController {
 
         if (_remainingTime == 0) {
           if (_finishedLoadingSteps) {
-            breathingPhasesQueue.value.removeFirst();
+            final removedPhase = breathingPhasesQueue.value.removeFirst();
+            _logQueue('REMOVE', phase: removedPhase);
             breathingPhasesQueue.value.add(null);
+            _logQueue('ADD (END)', phase: null);
             breathingPhasesQueue.value =
                 Queue<breathing_phase.BreathingPhase?>.from(
                     breathingPhasesQueue.value);
+            _logQueue('REBUILD');
             _stopTimer--;
 
             if (_stopTimer == 0) {
@@ -380,7 +397,7 @@ class TrainingController {
             }
           } else {
 
-             String? newStageId;
+            String? newStageId;
             if (_trainingStageIdQueue.length > 1) {
               newStageId = _trainingStageIdQueue.elementAt(1); 
             }
@@ -388,7 +405,8 @@ class TrainingController {
             dev.log(
                 'TrainingController: Starting new phase with stageId: $newStageId (current: $_currentTrainingStageId, queue size: ${_trainingStageIdQueue.length})');
 
-            breathingPhasesQueue.value.removeFirst();
+            final removedPhase = breathingPhasesQueue.value.removeFirst();
+            _logQueue('REMOVE', phase: removedPhase);
             _remainingTime = _nextRemainingTime;
             if (_trainingStageNameQueue.isNotEmpty) {
               _trainingStageNameQueue.removeFirst();
@@ -403,6 +421,7 @@ class TrainingController {
             breathingPhasesQueue.value =
                 Queue<breathing_phase.BreathingPhase?>.from(
                     breathingPhasesQueue.value);
+            _logQueue('REBUILD');
             _updateCurrentTrainingStageLabel();
 
             if (_sounds.backgroundSoundScope == SoundScope.perStage &&
