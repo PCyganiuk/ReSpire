@@ -304,7 +304,7 @@ class _TrainingPageState extends State<TrainingPage> {
       appBar: AppBar(
         title: Text(
           training.title,
-          style: TextStyle(color: Colors.black, fontFamily: 'Glacial', fontSize: 20, fontWeight: FontWeight.w900),
+          style: TextStyle(color: Colors.black, fontFamily: 'Glacial', fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         leading: IconButton(

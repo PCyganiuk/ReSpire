@@ -208,7 +208,7 @@ class _BreathingPageState extends State<BreathingPage> {
           valueListenable: controller!.breathingPhasesQueue,
           builder: (context, queue, _) {
             return IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
               onPressed: () {
                 if (queue.isNotEmpty && queue.first != null) {
                   controller!.pause();
@@ -233,7 +233,12 @@ class _BreathingPageState extends State<BreathingPage> {
             },
           )
         ],
-        title: Text(widget.training.title),
+        title: Text(widget.training.title,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Glacial',
+            ),
+          ),
         centerTitle: true,
         backgroundColor: Color.fromRGBO(50, 183, 207, 1),
       ),
