@@ -41,9 +41,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     db.initialize();
 
     _waveController1 =
-        AnimationController(vsync: this, duration: Duration(seconds: 18))..repeat();
+        AnimationController(vsync: this, duration: Duration(seconds: 17))..repeat();
     _waveController2 =
-        AnimationController(vsync: this, duration: Duration(seconds: 21))..repeat();
+        AnimationController(vsync: this, duration: Duration(seconds: 22))..repeat();
     _waveController3 =
         AnimationController(vsync: this, duration: Duration(seconds: 19))..repeat();
   }
