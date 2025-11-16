@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 
+final blockSize = 130.0;
+final sliderWidth = 400.0;
+
 class InstructionBlock {
   final String text;
   double position;
@@ -145,13 +148,13 @@ class InstructionSliderState extends State<InstructionSlider>
       final isCenter = (positionX / spacing).round() == 0;
 
     return Positioned(
-      left: 200 + positionX - 60, // offset to center + half block width
+      left: sliderWidth / 2 + positionX - blockSize / 2, // offset to center + half block width
       top: 50,
       child: Transform.scale(
         scale: scale,
         child: Container(
-          width: 130,
-          height: 130,
+          width: blockSize,
+          height: blockSize,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isCenter 
@@ -194,7 +197,7 @@ class InstructionSliderState extends State<InstructionSlider>
     return Column(
       children: [
         SizedBox(
-          width: 400,
+          width: sliderWidth,
           height: 220,
           child: AnimatedBuilder(
             animation: _animation,
