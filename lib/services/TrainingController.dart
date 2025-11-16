@@ -293,18 +293,19 @@ class TrainingController {
         if (breathingPhasesQueue.value.length > 1 &&
             breathingPhasesQueue.value.elementAt(1) != null) {
           final nextPhase = breathingPhasesQueue.value.elementAt(1)!;
-          final soundName = nextPhase.sounds.preBreathingPhase.name;
-          final type = nextPhase.sounds.preBreathingPhase.type;
-          if(!_nextPhaseSoundPlayed) {
-            if ((longSoundNames.contains(soundName) || 
-              type == SoundType.voice) ||
-              (_remainingTime <= 100 &&
-              !longSoundNames.contains(soundName))) {
+          //final soundName = nextPhase.sounds.preBreathingPhase.name;
+          //final type = nextPhase.sounds.preBreathingPhase.type;
+           if(!_nextPhaseSoundPlayed && _remainingTime <= 100) {
+          //   if (((longSoundNames.contains(soundName) || 
+          //     type == SoundType.voice) &&
+          //    _remainingTime) ||
+          //     ( &&
+          //     !longSoundNames.contains(soundName))) {
             _playPreBreathingPhaseSound(nextPhase);
             _nextPhaseSoundPlayed = true;
           } 
           
-          } else if (_remainingTime <= 300 && _remainingTime > 200) {
+          if (_remainingTime <= 300 && _remainingTime > 200) {
             //second.value = 0;
             breathing_phase.BreathingPhase breathingPhase =
                 breathingPhasesQueue.value.elementAt(1)!;
