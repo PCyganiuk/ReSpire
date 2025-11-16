@@ -116,6 +116,7 @@
             },
 
             "BinauralBeats":{
+                "warning":"Uwaga! Włączenie tej opcji spowoduje wyłączenie opcji muzyki w tle.",
                 "binaural_beats_label":"Dźwięki Binauralne",
                 "binaural_beats_enabled":"Włącz dźwięki binauralne",
                 "left_frequency_label":"Częstotliwość lewego ucha",
@@ -177,13 +178,6 @@
         "exhale":"Wydech",
         "retention":"Wstrzymanie",
         "recovery":"Regeneracja"
-    },
-
-    "ProfilePage":{
-        "page_title":"Mój Profil",
-        "badges_title":"Odznaki",
-        "default_name":"Jan Kowalski",
-        "default_email":"jan.kowalski@poczta.pl"
     },
 
     "SoundScope":{

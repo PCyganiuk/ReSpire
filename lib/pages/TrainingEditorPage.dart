@@ -522,10 +522,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             margin: EdgeInsets.symmetric(vertical: 4),
                                             padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                                             decoration: BoxDecoration(
-                                              color: widget.training.settings.binauralBeatsEnabled ? const Color.fromARGB(255, 218, 240, 240) : Colors.white,
+                                              color: Colors.white ,
                                               borderRadius: BorderRadius.circular(16),
                                               border: Border.all(
-                                                color: mediumblue,
+                                                color: widget.training.settings.binauralBeatsEnabled ? mediumblue.withOpacity(0.2) : mediumblue,
                                                 width: 1,
                                               ),
                                               boxShadow: [
@@ -668,7 +668,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         children: [
                                           Align(
                                             alignment: Alignment.center,
-                                            child: Text(
+                                            child: Column(
+                                              children: [Text(
                                               translationProvider.getTranslation(
                                                   "TrainingEditorPage.SoundsTab.BinauralBeats.binaural_beats_label"),
                                               style: TextStyle(
@@ -676,8 +677,25 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   fontWeight: FontWeight.bold,
                                                   color: darkblue),
                                             ),
+                                            if (!widget.training.settings.binauralBeatsEnabled) ...[
+                                              SizedBox(height: 4),
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 16, right: 16),
+                                                child: Text(
+                                                  translationProvider.getTranslation(
+                                                    "TrainingEditorPage.SoundsTab.BinauralBeats.warning",
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 12,
+                                                  ),
+                                                  textAlign: TextAlign.justify,
+                                                ),
+                                              ),
+                                          ],
+                                          ],
                                           ),
-                                          SizedBox(height: 8),
+                                          ),
                                           SwitchListTile(
                                             title: Text(translationProvider
                                                 .getTranslation(
@@ -734,6 +752,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 max: 500,
                                                 divisions: 80,
                                                 activeColor: darkerblue,
+                                                inactiveColor: Colors.grey[300],
                                                 onChanged: (v) => setState(() =>
                                                     widget.training.settings
                                                         .binauralLeftFrequency = v),
@@ -769,6 +788,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 max: 500,
                                                 divisions: 80,
                                                 activeColor: darkerblue,
+                                                inactiveColor: Colors.grey[300],
                                                 onChanged: (v) => setState(() =>
                                                     widget.training.settings
                                                         .binauralRightFrequency = v),

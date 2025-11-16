@@ -115,6 +115,7 @@
             },
 
             "BinauralBeats":{
+                "warning":"Note! Enabling this option means that background music option will be disabled.",
                 "binaural_beats_label":"Binaural Beats",
                 "binaural_beats_enabled":"Enable binaural beats",
                 "left_frequency_label":"Left ear frequency",
@@ -177,13 +178,6 @@
         "exhale":"Exhale",
         "retention":"Retention",
         "recovery":"Recovery"
-    },
-
-    "ProfilePage":{
-        "page_title":"My Profile",
-        "badges_title":"Badges",
-        "default_name":"John Doe",
-        "default_email":"john.doe@example.com"
     },
 
     "SoundScope":{
