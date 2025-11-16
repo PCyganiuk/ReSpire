@@ -18,9 +18,11 @@ class TrainingController {
   Timer? _timer;
   final TrainingParser parser;
   final ValueNotifier<Queue<breathing_phase.BreathingPhase?>>
-      breathingPhasesQueue = ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
+      breathingPhasesQueue =
+      ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
   final Queue<String?> _trainingStageNameQueue = Queue<String?>();
-  final Queue<String?> _trainingStageIdQueue = Queue<String?>(); // Track stage ID for each phase
+  final Queue<String?> _trainingStageIdQueue =
+      Queue<String?>(); // Track stage ID for each phase
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
@@ -176,14 +178,14 @@ class TrainingController {
     }
   }
 
-   Future<void> _playEndingSound(endingBackgroundSound, changeTime) async {
+  Future<void> _playEndingSound(endingBackgroundSound, changeTime) async {
     if (_currentSound != null) {
-        await soundManager.pauseSoundFadeOut(_currentSound, changeTime);
-      }
-      _currentSound = endingBackgroundSound;
-      if (endingBackgroundSound != null) {
-        soundManager.playSoundFadeIn(endingBackgroundSound, changeTime);
-      }
+      await soundManager.pauseSoundFadeOut(_currentSound, changeTime);
+    }
+    _currentSound = endingBackgroundSound;
+    if (endingBackgroundSound != null) {
+      soundManager.playSoundFadeIn(endingBackgroundSound, changeTime);
+    }
   }
 
   void _playPreBreathingPhaseSound(
@@ -282,23 +284,7 @@ class TrainingController {
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
         previousSecond = _remainingTime ~/ 1000;
         second.value = previousSecond + 1;
-
-        if (breathingPhasesQueue.value.length > 1 &&
-            breathingPhasesQueue.value.elementAt(1) != null) {
-          final nextPhase = breathingPhasesQueue.value.elementAt(1)!;
-          final soundName = nextPhase.sounds.preBreathingPhase.name;
-          final type = nextPhase.sounds.preBreathingPhase.type;
-
-          if(second.value==1 && 
-          (longSoundNames.contains(soundName) ||
-          type == SoundType.voice)) {
-            _playPreBreathingPhaseSound(nextPhase);
-          } else {
-             _playCountingSound(previousSecond);
-          }
-        } else {
-          _playCountingSound(previousSecond);
-        }
+        _playCountingSound(previousSecond);
       }
 
       if (_remainingTime > elapsed) {
@@ -307,22 +293,24 @@ class TrainingController {
         if (breathingPhasesQueue.value.length > 1 &&
             breathingPhasesQueue.value.elementAt(1) != null) {
           final nextPhase = breathingPhasesQueue.value.elementAt(1)!;
-          
-          if (_remainingTime <= 100 && 
-             !_nextPhaseSoundPlayed &&
-            !longSoundNames.contains(nextPhase.sounds.preBreathingPhase.name)) {
+          final soundName = nextPhase.sounds.preBreathingPhase.name;
+          final type = nextPhase.sounds.preBreathingPhase.type;
+          if(!_nextPhaseSoundPlayed) {
+            if ((longSoundNames.contains(soundName) || 
+              type == SoundType.voice) ||
+              (_remainingTime <= 100 &&
+              !longSoundNames.contains(soundName))) {
+            _playPreBreathingPhaseSound(nextPhase);
             _nextPhaseSoundPlayed = true;
-            _playPreBreathingPhaseSound(nextPhase); // short sound
           } 
-          else if (_remainingTime <= 300 &&
-              _remainingTime > 200) {
+          
+          } else if (_remainingTime <= 300 && _remainingTime > 200) {
             //second.value = 0;
             breathing_phase.BreathingPhase breathingPhase =
                 breathingPhasesQueue.value.elementAt(1)!;
             _handleBackgroundSoundChange(
                 breathingPhase.sounds.background.name, 500);
           }
-
         }
       } else if (_remainingTime > 0) {
         _remainingTime = 0;
@@ -391,16 +379,14 @@ class TrainingController {
               }
 
               _playEndingSound(_sounds.endingTrack.name, 500);
-
             } else {
               _remainingTime = _nextRemainingTime;
               previousSecond = (_remainingTime + 1) ~/ 1000;
             }
           } else {
-
             String? newStageId;
             if (_trainingStageIdQueue.length > 1) {
-              newStageId = _trainingStageIdQueue.elementAt(1); 
+              newStageId = _trainingStageIdQueue.elementAt(1);
             }
 
             dev.log(
