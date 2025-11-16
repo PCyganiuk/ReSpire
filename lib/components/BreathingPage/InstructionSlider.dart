@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Step.dart' as breathing_phase;
@@ -98,6 +99,11 @@ class InstructionSliderState extends State<InstructionSlider>
 
     if(oldWidget.change != widget.change) {
       _logSlider('CHANGE DETECTED', detail: 'change: ${oldWidget.change} → ${widget.change}');
+      final int phaseDuration = (widget.breathingPhasesQueue.elementAt(0)?.duration.toInt() != null)
+        ? (widget.breathingPhasesQueue.elementAt(0)!.duration * 1000).toInt() - 50 // -50 to account for some delay and have room for error
+        : 400;
+      _logSlider('phase duration', detail: 'Duration: $phaseDuration ms');
+      _controller.duration = Duration(milliseconds: min(phaseDuration,400));
       _controller.forward();
       if(_blocks.last.text!=translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text")) {
         addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2));

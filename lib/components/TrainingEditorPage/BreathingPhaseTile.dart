@@ -169,7 +169,8 @@ class _BreathingPhaseTileState extends State<BreathingPhaseTile> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
                             double currentValue =
-                                double.tryParse(durationController.text) ?? 0.1;
+                                double.tryParse(durationController.text) ?? 1.0;
+                            if (currentValue <= 0.3) return;
                             double breathingPhase = currentValue <= 1 ? 0.1 : 0.5;
                             double newValue = (currentValue - breathingPhase)
                                 .clamp(0.1, double.infinity);

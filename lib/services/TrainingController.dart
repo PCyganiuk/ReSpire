@@ -26,7 +26,7 @@ class TrainingController {
   final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
   final ValueNotifier<String> currentTrainingStageName = ValueNotifier('');
 
-  final int _updateInterval = 100; //in milliseconds
+  final int _updateInterval = 25; //in milliseconds
 
   int _remainingTime = 0; //in milliseconds
   int _nextRemainingTime = 0; //in milliseconds
@@ -34,7 +34,7 @@ class TrainingController {
 
   bool end = false;
   bool _finishedLoadingSteps = false;
-  bool _trainingFullyCompleted = false;
+  bool _nextPhaseSoundPlayed = false;
   int _stopTimer = 2;
 
   late Sounds _sounds;
@@ -308,9 +308,10 @@ class TrainingController {
             breathingPhasesQueue.value.elementAt(1) != null) {
           final nextPhase = breathingPhasesQueue.value.elementAt(1)!;
           
-          if (_remainingTime <= 600 && 
-            _remainingTime > 500 &&
+          if (_remainingTime <= 100 && 
+             !_nextPhaseSoundPlayed &&
             !longSoundNames.contains(nextPhase.sounds.preBreathingPhase.name)) {
+            _nextPhaseSoundPlayed = true;
             _playPreBreathingPhaseSound(nextPhase); // short sound
           } 
           else if (_remainingTime <= 300 &&
@@ -418,6 +419,7 @@ class TrainingController {
             _nextRemainingTime = _newBreathingPhaseRemainingTime;
             previousSecond = (_remainingTime + 1) ~/ 1000;
             _fetchNextBreathingPhase();
+            _nextPhaseSoundPlayed = false;
             breathingPhasesQueue.value =
                 Queue<breathing_phase.BreathingPhase?>.from(
                     breathingPhasesQueue.value);
