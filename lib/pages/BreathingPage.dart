@@ -302,7 +302,9 @@ class _BreathingPageState extends State<BreathingPage> {
                 valueListenable: controller!.breathingPhasesCount,
                 builder: (context, change, _) {
                   return InstructionSlider(
-                      breathingPhasesQueue: breathingPhasesQueue, change: change);
+                      preparationTime: widget.training.settings.preparationDuration.toDouble(), 
+                      breathingPhasesQueue: breathingPhasesQueue, 
+                      change: change);
                 },
               );
             },

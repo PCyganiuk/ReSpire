@@ -7,6 +7,7 @@ import 'package:respire/services/SoundManagers/ISoundManager.dart';
 import 'package:respire/services/PresetDataBase.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 import 'package:respire/components/Global/Sounds_lists.g.dart';
+import 'package:respire/services/SoundManagers/AudioPlayerPool.dart';
 
 class SoundManager implements ISoundManager {
   
@@ -30,6 +31,8 @@ class SoundManager implements ISoundManager {
   };
 
   final HashMap<String,AudioPlayer> _audioPlayers = HashMap<String,AudioPlayer>();
+  final Map<String, AudioPlayerPool> _pools = {};
+  final int _maxPoolSizePerSound = 5;
 
   @override
   Map<String, SoundAsset> getSounds(SoundListType type) {
@@ -55,7 +58,7 @@ class SoundManager implements ISoundManager {
   /// [forceCommonSetup] if true, will setup the audio player with common settings regardless of type.\
   /// [soundName] is the name of the sound file returned by **getLoadedSounds()**.
   @override
-  Future<bool> loadSound(String soundName, {bool forceCommonSetup = false}) async{
+  Future<bool> loadSound(String soundName) async{
     if(_availableSounds[soundName] == null) {
       log("Could not load sound: $soundName is not available.");
       return false;
@@ -71,21 +74,10 @@ class SoundManager implements ISoundManager {
     
     SoundAsset asset = _availableSounds[soundName]!;
     
-    if ((asset.type == SoundType.cue || asset.type == SoundType.counting) && !forceCommonSetup) {
-      setupLowLatencyAudioPlayer(audioPlayer);
-    } else {
-      _commonAudioPlayerSetup(audioPlayer);
-    }
-
-    bool isAsset = asset.path.startsWith("sounds/");
+    _commonAudioPlayerSetup(audioPlayer);
+    
     try{
-      if(isAsset){
-        await audioPlayer.setSource(AssetSource(asset.path));
-      }
-      else {
-        await audioPlayer.setSource(DeviceFileSource(asset.path));
-      }
-
+      await audioPlayer.setSource(_getSourceForAsset(asset));
       _audioPlayers[soundName] = audioPlayer;
       log("Sound $soundName loaded successfully.");
       return true;
@@ -133,47 +125,35 @@ class SoundManager implements ISoundManager {
     return _availableSounds.keys.toList();
   }
 
-  Future<void> ensureSoundLoaded(String? soundName) async{
-    if (soundName == null) {
-      return;
-    }
-    final asset = _availableSounds[soundName];
-    if (asset == null) {
+  @override
+  Future<void> playSound(String? soundName) async {
+    if (soundName == null || _availableSounds[soundName] == null) return;
+    final asset = _availableSounds[soundName]!;
+    if (asset.type == SoundType.cue || asset.type == SoundType.counting) {
+      await _playShortSound(soundName, asset);
       return;
     }
 
-    //If cue or counting, always remove old entry
-    if ((asset.type == SoundType.cue || asset.type == SoundType.counting) && _audioPlayers.containsKey(soundName)) {
-      var player = _audioPlayers[soundName];
-      if (player != null) {
-        player.dispose();
-      }
-      _audioPlayers.remove(soundName);
-    }
-
-    //Load if needed
-    if (!_audioPlayers.containsKey(soundName)) {
-      await loadSound(soundName);
-    }
+    await loadSound(soundName);
+    final player = _audioPlayers[soundName];
+    if (player != null) await player.resume();
   }
 
-  ///Plays a sound from a file in the assets folder.
-  @override
-  Future<void> playSound(String? soundName) async{
-    if (soundName == null || _availableSounds[soundName] == null){
-      return;
-    }
-    await ensureSoundLoaded(soundName);
-    log("Playing sound: $soundName");
+  Future<void> _playShortSound(String soundName, SoundAsset asset) async {
+    final pool = _pools.putIfAbsent(soundName, () => AudioPlayerPool(size: _maxPoolSizePerSound));
 
-    var player = _audioPlayers[soundName];
-    if (player == null) {
-      return;
-    }
-    if (_availableSounds[soundName]!.type == SoundType.cue || _availableSounds[soundName]!.type == SoundType.counting) {
-      await player.play(player.source!);
+    AudioPlayer? slot = pool.next;
+
+    setupLowLatencyAudioPlayer(slot);
+    
+    await slot.play(_getSourceForAsset(asset));
+  }
+
+  Source _getSourceForAsset(SoundAsset asset) {
+    if (asset.path.startsWith("sounds/")) {
+      return AssetSource(asset.path);
     } else {
-      await player.resume();
+      return DeviceFileSource(asset.path);
     }
   }
 
@@ -335,6 +315,9 @@ class SoundManager implements ISoundManager {
   void dispose() {
     for (var player in _audioPlayers.values) {
       player.dispose();
+    }
+    for (var pool in _pools.values) {
+      pool.dispose();
     }
     _audioPlayers.clear();
     log("SoundManager disposed and audio focus released.");

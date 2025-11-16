@@ -17,7 +17,7 @@ class SingleSoundManager implements ISoundManager {
   Future<void> playSound(String? soundName) async {
     if (soundName == null) return;
 
-    bool success = await _delegate.loadSound(soundName, forceCommonSetup: true);
+    bool success = await _delegate.loadSound(soundName);
     if(!success) return;
 
     final player = _delegate.getPlayer(soundName);
@@ -93,9 +93,6 @@ class SingleSoundManager implements ISoundManager {
   
   @override
   Future<bool> loadSound(String soundName) => _delegate.loadSound(soundName);
-  
-  @override
-  void refreshSoundsList() => _delegate.refreshSoundsList();
 
   AudioPlayer? getPlayer(String soundName) => _delegate.getPlayer(soundName);
 }

@@ -1,8 +1,10 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'dart:developer' as dev;
 
 final blockSize = 130.0;
 final sliderWidth = 400.0;
@@ -16,10 +18,11 @@ class InstructionBlock {
 
 class InstructionSlider extends StatefulWidget {
 
+  double preparationTime;
   Queue<breathing_phase.BreathingPhase?> breathingPhasesQueue = Queue<breathing_phase.BreathingPhase?>();
   int change; 
 
-  InstructionSlider({super.key, required this.breathingPhasesQueue, required this.change});
+  InstructionSlider({super.key,required this.preparationTime,  required this.breathingPhasesQueue, required this.change});
 
   @override
   State<InstructionSlider> createState() => InstructionSliderState();
@@ -42,30 +45,55 @@ class InstructionSliderState extends State<InstructionSlider>
    
     _blocks.add(
       InstructionBlock(
-        text: translationProvider.getTranslation("BreathingPage.InstructionSlider.get_ready_block_text"), 
+        text: translationProvider.getTranslation("BreathingPage.InstructionSlider.get_ready_block_text") + "\n${widget.preparationTime} s", 
         position: 0.0)
+        
     );
+    _logSlider('ADD', detail: 'Przygotuj się');
     
     _controller = AnimationController(vsync: this, duration: duration);
     _animation = Tween<double>(begin: 0.0, end: -1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(1), 1.0);
-    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2), 2.0);
+    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(1));
+    addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2));
 
+    _logSlider('INIT', detail: '3 bloki');
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        _logSlider('ANIMATION COMPLETE', detail: 'przed resetem');
         _controller.reset();
         setState(() {
+          final removed = _blocks.where((b) => b.position <= -2).toList();
+          if (removed.isNotEmpty) {
+            _logSlider('REMOVE', detail: removed.map((b) => b.text.split('\n').first).join(', '));
+          }
+
           _blocks.removeWhere((b) => b.position <= -2);
           _blocks.forEach(
               (b) => b.position += _animation.value); // apply final position
-          _blocks.forEach((b) => b.position -= 1); // shift left
+          _blocks.forEach((b) => b.position -= 1); 
+          _logSlider('SHIFT', detail: 'przesunięto o -1');// shift left
         });
       }
     });
+  }
+
+  void _logSlider(String action, {String? detail}) {
+    final blockTexts = _blocks.map((b) => 
+      b.text.split('\n').first // tylko pierwsza linia (nazwa)
+          .replaceAll(' s', '') // usuń " s"
+          .replaceAll(RegExp(r'\d+$'), '') // usuń czas
+          .trim()
+    ).toList();
+
+    final positions = _blocks.map((b) => b.position.toStringAsFixed(1)).toList();
+
+    dev.log('[SLIDER] $action: ${detail ?? ''} | '
+        'Blocks: $blockTexts | '
+        'Positions: [$positions]');
   }
 
   @override
@@ -73,9 +101,15 @@ class InstructionSliderState extends State<InstructionSlider>
     super.didUpdateWidget(oldWidget);
 
     if(oldWidget.change != widget.change) {
+      _logSlider('CHANGE DETECTED', detail: 'change: ${oldWidget.change} → ${widget.change}');
+      final int phaseDuration = (widget.breathingPhasesQueue.elementAt(0)?.duration.toInt() != null)
+        ? (widget.breathingPhasesQueue.elementAt(0)!.duration * 1000).toInt() - 50 // -50 to account for some delay and have room for error
+        : 400;
+      _logSlider('phase duration', detail: 'Duration: $phaseDuration ms');
+      _controller.duration = Duration(milliseconds: min(phaseDuration,400));
       _controller.forward();
       if(_blocks.last.text!=translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text")) {
-        addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2), 2.0);
+        addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2));
       }
     }
   }
@@ -86,13 +120,15 @@ class InstructionSliderState extends State<InstructionSlider>
   //   }
   // }
 
-  void addNewBreathingPhase(breathing_phase.BreathingPhase? breathingPhase, double position) {
+  void addNewBreathingPhase(breathing_phase.BreathingPhase? breathingPhase) {
+    final double position = _blocks.isEmpty ? 0.0 : _blocks.last.position + 1.0;
     String breathingPhaseName = breathingPhase==null ? translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text") : _breathingPhaseType(breathingPhase);
     _blocks.add(
       InstructionBlock(
         text: breathingPhaseName, 
         position: position)
     );
+    _logSlider('ADD', detail: breathingPhaseName.split('\n').first);
   }
 
    String _firstToUpperCase(String str) {
