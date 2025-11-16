@@ -20,7 +20,7 @@ class BreathingPage extends StatefulWidget {
   State<StatefulWidget> createState() => _BreathingPageState();
 }
 
-class _BreathingPageState extends State<BreathingPage> {
+class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserver {
   late TrainingParser parser;
   TrainingController? controller;
   int second = 0;
@@ -37,12 +37,23 @@ class _BreathingPageState extends State<BreathingPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Ensure sounds are properly propagated to breathing phases
     widget.training.updateSounds();
     parser = TrainingParser(training: widget.training);
     breathingPhases = parser.countBreathingPhases();
     
     _preloadAudio();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (controller == null) return;
+    if (state == AppLifecycleState.paused) {
+      controller!.pause();
+    } else if (state == AppLifecycleState.resumed) {
+      controller!.resume();
+    }
   }
   
   Future<void> _preloadAudio() async {
@@ -133,8 +144,9 @@ class _BreathingPageState extends State<BreathingPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     controller?.dispose();
+    super.dispose();
   }
 
   void _showConfirmationDialog() {
