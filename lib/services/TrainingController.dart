@@ -280,7 +280,7 @@ class TrainingController {
       final now = DateTime.now();
       final int elapsed = now.difference(lastTick).inMilliseconds;
       lastTick = now;
-      dev.log(previousSecond.toString() + " " + (_remainingTime ~/ 1000).toString());
+      
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
         previousSecond = _remainingTime ~/ 1000;
         second.value = previousSecond;
