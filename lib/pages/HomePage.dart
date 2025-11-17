@@ -258,7 +258,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ? translationProvider.getTranslation('HomePage.select_mode')
                     : translationProvider.getTranslation('HomePage.export_selected_count')
                         .replaceAll('{count}', _selectedIndices.length.toString()),
-                style: TextStyle(color: darkerblue, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: darkerblue, fontSize: 16, fontWeight: FontWeight.bold),
               )
             : Image.asset(
                 'assets/logo_poziom.png',
@@ -337,7 +337,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   'assets/animations/wave.json',
                   controller: _waveController1,
                   fit: BoxFit.cover,
-                  height: 700,
+                  height: 670,
                   repeat: true,
                 ),
               ),
