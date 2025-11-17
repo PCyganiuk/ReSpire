@@ -42,12 +42,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     db.initialize();
 
-    _waveController1 =
-        AnimationController(vsync: this, duration: Duration(seconds: 17))..repeat();
-    _waveController2 =
-        AnimationController(vsync: this, duration: Duration(seconds: 22))..repeat();
-    _waveController3 =
-        AnimationController(vsync: this, duration: Duration(seconds: 19))..repeat();
+  _waveController1 = AnimationController(vsync: this, duration: Duration(seconds: 55))..forward(from: 0.0)..repeat();
+  _waveController2 = AnimationController(vsync: this, duration: Duration(seconds: 62))..forward(from: 0.73)..repeat();
+  _waveController3 = AnimationController(vsync: this, duration: Duration(seconds: 50))..forward(from: 0.56)..repeat();
+
   }
 
   @override
@@ -327,7 +325,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       backgroundColor: mediumblue,
       body: Stack(
         children: [
-          // 🔹 Tło z falami
           Positioned(
             bottom: 0,
             left: 0,
@@ -340,7 +337,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   'assets/animations/wave.json',
                   controller: _waveController1,
                   fit: BoxFit.cover,
-                  height: 450,
+                  height: 700,
                   repeat: true,
                 ),
               ),
@@ -358,25 +355,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   'assets/animations/wave.json',
                   controller: _waveController2,
                   fit: BoxFit.cover,
-                  height: 350,
+                  height: 550,
                   repeat: true,
                 ),
               ),
             ),
           ),
           Positioned(
-            bottom: 0,
+            bottom: -20,
             left: 0,
             right: 0,
             child: Transform.rotate(
               angle: pi,
               child: Opacity(
-                opacity: 0.12,
+                opacity: 0.15,
                 child: Lottie.asset(
                   'assets/animations/wave.json',
                   controller: _waveController3,
                   fit: BoxFit.cover,
-                  height: 100,
+                  height: 450,
                   repeat: true,
                 ),
               ),
