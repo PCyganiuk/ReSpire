@@ -329,14 +329,12 @@ class _TrainingPageState extends State<TrainingPage> {
               ),
             ),
             ),
-        
-          // 🔹 Scrollable content
           Positioned.fill(
             child: Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.only(bottom: 220), // zostawia miejsce dla łódki
+                    padding: EdgeInsets.only(bottom: 220), 
                     child: Column(
                       children: [
                         Row(children: [shareButton(), Spacer(), editButton(), deleteButton()]),
