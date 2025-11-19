@@ -313,22 +313,7 @@ class _TrainingPageState extends State<TrainingPage> {
         ),
       ),
       backgroundColor: mediumblue,
-      body: Stack(
-        children: [
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-            child: Opacity(
-              opacity: 1,
-              child: Lottie.asset(
-                'assets/animations/boat.json',
-                fit: BoxFit.fitWidth,
-                repeat: true,
-              ),
-            ),
-            ),
+      body:
           Positioned.fill(
             child: Column(
               children: [
@@ -347,8 +332,6 @@ class _TrainingPageState extends State<TrainingPage> {
                 ),
               ],
             ),
-          ),
-        ],
       ),
     );
   }
