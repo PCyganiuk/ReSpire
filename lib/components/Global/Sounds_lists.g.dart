@@ -25,7 +25,6 @@ class ReSpireSounds {
   final Map<String, SoundAsset> shortSounds = {
     "Beep": SoundAsset(name: "Beep", path: "sounds/short/Beep.mp3", type: SoundType.cue),
     "Bell": SoundAsset(name: "Bell", path: "sounds/short/Bell.mp3", type: SoundType.cue),
-    "Gong": SoundAsset(name: "Gong", path: "sounds/short/Gong.mp3", type: SoundType.cue),
     "Harp": SoundAsset(name: "Harp", path: "sounds/short/Harp.mp3", type: SoundType.cue),
     "Pop": SoundAsset(name: "Pop", path: "sounds/short/Pop.mp3", type: SoundType.cue),
     "Snap": SoundAsset(name: "Snap", path: "sounds/short/Snap.mp3", type: SoundType.cue),
