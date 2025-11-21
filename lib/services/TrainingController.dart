@@ -192,6 +192,13 @@ class TrainingController {
     }
   }
 
+  void _playShortSound(String soundName){
+        soundManager.playSound(soundName);
+        Future.delayed(const Duration(seconds: 1), () {
+          soundManager.stopSound(soundName);
+        });
+  }
+
   void _playPreBreathingPhaseSound(
       breathing_phase.BreathingPhase breathingPhase) {
     switch (breathingPhase.sounds.preBreathingPhase.type) {
@@ -203,10 +210,7 @@ class TrainingController {
       case SoundType.none:
         break;
       default:
-        soundManager.playSound(breathingPhase.sounds.preBreathingPhase.name);
-        Future.delayed(const Duration(seconds: 1), () {
-          soundManager.stopSound(breathingPhase.sounds.preBreathingPhase.name);
-        });
+        _playShortSound(breathingPhase.sounds.preBreathingPhase.name);
         break;
     }
   }
@@ -427,6 +431,7 @@ class TrainingController {
               dev.log(
                   'TrainingController: Stage changed from $_currentTrainingStageId to $newStageId');
               _currentTrainingStageId = newStageId;
+              _playShortSound(parser.training.sounds.stageChangeSound.name);
               
               for (int i = 0; i < parser.training.trainingStages.length; i++) {
                 if (parser.training.trainingStages[i].id == newStageId) {

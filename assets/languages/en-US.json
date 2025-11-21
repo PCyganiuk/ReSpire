@@ -95,7 +95,8 @@
                     "global":"Global phase change sound",
                     "voice":"lector",
                     "for_each_breathing_phase":"change sound for each phase"
-                }
+                },
+                "stage_change_sound": "Stage change"
             },
 
             "TrainingMusic":{

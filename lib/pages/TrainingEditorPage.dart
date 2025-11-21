@@ -514,7 +514,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               ],
                                             ),
                                           ),
-                                        ],
+                                        SoundSelectionRow(
+                                            labelStyle: TextStyle(
+                                                color: darkerblue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14, 
+                                                overflow: TextOverflow.ellipsis),
+                                            label: translationProvider
+                                                .getTranslation(
+                                                    "TrainingEditorPage.SoundsTab.TrainingSounds.stage_change_sound"),
+                                            selectedValue:
+                                                _sounds.stageChangeSound,
+                                            soundListType:
+                                                SoundListType.shortSounds,
+                                            onChanged: (v) => setState(() {
+                                                  _sounds.stageChangeSound = v;
+                                                }),
+                                            includeVoiceOption: true,
+                                            blueBorder: true),],
                                       ),
                                     ),
                                   ),

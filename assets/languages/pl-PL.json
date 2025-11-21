@@ -95,7 +95,8 @@
                     "voice":"lektor",
                     "global":"Ogólny dźwięk zmiany fazy",
                     "for_each_breathing_phase":"dźwięk zmiany dla każdej fazy"
-                }
+                },
+                "stage_change_sound": "Zmiana etapu"
             },
 
             "TrainingMusic":{
