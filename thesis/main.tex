@@ -2,6 +2,7 @@
 
 %-------------------- Dodatkowe pakiety ---------------------
 \usepackage{listing}
+\usepackage[x11names]{xcolor} % colorful text with the most amount of colors enabled (x11names)
 \usepackage[backend=biber,
             style=ieee,
             language=polish,
@@ -12,7 +13,17 @@
             isbn=false]{biblatex} % pakiet pozwalający na konfigurację bibliografii
 \addbibresource{refs.bib}
 %------------------------------------------------------------
+%------------------Definicja własnych komend-----------------
+\newcommand{\Hania}[0]{\textcolor{SlateBlue1}{Hania}}
+\newcommand{\Jakub}[0]{\textcolor{green}{Jakub}}
+\newcommand{\Karol}[0]{\textcolor{Tan1}{Karol}}
+\newcommand{\Ola}[0]{\textcolor{Maroon0}{Ola}}
 
+\newcommand{\todoHania}[1]{\todo[color=SlateBlue1!35]{Hania: #1}}
+\newcommand{\todoKarol}[1]{\todo[color=Tan1!50]{Karol: #1}}
+\newcommand{\todoJakub}[1]{\todo[color=green!50]{Jakub: #1}}
+\newcommand{\todoOla}[1]{\todo[color=Maroon1!50]{Ola: #1}}
+%------------------------------------------------------------
 %------------------------------------------------------------
 %			      Początek pracy dyplomowej  
 %------------------------------------------------------------
@@ -33,6 +44,10 @@
 %\input{meta/abstract.tex}
 
 %------------------------------------------------------------
+%   Lista komentarzy
+\listoftodos
+
+%------------------------------------------------------------
 %	Utworzenie spisu treści pracy dyplomowej
 \tableofcontents
 
@@ -45,10 +60,13 @@
 
 \input{rozdzialy/wstep_cel_pracy.tex}
 \input{rozdzialy/istniejace_rozwiazania.tex}
+\input{rozdzialy/zalozenia_projektowe.tex}
+\input{rozdzialy/analiza_wymagan.tex}
+\input{rozdzialy/projekt_rozwiazania.tex}
 \input{rozdzialy/implementacja.tex}
+\input{rozdzialy/instrukcja_uzytkownika.tex}
 \input{rozdzialy/testowanie.tex}
-\input{rozdzialy/zakonczenie.tex}
-%\input{rozdzialy/przyklad.tex}
+\input{rozdzialy/podsumowanie.tex}
 
 % ---------------------- Bibliografia -----------------------
 \nocite{*} % dodajemy całą zawartość refs.bib
@@ -58,18 +76,18 @@
 %------------------------------------------------------------
 %	Dodanie wykazu rysunków oraz tabeli
 
-\renewcommand{\baselinestretch}{1.0}\normalsize	% interlinia w sekcji wykazów
-\addcontentsline{toc}{chapter}{\listfigurename}	% dodanie wykazu rysunków do spisu treści
-\listoffigures									% generacja wykazu rysunków
+% \renewcommand{\baselinestretch}{1.0}\normalsize	% interlinia w sekcji wykazów
+% \addcontentsline{toc}{chapter}{\listfigurename}	% dodanie wykazu rysunków do spisu treści
+% \listoffigures									% generacja wykazu rysunków
 
-\addcontentsline{toc}{chapter}{\listtablename}	% dodanie wykazu tabel do spisu treści
-\listoftables									% generacja wykazu tabel
-\renewcommand{\baselinestretch}{1.3}\normalsize	% powrót do interlinii 1.5
+% \addcontentsline{toc}{chapter}{\listtablename}	% dodanie wykazu tabel do spisu treści
+% \listoftables									% generacja wykazu tabel
+% \renewcommand{\baselinestretch}{1.3}\normalsize	% powrót do interlinii 1.5
 
 
 % ---------------------- DODATKI -----------------------
-\chapter*{Dodatek A}
-\addcontentsline{toc}{chapter}{Dodatek A}
+%\chapter*{Dodatek A}
+%\addcontentsline{toc}{chapter}{Dodatek A}
 % Zależnie od dodatku, zaleca się dodawnie dodatków jako
 % dokumenty PDF
 % \includepdf{dodatki/dodatek1.pdf}
