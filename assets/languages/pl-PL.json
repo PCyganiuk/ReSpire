@@ -20,7 +20,7 @@
         "select_all":"Zaznacz wszystkie",
         "deselect_all":"Odznacz wszystkie",
         "export_selected":"Eksportuj",
-        "export_selected_count":"Eksportuj ({count})",
+        "export_selected_count":"Wybrano ({count})",
         "export_multiple_success":"Treningi zostały wyeksportowane",
         "no_trainings_selected":"Nie wybrano treningów",
         "import_multiple_success":"{count} treningów zostało pomyślnie zaimportowanych",

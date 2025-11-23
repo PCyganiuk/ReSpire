@@ -20,7 +20,7 @@
         "select_all":"Select all",
         "deselect_all":"Deselect all",
         "export_selected":"Export",
-        "export_selected_count":"Export ({count})",
+        "export_selected_count":"Selected({count})",
         "export_multiple_success":"Trainings exported successfully",
         "no_trainings_selected":"No trainings selected",
         "import_multiple_success":"{count} trainings imported successfully",

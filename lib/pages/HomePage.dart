@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: lightblue,
         ),
       );
       return;
@@ -251,20 +251,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         centerTitle: true,
-        title: _isSelectionMode 
-            ? Text(
-                _selectedIndices.isEmpty
-                    ? translationProvider.getTranslation('HomePage.select_mode')
-                    : translationProvider.getTranslation('HomePage.export_selected_count')
-                        .replaceAll('{count}', _selectedIndices.length.toString()),
-                style: TextStyle(color: darkerblue, fontSize: 16, fontWeight: FontWeight.bold),
-              )
-            : Image.asset(
-                'assets/logo_poziom.png',
-                height: 36,
-              ),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        automaticallyImplyLeading: false,
         leading: _isSelectionMode
             ? IconButton(
                 icon: Icon(Icons.close, color: darkerblue),
@@ -272,54 +261,62 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 tooltip: translationProvider.getTranslation('HomePage.cancel_selection'),
               )
             : IconButton(
-                  icon: Icon(Icons.checklist, color: darkerblue),
-                  onPressed: db.presetList.isEmpty ? null : _toggleSelectionMode,
-                  tooltip: translationProvider.getTranslation('HomePage.select_mode'),
-                ),
-        actions: _isSelectionMode
-            ? [
-                // Select All / Deselect All button
-                if (_selectedIndices.length < db.presetList.length)
+                icon: Icon(Icons.checklist, color: darkerblue),
+                onPressed: db.presetList.isEmpty ? null : _toggleSelectionMode,
+                tooltip: translationProvider.getTranslation('HomePage.select_mode'),
+              ),
+
+        title: _isSelectionMode
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _selectedIndices.isEmpty
+                        ? translationProvider.getTranslation('HomePage.select_mode')
+                        : translationProvider
+                            .getTranslation('HomePage.export_selected_count')
+                            .replaceAll('{count}', _selectedIndices.length.toString()),
+                    style: TextStyle(
+                      color: darkerblue,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 10),
                   FilledButton(
-                    onPressed: _selectAll,
+                    onPressed: _selectedIndices.length < db.presetList.length
+                        ? _selectAll
+                        : _deselectAll,
                     style: FilledButton.styleFrom(
                       backgroundColor: darkerblue.withOpacity(0.1),
                       foregroundColor: darkerblue,
                       padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
                     child: Text(
-                      translationProvider.getTranslation('HomePage.select_all'),
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  )
-                else
-                  FilledButton(
-                    onPressed: _deselectAll,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: darkerblue.withOpacity(0.1),
-                      foregroundColor: darkerblue,
-                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    ),
-                    child: Text(
-                      translationProvider.getTranslation('HomePage.deselect_all'),
+                      _selectedIndices.length < db.presetList.length
+                          ? translationProvider.getTranslation('HomePage.select_all')
+                          : translationProvider.getTranslation('HomePage.deselect_all'),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                // Export button
+                ],
+              )
+            : Image.asset('assets/logo_poziom.png', height: 36),
+        actions: _isSelectionMode
+            ? [
                 IconButton(
                   icon: Icon(Icons.file_upload_outlined, color: darkerblue),
                   onPressed: _exportSelected,
                   tooltip: translationProvider.getTranslation('HomePage.export_selected'),
-                ),
+                )
               ]
             : [
-                // Import button
                 IconButton(
                   icon: Icon(Icons.file_download_outlined, color: darkerblue),
                   onPressed: importTraining,
                   tooltip: translationProvider.getTranslation('HomePage.import_training_tooltip'),
                 ),
-                // Settings button
                 IconButton(
                   icon: Icon(Icons.settings, color: darkerblue),
                   onPressed: () {
