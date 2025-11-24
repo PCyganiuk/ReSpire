@@ -262,7 +262,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
             valueListenable: controller!.currentTrainingStageName,
             builder: (context, stageName, _) {
               final trimmed = stageName.trim();
-              _displayStageInfo = trimmed.isNotEmpty && controller!.totalStages.value > 1;
+              _displayStageInfo = trimmed.isNotEmpty && !_isPreloading;
               return Visibility(
                 visible: _displayStageInfo,
                 maintainSize: true,
