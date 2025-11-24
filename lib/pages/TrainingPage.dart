@@ -316,14 +316,16 @@ class _TrainingPageState extends State<TrainingPage> {
       body: Stack(
         children: [
           Positioned(
-            bottom: screenWidth * 0.2,
-            width: screenWidth * 0.5,
-            left: screenWidth * 0.25, //half of screen widthgit - half of image width
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 200,
             child: Opacity(
               opacity: 1,
-              child: Image(image:   
-              AssetImage('assets/group_logo.png'),
-                fit: BoxFit.cover,
+              child: Lottie.asset(
+                'assets/animations/boat.json',
+                fit: BoxFit.fitWidth,
+                repeat: true,
               ),
             ),
             ),
