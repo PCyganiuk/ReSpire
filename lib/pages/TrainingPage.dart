@@ -313,13 +313,25 @@ class _TrainingPageState extends State<TrainingPage> {
         ),
       ),
       backgroundColor: mediumblue,
-      body:
+      body: Stack(
+        children: [
+          Positioned(
+            bottom: screenWidth * 0.2,
+            width: screenWidth * 0.5,
+            left: screenWidth * 0.25, //half of screen widthgit - half of image width
+            child: Opacity(
+              opacity: 1,
+              child: Image(image:   
+              AssetImage('assets/group_logo.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            ),
           Positioned.fill(
             child: Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.only(bottom: 220), 
                     child: Column(
                       children: [
                         Row(children: [shareButton(), Spacer(), editButton(), deleteButton()]),
@@ -332,6 +344,8 @@ class _TrainingPageState extends State<TrainingPage> {
                 ),
               ],
             ),
+          ),
+        ],
       ),
     );
   }
