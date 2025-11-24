@@ -249,7 +249,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double size = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PreferredSize(
+      preferredSize: Size.fromHeight(56),
+      child: AppBar(
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -271,6 +273,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Expanded(child:
                   Text(
                     _selectedIndices.isEmpty
                         ? translationProvider.getTranslation('HomePage.select_mode')
@@ -282,7 +285,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
+                  ),),
                   SizedBox(width: 10),
                   FilledButton(
                     onPressed: _selectedIndices.length < db.presetList.length
@@ -293,11 +296,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       foregroundColor: darkerblue,
                       padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
-                    child: Text(
-                      _selectedIndices.length < db.presetList.length
-                          ? translationProvider.getTranslation('HomePage.select_all')
-                          : translationProvider.getTranslation('HomePage.deselect_all'),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _selectedIndices.length < db.presetList.length
+                            ? translationProvider.getTranslation('HomePage.select_all')
+                            : translationProvider.getTranslation('HomePage.deselect_all'),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
@@ -328,7 +334,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   tooltip: translationProvider.getTranslation('HomePage.settings_tooltip'),
                 ),
               ],
-      ),
+      ),),
       backgroundColor: mediumblue,
       body: Stack(
         children: [
