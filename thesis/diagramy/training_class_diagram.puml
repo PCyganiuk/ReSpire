@@ -1,4 +1,9 @@
 @startuml
+
+scale 2480 width
+skinparam dpi 300
+skinparam defaultFontSize 14
+
 set namespaceSeparator ::
 
 class "respire::components::Global::Phase.dart::TrainingStage" {
