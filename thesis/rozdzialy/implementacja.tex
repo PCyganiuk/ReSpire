@@ -17,15 +17,83 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum arcu 
 \subsection{Menu - inne}
 
 \section{Przebieg treningu \Hania}
-\subsection{TrainingParser}
-Klasa TrainingParser powstała w celu przekształcenia hierarchicznych danych treningowych pobranych z lokalnej bazy danych Hive w ciąg występujących po sobie faz, oparty na skonfigurowanym uprzednio przez użytkownika wzorcu oddychania. Jej zadaniem jest zwracanie kolejnych faz do obiektu TrainingController. Dzięki temu logika przełączania faz i powtórzeń jest odseparowana od interfejsu. 
-Przedstawiono poniżej w kodzie \ref{code/parser}
+\subsection{Klasa TrainingParser}
+Klasa \texttt{TrainingParser} powstała w celu przekształcenia hierarchicznych danych treningowych pobranych z lokalnej bazy danych Hive w ciąg występujących po sobie faz, oparty na skonfigurowanym uprzednio przez użytkownika wzorcu oddychania. Jej zadaniem jest zwracanie kolejnych faz do obiektu \texttt{TrainingController}. Dzięki temu logika przełączania faz i powtórzeń jest odseparowana od interfejsu. 
 
-\begin{lstlisting}[caption={main.dart - aplikacja Flutter}, label={code/parser}]
-import 'package:flutter/material.dart';
+Konstruktor jako parametr przyjmuje obiekt klasy \texttt{Training} i zapisuje do zmiennej \textit{currentTrainingStage} pierwszy etap treningu. Fragment realizujący tą funkcjonalność przedstawiono poniżej w kodzie \ref{code/parser/constructor}.
+
+\begin{figure}[h]
+\centering
+\begin{lstlisting}[caption={TrainingParser - konstruktor}, label={code/parser/constructor}]
+  Training training;
+  TrainingStage currentTrainingStage;
+  late breathing_phase.BreathingPhase currentBreathingPhase;
+
+  TrainingParser({required this.training})
+      : currentTrainingStage = training.trainingStages[0];
 \end{lstlisting}
+\end{figure}
 
-\subsection{Training Controller}
+\newpage
+Zadaniem funkcji \texttt{nextInstruction}, przedstawionej na kodzie \ref{code/parser/nextInstruction}, jest zwrócenie danych dotyczącej kolejnej fazy oddechowej w postaci mapy \texttt{Map<String, dynamic>} lub wartości \texttt{null} w~przypadku zakończenia całego treningu. 
+
+W pierwszej kolejności analizowany jest aktualny indeks fazy oddechowej (\textit{breathingPhaseID}). Jeżeli wskazuje on ostatnią fazę w bieżącym etapie, oznacza to zakończenie jednego pełnego cyklu etapu. W takim przypadku indeks fazy jest zerowany (\textit{breathingPhaseID = 0}), a licznik wykonanych powtórzeń w etapie (\textit{doneReps}) zwiększany jest o jeden. Następnie sprawdzana jest liczba wykonanych powtórzeń w odniesieniu do wartości zdefiniowanej w obiekcie etapu (\textit{currentTrainingStage.reps}). W przypadku jej osiągnięcia następuje przejście do kolejnego etapu treningu poprzez inkrementację indeksu \textit{trainingStageID}. Jeżeli po tej operacji indeks ten osiągnie wartość równą liczbie wszystkich etapów w strukturze treningu, funkcja zwraca \textit{null}, sygnalizując zakończenie sesji. W przeciwnym razie wczytywany jest nowy etap (\textit{currentTrainingStage = training.trainingStages[trainingStageID]}), a licznik \textit{doneReps} zostaje zresetowany do zera. Gdy aktualna faza nie była ostatnią w cyklu, indeks \textit{breathingPhaseID} jest jedynie zwiększany o jeden. Po ustaleniu poprawnego indeksu do zmiennej \textit{currentBreathingPhase} przypisywana jest odpowiadająca mu faza oddechowa. Kolejnym etapem jest obliczenie rzeczywistego czasu trwania fazy z uwzględnieniem mechanizmu progresji. 
+
+Na podstawie obliczonego czasu tworzona jest zmienna \textit{progressedBreathingPhase}, w której pole \textit{duration} przyjmuje wartość \textit{durationSeconds}, natomiast pozostałe atrybuty (\textit{breathingPhaseType}, \textit{breathType}, \textit{breathDepth}, \textit{sounds}) są kopiowane z obecnej fazy oddechowej.
+
+Funkcja zwraca mapę zawierającą następujące klucze:
+\begin{itemize}
+    \item \textit{breathingPhase} - pełny obiekt fazy,
+    \item \textit{remainingTime} - czas trwania fazy wyrażony w milisekundach,
+    \item \textit{trainingStageName} - nazwę aktualnego etapu treningu.
+\end{itemize}
+
+W ten sposób \textit{nextInstruction()} pełni rolę centralnego mechanizmu sterującego przebiegiem treningu oddechowego, zapewniając poprawne przechodzenie pomiędzy fazami i etapami oraz automatyczne zwiększanie trudności zgodnie z zaimplementowanym modelem progresji liniowej.
+
+\newpage
+\begin{figure}[h]
+\centering
+\begin{lstlisting}[caption={TrainingParser - pobranie instrukcji}, label={code/parser/nextInstruction}]
+  Map<String, dynamic>? nextInstruction() {
+    if (breathingPhaseID == currentTrainingStage.breathingPhases.length - 1) {
+      breathingPhaseID = 0;
+      doneReps++;
+
+      if (doneReps == currentTrainingStage.reps) {
+        trainingStageID++;
+        if (trainingStageID == training.trainingStages.length) {
+          return null;
+        } else {
+          currentTrainingStage = training.trainingStages[trainingStageID];
+          doneReps = 0;
+        }
+      }
+    } else {
+      breathingPhaseID++;
+    }
+
+    currentBreathingPhase = currentTrainingStage.breathingPhases[breathingPhaseID];
+
+    double durationSeconds = currentBreathingPhase.duration + (currentTrainingStage.increment * doneReps);
+
+    final progressedBreathingPhase = breathing_phase.BreathingPhase(
+      duration: durationSeconds,
+      breathingPhaseType: currentBreathingPhase.breathingPhaseType,
+      breathType: currentBreathingPhase.breathType,
+      breathDepth: currentBreathingPhase.breathDepth,
+      sounds: currentBreathingPhase.sounds,
+    );
+
+    return {
+      "breathingPhase": progressedBreathingPhase,
+      "remainingTime": (durationSeconds * 1000).truncate(),
+      "trainingStageName": currentTrainingStage.name,
+    };
+  }
+\end{lstlisting}
+\end{figure}
+
+\subsection{TrainingController}
 \subsection{Kółko}
 \subsection{Instrukcja}
 
