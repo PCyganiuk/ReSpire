@@ -10,6 +10,7 @@ import 'package:respire/components/Global/Step.dart' as breathing_phase;
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -37,6 +38,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     WidgetsBinding.instance.addObserver(this);
     // Ensure sounds are properly propagated to breathing phases
     widget.training.updateSounds();
@@ -144,6 +146,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     WidgetsBinding.instance.removeObserver(this);
     controller?.dispose();
     super.dispose();
