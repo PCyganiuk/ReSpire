@@ -157,7 +157,8 @@
             "training_description_label":"Opis treningu",
             "training_description_hint":"Wpisz opis treningu...",
             "training_preparation_label":"Przygotowanie do treningu",
-            "preparation_duration_label":"Czas przygotowania (s)"
+            "preparation_duration_label":"Czas przygotowania (s)",
+            "preparation_sound_warning": "Czas przygotowania jest ustawiony na 0, a dźwięk przygotowania nie jest pusty. Muzyka zostanie odtworzona w całości."
         },
 
         "Alert":{

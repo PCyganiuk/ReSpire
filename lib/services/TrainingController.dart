@@ -61,7 +61,6 @@ class TrainingController {
     soundManager.stopAllSounds();
     playlistManager = PlaylistManager();
     binauralGenerator = BinauralBeatGenerator();
-    _remainingTime = parser.training.settings.preparationDuration * 1000;
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
 
@@ -77,13 +76,27 @@ class TrainingController {
         'TrainingController: binauralBeatsEnabled=${_settings.binauralBeatsEnabled}');
 
     _preloadBreathingPhases();
-    _currentSound = _sounds.preparationTrack.type != SoundType.none
-        ? _sounds.preparationTrack.name
-        : null;
+    _initializePreparationSound();
 
     // Note: Global playlist will be started after preparation phase
     // See _handlePreparationPhaseEnd()
+  }
 
+  void _initializePreparationSound() async{
+    if(_sounds.preparationTrack.type != SoundType.none)
+    {
+      _currentSound = _sounds.preparationTrack.name;
+      if(_settings.preparationDuration == 0){
+        var duration = await soundManager.getSoundDuration(_currentSound!);
+        _remainingTime = duration!.inMilliseconds;
+      } else {
+        _remainingTime = parser.training.settings.preparationDuration * 1000;
+      }
+      
+    }else {
+      _currentSound = null;
+    }
+    
     _start();
   }
 

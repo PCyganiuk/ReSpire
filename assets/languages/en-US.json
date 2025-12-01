@@ -157,7 +157,8 @@
             "training_description_label":"Training description",
             "training_description_hint":"Describe your training...",
             "training_preparation_label":"Training preparation",
-            "preparation_duration_label":"Preparation time (s)"
+            "preparation_duration_label":"Preparation time (s)",
+            "preparation_sound_warning": "Preparation duration is set to 0 while music is not null. The music will play in its full length."
         },
 
                     

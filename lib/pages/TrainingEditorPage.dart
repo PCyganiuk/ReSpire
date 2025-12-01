@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart';
@@ -933,9 +936,28 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                     color: Colors.black)),
                                           ),
                                           ListTile(
-                                            title: Text(translationProvider
-                                                .getTranslation(
-                                                    "TrainingEditorPage.OtherTab.preparation_duration_label")),
+                                            title: Row(
+                                              children:[Expanded(child:Text(translationProvider
+                                                              .getTranslation("TrainingEditorPage.OtherTab.preparation_duration_label"), overflow: TextOverflow.ellipsis,
+                                                              )),
+                                                              if (widget.training.settings.preparationDuration == 0 && _sounds.preparationTrack.type != SoundType.none)
+                                                  Tooltip(
+                                                    message: translationProvider.getTranslation("TrainingEditorPage.OtherTab.preparation_sound_warning"),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.yellow.shade700,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.07, vertical: 0),
+                                                    triggerMode: TooltipTriggerMode.tap,
+                                                    showDuration: Duration(seconds: 10),
+                                                    textStyle: const TextStyle(color: Colors.black),
+                                                    child: const Icon(
+                                                      Icons.warning,
+                                                      color: Colors.amber,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                              ]),
                                             trailing: Container(
                                               width: 90,
                                               height: 35,
@@ -963,7 +985,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                                 1;
                                                         int newValue =
                                                             (currentValue - 1)
-                                                                .clamp(1, 999);
+                                                                .clamp(0, 999);
                                                         preparationController
                                                                 .text =
                                                             newValue.toString();
