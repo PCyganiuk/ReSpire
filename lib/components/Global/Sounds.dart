@@ -63,6 +63,10 @@ class Sounds {
   @HiveField(11)
   SoundAsset stageChangeSound = SoundManager.shortSounds["Bell"]!;
 
+  /// Sound played between cycles (repeated stage)
+  @HiveField(12)
+  SoundAsset cycleChangeSound = SoundManager.shortSounds["Beep"]!;
+
   void clearUserSound(String soundName) {
     if (countingSound.name == soundName) {
       countingSound = SoundAsset();
@@ -80,6 +84,10 @@ class Sounds {
 
     for (var stage in stagePlaylists.keys) {
       stagePlaylists[stage]!.removeWhere((sound) => sound.name == soundName);
+    }
+
+    if(cycleChangeSound.name == soundName) {
+      cycleChangeSound = SoundAsset();
     }
 
     breathingPhaseCues.forEach((key, value) {

@@ -203,10 +203,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               ElevatedButton(
-                child: Text(
-                  translationProvider.getTranslation("PopupButton.save"),
-                  style: TextStyle(color: Colors.white),
-                ),
                 style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
                 onPressed: () {
                   String text = tempController.text.trim();
@@ -223,6 +219,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                   });
                   Navigator.of(context).pop();
                 },
+                child: Text(
+                  translationProvider.getTranslation("PopupButton.save"),
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -534,7 +534,28 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 }),
                                             includeVoiceOption: false,
                                             blueBorder: true,
-                                            isSoundSelection: true)],
+                                            isSoundSelection: true),
+
+                                        SoundSelectionRow(
+                                            labelStyle: TextStyle(
+                                                color: darkerblue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14, 
+                                                overflow: TextOverflow.ellipsis),
+                                            label: translationProvider
+                                                .getTranslation(
+                                                    "TrainingEditorPage.SoundsTab.TrainingSounds.cycle_change_sound"),
+                                            selectedValue:
+                                                _sounds.cycleChangeSound,
+                                            soundListType:
+                                                SoundListType.shortSounds,
+                                            onChanged: (v) => setState(() {
+                                                  _sounds.cycleChangeSound = v;
+                                                }),
+                                            includeVoiceOption: false,
+                                            blueBorder: true,
+                                            isSoundSelection: true)
+                                            ],
                                       ),
                                     ),
                                   ),
