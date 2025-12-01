@@ -68,7 +68,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void addTrainingStage() {
     setState(() {
       trainingStages.add(TrainingStage(
-          reps: 3,
+          reps: 1,
           breathingPhases: [],
           increment: 0,
           name:
