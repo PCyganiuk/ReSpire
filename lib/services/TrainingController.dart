@@ -39,6 +39,7 @@ class TrainingController {
   int _remainingTime = 0; //in milliseconds
   int _nextRemainingTime = 0; //in milliseconds
   int _newBreathingPhaseRemainingTime = 0; //in milliseconds
+  late int _endingDuration;
 
   bool end = false;
   bool _finishedLoadingSteps = false;
@@ -55,6 +56,9 @@ class TrainingController {
   late BinauralBeatGenerator binauralGenerator;
   bool _isUsingPlaylist = false;
   bool _preparationPhaseCompleted = false;
+  bool _endingInitiated = false;
+
+  late BuildContext _context;
 
   TranslationProvider translationProvider = TranslationProvider();
 
@@ -65,7 +69,6 @@ class TrainingController {
     soundManager.stopAllSounds();
     playlistManager = PlaylistManager();
     binauralGenerator = BinauralBeatGenerator();
-    _remainingTime = parser.training.settings.preparationDuration * 1000;
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
     showLabels.value = false;
@@ -84,14 +87,40 @@ class TrainingController {
         'TrainingController: binauralBeatsEnabled=${_settings.binauralBeatsEnabled}');
 
     _preloadBreathingPhases();
-    _currentSound = _sounds.preparationTrack.type != SoundType.none
-        ? _sounds.preparationTrack.name
-        : null;
+    _initializePreparationSound();
+    _loadEndingSoundDuration();
 
     // Note: Global playlist will be started after preparation phase
     // See _handlePreparationPhaseEnd()
+  }
 
+  void setContext(BuildContext context) {
+    _context = context;
+  }
+
+  void _initializePreparationSound() async {
+
+    bool hasSound = _sounds.preparationTrack.type != SoundType.none;
+    _currentSound = hasSound ? _sounds.preparationTrack.name : null;
+
+    if (_settings.preparationDuration == 0 && hasSound)
+    {
+      var duration = await soundManager.getSoundDuration(_currentSound!);
+      _remainingTime = duration!.inMilliseconds;
+    } else {
+      _remainingTime = _settings.preparationDuration * 1000;
+    }
+    
+    second.value = _remainingTime ~/ 1000;
     _start();
+  }
+
+  void _loadEndingSoundDuration() async {
+    if(_settings.endingDuration == 0 && _sounds.endingTrack.type != SoundType.none) {
+        _endingDuration = (await soundManager.getSoundDuration(_sounds.endingTrack.name))!.inMilliseconds;
+    } else {
+      _endingDuration = _settings.endingDuration * 1000;
+    }
   }
 
   void _preloadBreathingPhases() {
@@ -151,6 +180,14 @@ class TrainingController {
 
   void pause() {
     isPaused.value = true;
+
+    if(!_preparationPhaseCompleted || _endingInitiated)
+    {
+      soundManager.pauseSound(_currentSound);
+      _timer?.cancel();
+      return;
+    }
+
     // to account for some longer counting sounds
     //(that are not stored in the _currentSound)
     soundManager.stopAllSounds();
@@ -165,10 +202,17 @@ class TrainingController {
 
   void resume() {
     isPaused.value = false;
+
+    if(!_preparationPhaseCompleted || _endingInitiated)
+    {
+      soundManager.playSound(_currentSound);
+      _timer?.cancel();
+      _start();
+      return;
+    }
+
     if (_isUsingPlaylist) {
       playlistManager.resumePlaylist();
-    } else if (_currentSound != null) {
-      //soundManager.playSound(_currentSound!); //TODO: Delete once the playlist is working properly
     }
     if (_settings.binauralBeatsEnabled) {
       binauralGenerator.resume();
@@ -288,7 +332,6 @@ class TrainingController {
     DateTime lastTick = DateTime.now();
     soundManager.playSound(_currentSound);
     bool skipFirstCounting = false;
-    //TODO: Handle distinguishing when are we playing a playlist and when a single sound. Maybe by checking the return type?
 
     _timer =
         Timer.periodic(Duration(milliseconds: _updateInterval), (Timer timer) {
@@ -299,7 +342,10 @@ class TrainingController {
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
         previousSecond = _remainingTime ~/ 1000;
         second.value = previousSecond;
-        if(!skipFirstCounting){ //skip the sound for the first counting after phase change to avoid overlapping sounds or playing them too frequently (eg. when phase duration is 1.5s it would play for 2s and 1s)
+        if(!skipFirstCounting && // skip counting to avoid overlapping and too frequent sounds
+        ((!_preparationPhaseCompleted && _sounds.preparationTrack.type == SoundType.none) || // play during preparation if no sound was set
+         (_preparationPhaseCompleted && !_endingInitiated) || // play mid training 
+         (_endingInitiated && _sounds.endingTrack.type == SoundType.none))){ // play during ending if no sound was set
           _playCountingSound(previousSecond);
         }else{
           skipFirstCounting = false;
@@ -337,7 +383,7 @@ class TrainingController {
         //second.value = 0;
       }
 
-      if (_remainingTime == 0 && _stopTimer != 0) {
+      if (_remainingTime == 0) {
         breathingPhasesCount.value++;
 
         if (breathingPhasesCount.value == 1 && _settings.binauralBeatsEnabled) {
@@ -379,6 +425,11 @@ class TrainingController {
         }
 
         if (_remainingTime == 0) {
+          if (_endingInitiated){
+                second.value = 0;
+                end = true;
+                Navigator.pop(_context);
+          }
           if (_finishedLoadingSteps) {
             final removedPhase = breathingPhasesQueue.value.removeFirst();
             _logQueue('REMOVE', phase: removedPhase);
@@ -390,9 +441,13 @@ class TrainingController {
             _logQueue('REBUILD');
             _stopTimer--;
 
-            if (_stopTimer == 0) {
-              second.value = 0;
-              end = true;
+            if (_stopTimer == 0) { // We've gone through all phases
+              
+              _endingInitiated = true; // Ending triggered
+              _remainingTime = _endingDuration;
+              _currentSound = _sounds.endingTrack.name;
+              previousSecond = (_remainingTime ~/ 1000)+1;
+              skipFirstCounting = true;
 
               if (_isUsingPlaylist) {
                 playlistManager.completePlaylist();
@@ -401,6 +456,7 @@ class TrainingController {
 
               showLabels.value = false;
               _playEndingSound(_sounds.endingTrack.name, 500);
+              
             } else {
               _remainingTime = _nextRemainingTime;
               previousSecond = (_remainingTime ~/ 1000)+1;
