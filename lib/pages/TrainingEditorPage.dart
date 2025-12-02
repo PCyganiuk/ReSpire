@@ -944,13 +944,15 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   Tooltip(
                                                     message: translationProvider.getTranslation("TrainingEditorPage.OtherTab.preparation_sound_warning"),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.yellow.shade700,
-                                                      borderRadius: BorderRadius.circular(8),
+                                                      color: mediumblue,
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      border: Border.all(color: darkerblue, width: 2),
                                                     ),
                                                     margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.07, vertical: 0),
                                                     triggerMode: TooltipTriggerMode.tap,
                                                     showDuration: Duration(seconds: 10),
-                                                    textStyle: const TextStyle(color: Colors.black),
+                                                    textStyle: const TextStyle(color: darkblue, fontWeight: FontWeight.w500),
+                                                    textAlign: TextAlign.center,
                                                     child: const Icon(
                                                       Icons.warning,
                                                       color: Colors.amber,
