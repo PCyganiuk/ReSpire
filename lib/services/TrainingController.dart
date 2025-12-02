@@ -305,7 +305,7 @@ class TrainingController {
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
         previousSecond = _remainingTime ~/ 1000;
         second.value = previousSecond;
-        if(!skipFirstCounting){ //skip the sound for the first counting after phase change to avoid overlapping sounds or playing them too frequently (eg. when phase duration is 1.5s it would play for 2s and 1s)
+        if(!skipFirstCounting && _preparationPhaseCompleted){ //skip the sound for the first counting after phase change to avoid overlapping sounds or playing them too frequently (eg. when phase duration is 1.5s it would play for 2s and 1s)
           _playCountingSound(previousSecond);
         }else{
           skipFirstCounting = false;
