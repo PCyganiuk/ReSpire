@@ -21,6 +21,8 @@ class SoundScopeAdapter extends TypeAdapter<SoundScope> {
         return SoundScope.perStage;
       case 3:
         return SoundScope.perPhase;
+      case 4:
+        return SoundScope.perEveryPhaseInEveryStage;
       default:
         return SoundScope.none;
     }
@@ -40,6 +42,9 @@ class SoundScopeAdapter extends TypeAdapter<SoundScope> {
         break;
       case SoundScope.perPhase:
         writer.writeByte(3);
+        break;
+      case SoundScope.perEveryPhaseInEveryStage:
+        writer.writeByte(4);
         break;
     }
   }

@@ -201,6 +201,8 @@ class TrainingJsonConverter {
         return "perStage";
       case SoundScope.perPhase:
         return "perPhase";
+      case SoundScope.perEveryPhaseInEveryStage:
+        return "perEveryPhaseInEveryStage";
     }
   }
   
@@ -285,6 +287,8 @@ class TrainingJsonConverter {
         return SoundScope.perStage;
       case "perPhase":
         return SoundScope.perPhase;
+      case "perEveryPhaseInEveryStage":
+        return SoundScope.perEveryPhaseInEveryStage;
       default:
         return SoundScope.none;
     }

@@ -212,7 +212,8 @@
         "none":"Brak",
         "global":"Na cały trening",
         "perStage":"Dla etapów treningu",
-        "perPhase":"Dla każdej fazy oddechowej"
+        "perPhase":"Dla każdej fazy oddechowej",
+        "perEveryPhaseInEveryStage":"Dla faz w etapie"
     },
 
     "FilePicker":{

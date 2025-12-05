@@ -318,10 +318,13 @@ class TrainingController {
       }
     }
 
-    if (_sounds.backgroundSoundScope == SoundScope.perPhase) {
+    if (_sounds.backgroundSoundScope == SoundScope.perPhase || 
+        _sounds.backgroundSoundScope == SoundScope.perEveryPhaseInEveryStage) {
       if (_currentSound != null) {
         await soundManager.pauseSoundFadeOut(_currentSound, changeTime); // we have to use both for some unknown reason, do not remove any
-        await soundManager.stopSound(_currentSound);
+        if(_currentSound == "Odliczanie"){
+          await soundManager.stopSound(_currentSound);
+        }
       }
       _currentSound = nextBackgroundSound;
       if (nextBackgroundSound != null) {
