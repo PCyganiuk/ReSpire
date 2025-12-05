@@ -448,6 +448,7 @@ class TrainingController {
             if (_stopTimer == 0) { // We've gone through all phases
               
               _endingInitiated = true; // Ending triggered
+              _playShortSound(parser.training.sounds.stageChangeSound.name);
               _remainingTime = _endingDuration;
               _currentSound = _sounds.endingTrack.name;
               previousSecond = (_remainingTime ~/ 1000)+1;
