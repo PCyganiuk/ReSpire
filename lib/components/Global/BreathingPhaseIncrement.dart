@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-part 'StepIncrement.g.dart';
+part 'BreathingPhaseIncrement.g.dart';
 
 @HiveType(typeId: 5)
 enum BreathingPhaseIncrementType {

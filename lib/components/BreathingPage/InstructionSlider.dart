@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/Step.dart' as breathing_phase;
+import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'dart:developer' as dev;
 

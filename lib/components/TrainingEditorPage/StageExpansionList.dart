@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/Phase.dart';
+import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
 

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'Step.dart';
+part of 'BreathingPhase.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

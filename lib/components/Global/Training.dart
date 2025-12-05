@@ -1,10 +1,10 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:respire/components/Global/Phase.dart';
+import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
-import 'package:respire/components/Global/Step.dart';
+import 'package:respire/components/Global/BreathingPhase.dart';
 
 part 'Training.g.dart';
 

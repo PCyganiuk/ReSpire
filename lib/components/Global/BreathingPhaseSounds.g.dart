@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'PhaseSounds.dart';
+part of 'BreathingPhaseSounds.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

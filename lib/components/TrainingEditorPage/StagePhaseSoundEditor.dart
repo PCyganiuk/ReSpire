@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/Phase.dart';
+import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
-import 'package:respire/components/Global/Step.dart';
+import 'package:respire/components/Global/BreathingPhase.dart';
 import 'package:respire/components/TrainingEditorPage/SoundSelectionRow.dart';
 import 'package:respire/components/TrainingEditorPage/StageExpansionList.dart';
 import 'package:respire/services/SoundManagers/ISoundManager.dart';

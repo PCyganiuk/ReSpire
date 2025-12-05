@@ -7,7 +7,7 @@ import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
-import 'package:respire/components/Global/Step.dart' as breathing_phase;
+import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
 import 'package:respire/services/BinauralBeatGenerator.dart';
 import 'package:respire/services/SoundManagers/PlaylistManager.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
@@ -42,7 +42,7 @@ class TrainingController {
   late int _endingDuration;
 
   bool end = false;
-  bool _finishedLoadingSteps = false;
+  bool _finishedLoadingBreathingPhases = false;
   bool _nextPhaseSoundPlayed = false;
   int _stopTimer = 2;
 
@@ -137,7 +137,7 @@ class TrainingController {
   void _fetchNextBreathingPhase() {
     var instructionData = parser.nextInstruction();
     if (instructionData == null) {
-      _finishedLoadingSteps = true;
+      _finishedLoadingBreathingPhases = true;
       breathingPhasesQueue.value.add(null);
       _logQueue('ADD (finish)', phase: null);
       _trainingStageNameQueue.add(null);
@@ -437,7 +437,7 @@ class TrainingController {
                 end = true;
                 Navigator.pop(_context);
           }
-          if (_finishedLoadingSteps) {
+          if (_finishedLoadingBreathingPhases) {
             final removedPhase = breathingPhasesQueue.value.removeFirst();
             _logQueue('REMOVE', phase: removedPhase);
             breathingPhasesQueue.value.add(null);
