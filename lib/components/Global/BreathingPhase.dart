@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:respire/components/Global/PhaseSounds.dart';
-import 'package:respire/components/Global/StepIncrement.dart';
+import 'package:respire/components/Global/BreathingPhaseSounds.dart';
+import 'package:respire/components/Global/BreathingPhaseIncrement.dart';
 
-part 'Step.g.dart';
+part 'BreathingPhase.g.dart';
 
 @HiveType(typeId: 3)
 enum BreathingPhaseType { 

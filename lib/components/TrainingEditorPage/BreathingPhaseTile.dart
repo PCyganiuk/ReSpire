@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:respire/components/Global/Step.dart' as respire;
+import 'package:respire/components/Global/BreathingPhase.dart' as respire;
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -21,7 +21,7 @@ class CommaToDecimalFormatter extends TextInputFormatter {
 
 class BreathingPhaseTile extends StatefulWidget {
   final respire.BreathingPhase breathingPhase;
-  final Function(respire.BreathingPhase newStep) onBreathingPhaseChanged;
+  final Function(respire.BreathingPhase newBreathingPhase) onBreathingPhaseChanged;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
 

@@ -213,7 +213,8 @@
         "none":"None",
         "global":"For whole training",
         "perStage":"For training stages",
-        "perPhase":"For each breathing phase"
+        "perPhase":"For each breathing phase",
+        "perEveryPhaseInEveryStage":"For phases in stage"
     },
 
     "FilePicker":{

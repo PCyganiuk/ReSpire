@@ -3,9 +3,9 @@ import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Training.dart';
-import 'package:respire/components/Global/Phase.dart';
-import 'package:respire/components/Global/Step.dart';
-import 'package:respire/components/Global/StepIncrement.dart';
+import 'package:respire/components/Global/TrainingStage.dart';
+import 'package:respire/components/Global/BreathingPhase.dart';
+import 'package:respire/components/Global/BreathingPhaseIncrement.dart';
 import 'package:respire/components/Global/Settings.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:uuid/uuid.dart';
@@ -201,6 +201,8 @@ class TrainingJsonConverter {
         return "perStage";
       case SoundScope.perPhase:
         return "perPhase";
+      case SoundScope.perEveryPhaseInEveryStage:
+        return "perEveryPhaseInEveryStage";
     }
   }
   
@@ -285,6 +287,8 @@ class TrainingJsonConverter {
         return SoundScope.perStage;
       case "perPhase":
         return SoundScope.perPhase;
+      case "perEveryPhaseInEveryStage":
+        return SoundScope.perEveryPhaseInEveryStage;
       default:
         return SoundScope.none;
     }

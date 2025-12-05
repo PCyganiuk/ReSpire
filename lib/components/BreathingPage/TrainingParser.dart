@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:respire/components/Global/Phase.dart';
-import 'package:respire/components/Global/Step.dart' as breathing_phase;
+import 'package:respire/components/Global/TrainingStage.dart';
+import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
 import 'package:respire/components/Global/Training.dart';
 
 class TrainingParser {
