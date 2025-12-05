@@ -372,6 +372,7 @@ class _TrainingPageState extends State<TrainingPage> {
                 setState(() {});
                 Navigator.pop(context, true);
               },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: Text(translationProvider.getTranslation("PopupButton.delete")),
             ),
           ],
@@ -389,7 +390,9 @@ class _TrainingPageState extends State<TrainingPage> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(translationProvider.getTranslation('TrainingPage.export_success')),
+            content: Text(translationProvider.getTranslation('TrainingPage.export_success'), 
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, color: Colors.white),),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
           ),

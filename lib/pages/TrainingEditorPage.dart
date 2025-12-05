@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/Step.dart';
@@ -32,11 +33,13 @@ class TrainingEditorPage extends StatefulWidget {
 class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late List<TrainingStage> trainingStages;
   late Settings settings;
-  late TextEditingController preparationController;
   late TextEditingController descriptionController;
+  late TextEditingController preparationController;
+  late TextEditingController endingController;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _descriptionFocusNode = FocusNode();
   FocusNode? preparationFocusNode = FocusNode();
+  FocusNode? endingFocusNode = FocusNode();
 
   int _selectedTab = 0;
   late Sounds _sounds;
@@ -52,6 +55,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     _sounds = widget.training.sounds;
     descriptionController =
         TextEditingController(text: widget.training.description);
+
     preparationController = TextEditingController(
         text: widget.training.settings.preparationDuration.toString());
     preparationFocusNode = FocusNode();
@@ -63,12 +67,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         }
       }
     });
+
+    endingController = TextEditingController(
+        text: widget.training.settings.endingDuration.toString());
+    endingFocusNode = FocusNode();
+    endingFocusNode!.addListener(() {
+      if (!(endingFocusNode?.hasFocus ?? true)) {
+        final value = int.tryParse(endingController.text);
+        if (value != null && value > 0) {
+          setState(() => widget.training.settings.endingDuration = value);
+        }
+      }
+    });
   }
 
   void addTrainingStage() {
     setState(() {
       trainingStages.add(TrainingStage(
-          reps: 3,
+          reps: 1,
           breathingPhases: [],
           increment: 0,
           name:
@@ -109,7 +125,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
               },
               child: Text(
                   translationProvider.getTranslation("PopupButton.remove"),
-                  style: TextStyle(color: darkerblue)),
+                  style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -136,6 +152,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     descriptionController.dispose();
     _descriptionFocusNode.dispose();
     preparationFocusNode?.dispose();
+    endingFocusNode?.dispose();
     super.dispose();
   }
 
@@ -203,10 +220,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               ElevatedButton(
-                child: Text(
-                  translationProvider.getTranslation("PopupButton.save"),
-                  style: TextStyle(color: Colors.white),
-                ),
                 style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
                 onPressed: () {
                   String text = tempController.text.trim();
@@ -223,6 +236,10 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                   });
                   Navigator.of(context).pop();
                 },
+                child: Text(
+                  translationProvider.getTranslation("PopupButton.save"),
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -532,9 +549,30 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             onChanged: (v) => setState(() {
                                                   _sounds.stageChangeSound = v;
                                                 }),
-                                            includeVoiceOption: true,
+                                            includeVoiceOption: false,
                                             blueBorder: true,
-                                            isSoundSelection: true)],
+                                            isSoundSelection: true),
+
+                                        SoundSelectionRow(
+                                            labelStyle: TextStyle(
+                                                color: darkerblue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14, 
+                                                overflow: TextOverflow.ellipsis),
+                                            label: translationProvider
+                                                .getTranslation(
+                                                    "TrainingEditorPage.SoundsTab.TrainingSounds.cycle_change_sound"),
+                                            selectedValue:
+                                                _sounds.cycleChangeSound,
+                                            soundListType:
+                                                SoundListType.shortSounds,
+                                            onChanged: (v) => setState(() {
+                                                  _sounds.cycleChangeSound = v;
+                                                }),
+                                            includeVoiceOption: false,
+                                            blueBorder: true,
+                                            isSoundSelection: true)
+                                            ],
                                       ),
                                     ),
                                   ),
@@ -853,6 +891,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  //Preparation
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
@@ -933,9 +972,30 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                     color: Colors.black)),
                                           ),
                                           ListTile(
-                                            title: Text(translationProvider
-                                                .getTranslation(
-                                                    "TrainingEditorPage.OtherTab.preparation_duration_label")),
+                                            title: Row(
+                                              children:[Expanded(child:Text(translationProvider
+                                                              .getTranslation("TrainingEditorPage.OtherTab.preparation_duration_label"), overflow: TextOverflow.ellipsis,
+                                                              )),
+                                                              if (widget.training.settings.preparationDuration == 0 && _sounds.preparationTrack.type != SoundType.none)
+                                                  Tooltip(
+                                                    message: translationProvider.getTranslation("TrainingEditorPage.OtherTab.preparation_sound_warning"),
+                                                    decoration: BoxDecoration(
+                                                      color: mediumblue,
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      border: Border.all(color: darkerblue, width: 2),
+                                                    ),
+                                                    margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.07, vertical: 0),
+                                                    triggerMode: TooltipTriggerMode.tap,
+                                                    showDuration: Duration(seconds: 10),
+                                                    textStyle: const TextStyle(color: darkblue, fontWeight: FontWeight.w500),
+                                                    textAlign: TextAlign.center,
+                                                    child: const Icon(
+                                                      Icons.warning,
+                                                      color: Colors.amber,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                              ]),
                                             trailing: Container(
                                               width: 90,
                                               height: 35,
@@ -963,7 +1023,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                                 1;
                                                         int newValue =
                                                             (currentValue - 1)
-                                                                .clamp(1, 999);
+                                                                .clamp(0, 999);
                                                         preparationController
                                                                 .text =
                                                             newValue.toString();
@@ -987,7 +1047,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   Expanded(
                                                     child: Center(
                                                       child: TextField(
-                                                        key: ValueKey('reps_${widget.training.hashCode}'),
+                                                        key: ValueKey('preparation_${widget.training.hashCode}'),
                                                         controller: preparationController,
                                                         focusNode: preparationFocusNode,
                                                         keyboardType: TextInputType.number,
@@ -995,6 +1055,30 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                         inputFormatters: [
                                                           FilteringTextInputFormatter.digitsOnly,
                                                         ],
+                                                        onChanged: (value) {
+                                                          int newValue = int.tryParse(value) ?? 0;
+                                                          setState(() {
+                                                            widget.training.settings.preparationDuration = newValue;
+                                                          });
+                                                        },
+                                                        onTapOutside: (event) {
+                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                          if (preparationController.text.isEmpty) {
+                                                            setState(() {
+                                                              widget.training.settings.preparationDuration = 0;
+                                                              preparationController.text = "0";
+                                                            });
+                                                          }
+                                                        },
+                                                        onEditingComplete: () => {
+                                                          FocusManager.instance.primaryFocus?.unfocus(),
+                                                          if (preparationController.text.isEmpty) {
+                                                            setState(() {
+                                                              widget.training.settings.preparationDuration = 0;
+                                                              preparationController.text = "0";
+                                                            })
+                                                          }
+                                                        },
                                                         decoration: InputDecoration(
                                                           border: InputBorder.none,
                                                           contentPadding: EdgeInsets.zero,
@@ -1031,6 +1115,192 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                                   .training
                                                                   .settings
                                                                   .preparationDuration =
+                                                              newValue;
+                                                        });
+                                                      },
+                                                      child: const Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8),
+                                                        child: Icon(Icons.add,
+                                                            size: 16),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  //Ending 
+                                  SizedBox(height: 12),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    elevation: 2,
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                                translationProvider.getTranslation(
+                                                    "TrainingEditorPage.OtherTab.training_ending_label"),
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)),
+                                          ),
+                                          ListTile(
+                                            title: Row(
+                                              children:[Expanded(child:Text(translationProvider
+                                                              .getTranslation("TrainingEditorPage.OtherTab.ending_duration_label"), overflow: TextOverflow.ellipsis,
+                                                              )),
+                                                              if (widget.training.settings.endingDuration == 0 && _sounds.endingTrack.type != SoundType.none)
+                                                  Tooltip(
+                                                    message: translationProvider.getTranslation("TrainingEditorPage.OtherTab.ending_sound_warning"),
+                                                    decoration: BoxDecoration(
+                                                      color: mediumblue,
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      border: Border.all(color: darkerblue, width: 2),
+                                                    ),
+                                                    margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.07, vertical: 0),
+                                                    triggerMode: TooltipTriggerMode.tap,
+                                                    showDuration: Duration(seconds: 10),
+                                                    textStyle: const TextStyle(color: darkblue, fontWeight: FontWeight.w500),
+                                                    textAlign: TextAlign.center,
+                                                    child: const Icon(
+                                                      Icons.warning,
+                                                      color: Colors.amber,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                              ]),
+                                            trailing: Container(
+                                              width: 90,
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(18),
+                                                border: Border.all(
+                                                    color: darkerblue,
+                                                    width: 2),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              18),
+                                                      onTap: () {
+                                                        int currentValue =
+                                                            int.tryParse(
+                                                                    endingController
+                                                                        .text) ??
+                                                                1;
+                                                        int newValue =
+                                                            (currentValue - 1)
+                                                                .clamp(0, 999);
+                                                        endingController
+                                                                .text =
+                                                            newValue.toString();
+                                                        setState(() {
+                                                          widget
+                                                                  .training
+                                                                  .settings
+                                                                  .endingDuration =
+                                                              newValue;
+                                                        });
+                                                      },
+                                                      child: const Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8),
+                                                        child: Icon(
+                                                            Icons.remove,
+                                                            size: 16),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Center(
+                                                      child: TextField(
+                                                        key: ValueKey('ending_${widget.training.hashCode}'),
+                                                        controller: endingController,
+                                                        focusNode: endingFocusNode,
+                                                        keyboardType: TextInputType.number,
+                                                        textAlign: TextAlign.center,
+                                                        inputFormatters: [
+                                                          FilteringTextInputFormatter.digitsOnly,
+                                                        ],
+                                                        onChanged: (value) {
+                                                          int newValue = int.tryParse(value) ?? 0;
+                                                          setState(() {
+                                                            widget.training.settings.endingDuration = newValue;
+                                                          });
+                                                        },
+                                                        onTapOutside: (event) {
+                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                          if (endingController.text.isEmpty) {
+                                                            setState(() {
+                                                              widget.training.settings.endingDuration = 0;
+                                                              endingController.text = "0";
+                                                            });
+                                                          }
+                                                        },
+                                                        onEditingComplete: () => {
+                                                          FocusManager.instance.primaryFocus?.unfocus(),
+                                                          if (endingController.text.isEmpty) {
+                                                            setState(() {
+                                                              widget.training.settings.endingDuration = 0;
+                                                              endingController.text = "0";
+                                                            })
+                                                          }
+                                                        },
+                                                        decoration: InputDecoration(
+                                                          border: InputBorder.none,
+                                                          contentPadding: EdgeInsets.zero,
+                                                          isDense: true,
+                                                        ),
+                                                        style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              18),
+                                                      onTap: () {
+                                                        int currentValue =
+                                                            int.tryParse(
+                                                                    endingController
+                                                                        .text) ??
+                                                                1;
+                                                        int newValue =
+                                                            (currentValue + 1)
+                                                                .clamp(1, 999);
+                                                        endingController
+                                                                .text =
+                                                            newValue.toString();
+                                                        setState(() {
+                                                          widget
+                                                                  .training
+                                                                  .settings
+                                                                  .endingDuration =
                                                               newValue;
                                                         });
                                                       },

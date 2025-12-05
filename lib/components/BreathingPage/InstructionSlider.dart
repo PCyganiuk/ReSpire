@@ -16,10 +16,11 @@ class InstructionBlock {
 class InstructionSlider extends StatefulWidget {
 
   double preparationTime;
+  double endingTime;
   Queue<breathing_phase.BreathingPhase?> breathingPhasesQueue = Queue<breathing_phase.BreathingPhase?>();
   int change; 
 
-  InstructionSlider({super.key,required this.preparationTime,  required this.breathingPhasesQueue, required this.change});
+  InstructionSlider({super.key,required this.preparationTime, required this.endingTime, required this.breathingPhasesQueue, required this.change});
 
   @override
   State<InstructionSlider> createState() => InstructionSliderState();
@@ -105,7 +106,7 @@ class InstructionSliderState extends State<InstructionSlider>
       _logSlider('phase duration', detail: 'Duration: $phaseDuration ms');
       _controller.duration = Duration(milliseconds: min(phaseDuration,400));
       _controller.forward();
-      if(_blocks.last.text!=translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text")) {
+      if(!_blocks.last.text.startsWith(translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text"))) {
         addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2));
       }
     }
@@ -119,7 +120,7 @@ class InstructionSliderState extends State<InstructionSlider>
 
   void addNewBreathingPhase(breathing_phase.BreathingPhase? breathingPhase) {
     final double position = _blocks.isEmpty ? 0.0 : _blocks.last.position + 1.0;
-    String breathingPhaseName = breathingPhase==null ? translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text") : _breathingPhaseType(breathingPhase);
+    String breathingPhaseName = breathingPhase==null ? translationProvider.getTranslation("BreathingPage.InstructionSlider.ending_tile_text") + "\n${widget.endingTime} s" : _breathingPhaseType(breathingPhase);
     _blocks.add(
       InstructionBlock(
         text: breathingPhaseName, 
@@ -133,16 +134,6 @@ class InstructionSliderState extends State<InstructionSlider>
     return str[0].toUpperCase() + str.substring(1);
   }
 
-   String _breathDepth(breathing_phase.BreathingPhase? breathingPhase) {
-    if (breathingPhase!.breathDepth == null) return "";
-    return _firstToUpperCase(breathingPhase.breathDepth!.name);
-  }
-
-  String _breathType(breathing_phase.BreathingPhase? breathingPhase) {
-    if (breathingPhase!.breathType == null) return "";
-    return _firstToUpperCase(translationProvider.getTranslation("BreathingPhaseType.${breathingPhase.breathType!.name}"));
-  }
-
   String _breathingPhaseType(breathing_phase.BreathingPhase? breathingPhase) {
     if (breathingPhase == null) return "";
 
@@ -152,14 +143,6 @@ class InstructionSliderState extends State<InstructionSlider>
 
       case breathing_phase.BreathingPhaseType.inhale:
       case breathing_phase.BreathingPhaseType.exhale:
-        if (breathingPhase.breathType!=null) {
-          str += "\n${_breathType(breathingPhase)}";
-        }
-        if (breathingPhase.breathDepth!=null) {
-          str += "\n${_breathDepth(breathingPhase)}";
-        }
-        break;
-
       default:
         break;  
     }
