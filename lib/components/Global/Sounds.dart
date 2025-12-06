@@ -63,12 +63,16 @@ class Sounds {
   @HiveField(11)
   Map<String, Map<BreathingPhaseType, SoundAsset>> perEveryPhaseBreathingPhaseBackgrounds = {};
 
-  /// Sound played between stages
+  /// Short sounds for each breathing phase in every stage
   @HiveField(12)
+  Map<String, Map<BreathingPhaseType, SoundAsset>> perEveryPhaseBreathingPhaseCues = {};
+
+  /// Sound played between stages
+  @HiveField(13)
   SoundAsset stageChangeSound = SoundManager.shortSounds["Bell"]!;
 
   /// Sound played between cycles (repeated stage)
-  @HiveField(13)
+  @HiveField(14)
   SoundAsset cycleChangeSound = SoundManager.shortSounds["Beep"]!;
 
   void clearUserSound(String soundName) {

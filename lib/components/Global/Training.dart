@@ -62,7 +62,6 @@ class Training {
     switch (sounds.nextSoundScope) {
       case SoundScope.none:
       case SoundScope.perStage:
-      case SoundScope.perEveryPhaseInEveryStage:
         break;
 
       case SoundScope.global:
@@ -90,9 +89,27 @@ class Training {
             }
           }
         }
+        break;
 
-        
-
+      case SoundScope.perEveryPhaseInEveryStage:
+        for (int i=0; i<trainingStages.length; i++) {
+          for (var phase in trainingStages[i].breathingPhases){
+            switch(phase.breathingPhaseType) {
+              case BreathingPhaseType.inhale:
+                phase.sounds.preBreathingPhase = sounds.perEveryPhaseBreathingPhaseCues[trainingStages[i].id]?[BreathingPhaseType.inhale] ?? SoundAsset();
+                break;
+              case BreathingPhaseType.retention:
+                phase.sounds.preBreathingPhase = sounds.perEveryPhaseBreathingPhaseCues[trainingStages[i].id]?[BreathingPhaseType.retention] ?? SoundAsset();
+                break;
+              case BreathingPhaseType.exhale:
+                phase.sounds.preBreathingPhase = sounds.perEveryPhaseBreathingPhaseCues[trainingStages[i].id]?[BreathingPhaseType.exhale] ?? SoundAsset();
+                break;
+              case BreathingPhaseType.recovery:
+                phase.sounds.preBreathingPhase = sounds.perEveryPhaseBreathingPhaseCues[trainingStages[i].id]?[BreathingPhaseType.recovery] ?? SoundAsset();
+                break;
+            }
+          }
+        }
         break; 
 
     }

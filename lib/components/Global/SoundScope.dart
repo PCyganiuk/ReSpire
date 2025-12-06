@@ -38,6 +38,6 @@ extension SoundScopeX on SoundScope {
   }
 
   static List<SoundScope> get nextPhaseScopeValues {
-    return SoundScope.values.where((scope) => scope != SoundScope.perStage && scope != SoundScope.perEveryPhaseInEveryStage).toList();
+    return SoundScope.values.where((scope) => scope != SoundScope.perStage).toList();
   }
 }
