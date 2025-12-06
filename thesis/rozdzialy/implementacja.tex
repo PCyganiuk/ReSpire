@@ -5,23 +5,18 @@ Projekt został wykonany w środowisku Flutter za pomocą zestawu narzędzi dla 
 Aplikacja została napisana w jęzku Dart we frameworku Flutter.
 
 \section{Schemat plików/klas/modułów \Hania\ \Ola\ \Jakub\ \Karol}
+Aplikacja ReSpire charakteryzuje się modułową budową, na którą składają się łącznie 63 pliki źródłowe w języku Dart. Projekt obejmuje 80 klas oraz ponad 400 metod realizujących logikę biznesową i interfejs użytkownika. Całkowity rozmiar projektu wynosi nieco ponad 10 kLOC (ang. Kilo Lines of Code – tysięcy linii kodu), z czego blisko 8900 stanowi tzw. czysty kod, określany jako SLOC (ang. Source Lines of Code). Ze względu na taką złożoność struktury, diagramy klas i architektury zostały w niniejszej dokumentacji podzielone na logiczne fragmenty, aby zachować ich czytelność.
 
-\section{Podział prac w zespole \Jakub}
+\subsection{Klasy treningu} \label{subsec:training_classes}
 
-Prace nad projektem realizowane były przy pełnym zaangażowaniu całego zespołu, którego priorytetem było osiągnięcie wysokiej jakości produktu końcowego. Członkowie grupy dynamicznie reagowali na informacje zwrotne, sprawnie wdrażając sugestie opiekuna oraz nowe koncepcje funkcjonalne. Dzięki bieżącej eliminacji błędów i iteracyjnemu wprowadzaniu udoskonaleń, zapewniono ciągłość procesu wytwórczego oraz stabilny rozwój systemu.
-\newline
-\subsection{Hanna}
-Hanna odpowiadała za projekt oraz implementację kluczowych komponentów służących do optymalizacji procesu pobierania i odtwarzania sesji treningowych - \texttt{TrainingController} oraz \texttt{TrainingParser}. Opracowała również wstępny projekt interfejsu użytkownika w środowisku Figma, który stanowił fundament dla dalszych prac deweloperskich. W warstwie widoku zaimplementowała moduł wizualizacji treningów wraz z walidacją danych wejściowych, a także stworzyła widok szczegółów treningu, stanowiący element nawigacyjny między stroną główną a odtwarzaczem.
+Na trening składa się 12 klas, z czego główną z nich jest \texttt{Training}. Zawiera ona główne informacje o ćwiczeniu takie jak tytuł, czy opis, a także listę etapów, dźwięki i ustawienia. Struktura dźwięków została opisana w rodziale \ref{sec:Sounds}. 
 
-\subsection{Aleksandra}
-Do zadań Aleksandry należało opracowanie kompletnej identyfikacji wizualnej systemu - zaprojektowanie logotypu oraz zdefiniowanie spójnego motywu graficznego aplikacji (dobór kolorystyki i typografii), który stał się obowiązującym standardem dla wszystkich modułów aplikacji. W warstwie implementacyjnej przygotowała widok strony głównej, a także wzbogaciła interfejs użytkownika o animacje, zwiększające dynamikę i interaktywność aplikacji.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{diagramy/class_diagram.png}
+  \caption{Diagram klas treningu}
+\end{figure}
 
-\subsection{Jakub}
-Zadania Jakuba związane były z zaprojektowaniem i implementacją całej warstwy obsługi dźwięku w aplikacji. Jego głównym zadaniem było stworzenie architektury silnika audio, opartej na komponentach \texttt{SoundManager} oraz \texttt{SingleSoundManager}. Aby zapewnić płynność działania interfejsu i uniknąć blokowania głównego wątku aplikacji, zaimplementował on asynchroniczną obsługę odtwarzania multimediów. Ponadto zaprojektował kluczowe struktury danych oraz zaimplementował klasę \texttt{PlaylistManager}, zarządzającą logiką list odtwarzania. Dodatkowo wdrożył mechanizm internacjonalizacji (obsługę wielu języków) oraz funkcjonalność pozwalającą użytkownikom na import własnych plików dźwiękowych.
-
-\subsection{Karol}
-
-Karol był odpowiedzialny za implementację mechanizmu modyfikacji treningów w sposób intuicyjny dla użytkowników, a także za funkcjonalność importu i eksportu treningów. W obszarze przetwarzania sygnałów opracował moduł generujący dudnienia różnicowe (binaural beats). Ponadto zajął się optymalizacją wydajności poprzez wdrożenie mechanizmu ładowania zasobów z~wyprzedzeniem przed uruchomieniem treningu. W warstwie interfejsu stworzył edytor list odtwarzania plików audio.
 
 \section{Edytor treningów}
 
@@ -51,7 +46,7 @@ Proces importu charakteryzuje się elastycznością dzięki dwóm wariantom eksp
 \subsection{Menu - inne}
 
 \section{Przebieg treningu \Hania}
-\subsection{Klasa TrainingParser}
+\subsection{Klasa TrainingParser}\label{subsec:TrainingParser}
 Klasa \texttt{TrainingParser} powstała w celu przekształcenia hierarchicznych danych treningowych pobranych z lokalnej bazy danych Hive w ciąg występujących po sobie faz, oparty na skonfigurowanym uprzednio przez użytkownika wzorcu oddychania. Jej zadaniem jest zwracanie kolejnych faz do obiektu \texttt{TrainingController}. Dzięki temu logika przełączania faz i powtórzeń jest odseparowana od interfejsu. 
 
 Konstruktor jako parametr przyjmuje obiekt klasy \texttt{Training} i zapisuje do zmiennej \textit{currentTrainingStage} pierwszy etap treningu. Fragment realizujący tą funkcjonalność przedstawiono poniżej w kodzie \ref{code/parser/constructor}.
@@ -127,8 +122,8 @@ W ten sposób \textit{nextInstruction()} pełni rolę centralnego mechanizmu ste
 \end{lstlisting}
 \end{figure}
 
-\subsection{TrainingController}
-\subsection{AnimatedCircle}
+\subsection{TrainingController} \label{subsec:TrainingController}
+\subsection{AnimatedCircle} \label{subsec:AnimatedCircle}
 Komponent \texttt{AnimatedCircle} odpowiada za wizualizację przebiegu fazy oddechowej w postaci animowanego koła. Wdech powoduje zwiększanie jego promienia, wydech - zmniejszanie, natomiast fazy retencji i regeneracji utrzymują stały rozmiar.
 
 Obiekt przyjmuje dwa parametry - obiekt typu \texttt{BreathingPhase?}, który reprezentuje aktualną fazę oddechową bądź wartość null w przypadku zakończenia treningu oraz obiekt typu \texttt{bool} \textit{isPaused}, reprezentujący stan wstrzymania treningu. Framgment tworzenia klasy przedstawiony został w kodzie \ref{code/circle/constructor}.
@@ -303,10 +298,29 @@ if(oldWidget.change != widget.change) {
 \end{lstlisting}
 \end{figure}
 
-\section{Dźwięki \Jakub}
-\subsection{SoundManager}
-\subsection{textToSpeach}
+\section{Dźwięki \Jakub} \label{sec:Sounds}
 
-\section{Języki}
+Wysoki stopień konfigurowalności warstwy audio przez użytkownika wymusił dekompozycję logiki biznesowej aplikacji na klasy odpowiedzialne za poszczególne przypadki użycia, postępując zgodnie z zasadą pojedynczej odpowiedzialności. 
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{diagramy/soundManagers_diagram.png}
+  \caption{Diagram klas dźwiękowych}
+\end{figure}
+
+\subsection{SoundManager} \label{subsec:SoundManager}
+Centralnym elementem modułu audio jest klasa \texttt{SoundManager}. Ze względu na konieczność zapewnienia globalnego punktu dostępu do listy załadowanych plików oraz potrzebę współdzielenia jednej instancji obiektu przez wiele komponentów aplikacji, zastosowano w niej wzorzec projektowy Singleton. W polach wspomnianej instancji przechowywane są listy dźwięków krótkich, jak i długich. Rozróżnienie na typy dźwięków było niezbędne ze względu na odmienne ładowanie i odtwarzanie plików. Krótkie efekty dźwiękowe wymagają minimalnej latencji (czasu reakcji) przy odtwarzaniu, natomiast długie ścieżki dźwiękowe, charakteryzujące się rzadszą rotacją i mniejszą dynamiką zmian, nie podlegają tak rygorystycznym wymogom czasowym przy inicjalizacji. Do osiągnięcia tego wymagania należało zastosować oddzielne konfiguracje odtwarzaczy dźwięków (komponentów klasy \texttt{AudioPlayer}) — low latency mode (tryb minimalnego czasu reakcji) lub media player mode (tryb odtwarzania media). Mimo zastosowania tych trybów wysoki narzut obliczeniowy związany z  częstą inicjalizacją odtwarzaczy uniemożliwił odtwarzanie sygnałów dźwiękowych z wymaganą precyzją. Ograniczenie to zmusiło nas do wprowadzenia mechanizmu puli obiektów — \texttt{AudioPlayerPool} \ref{subsec:AudioPlayerPool}.
+
+ \todoJakub{Rozpisz poniższe}
+- fade in/out
+- ustawienie by dźwięki mogły lecieć razem
+
+\subsection{SingleSoundManager} \label{subsec:SingleSoundManager}
+\subsection{PlaylistManager} \label{subsec:PlaylistManager}
+\subsection{AudioPlayerPool} \label{subsec:AudioPlayerPool}
+\subsection{textToSpeech} \label{subsec:TTS}
+
+\section{Języki} \label{sec:Languages}
 
 \section{Baza danych}
