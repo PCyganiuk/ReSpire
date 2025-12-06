@@ -10,7 +10,7 @@ class "respire::services::SoundManagers::AudioPlayerPool.dart::AudioPlayerPool" 
   +void dispose()
 }
 
-"respire::services::SoundManagers::AudioPlayerPool.dart::AudioPlayerPool" --> "respire::services::SoundManagers::SoundManager.dart::SoundManager"
+"respire::services::SoundManagers::AudioPlayerPool.dart::AudioPlayerPool" --* "respire::services::SoundManagers::SoundManager.dart::SoundManager"
 
 abstract class "respire::services::SoundManagers::ISoundManager.dart::ISoundManager" {
   +Map<String, SoundAsset> getSounds()
@@ -41,7 +41,7 @@ class "respire::services::SoundManagers::PlaylistManager.dart::PlaylistManager" 
   +void completePlaylist()
 }
 
-"respire::services::SoundManagers::PlaylistManager.dart::PlaylistManager" o-- "respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager"
+"respire::services::SoundManagers::PlaylistManager.dart::PlaylistManager" <-- "respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager"
 
 
 class "respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager" {
@@ -62,7 +62,7 @@ class "respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundMan
   +AudioPlayer? getPlayer()
 }
 
-"respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager" o-right- "respire::services::SoundManagers::SoundManager.dart::SoundManager"
+"respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager" <-right- "respire::services::SoundManagers::SoundManager.dart::SoundManager"
 
 "respire::services::SoundManagers::ISoundManager.dart::ISoundManager" <|-- "respire::services::SoundManagers::SingleSoundManager.dart::SingleSoundManager"
 

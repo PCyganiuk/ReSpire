@@ -7,6 +7,18 @@ Projekt w Figmie
 Aplikacja została napisana w jęzku Dart we frameworku Flutter.
 
 \section{Schemat plików/klas/modułów \Hania\ \Ola\ \Jakub\ \Karol}
+Aplikacja ReSpire charakteryzuje się modułową budową, na którą składają się łącznie 63 pliki źródłowe w języku Dart. Projekt obejmuje 80 klas oraz ponad 400 metod realizujących logikę biznesową i interfejs użytkownika. Całkowity rozmiar projektu wynosi nieco ponad 10 kLOC (ang. Kilo Lines of Code – tysięcy linii kodu), z czego blisko 8900 stanowi tzw. czysty kod, określany jako SLOC (ang. Source Lines of Code). Ze względu na taką złożoność struktury, diagramy klas i architektury zostały w niniejszej dokumentacji podzielone na logiczne fragmenty, aby zachować ich czytelność.
+
+\subsection{Klasy treningu} \label{subsec:training_classes}
+
+Na trening składa się 12 klas, z czego główną z nich jest \texttt{Training}. Zawiera ona główne informacje o ćwiczeniu takie jak tytuł, czy opis, a także listę etapów, dźwięki i ustawienia. Struktura dźwięków została opisana w rodziale \ref{sec:Sounds}. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{diagramy/class_diagram.png}
+  \caption{Diagram klas treningu}
+\end{figure}
+
 
 \section{Edycja treningu \Ola}
 \subsection{Menu - trening}
@@ -188,10 +200,27 @@ Dodatkowo utworzony został obiekt łączący \texttt{AnimatedCircle} oraz dwa k
 
 \subsection{Instrukcja}
 
-\section{Dźwięki \Jakub}
+\section{Dźwięki \Jakub} \label{sec:Sounds}
+
+Wysoki stopień konfigurowalności warstwy audio przez użytkownika wymusił dekompozycję logiki biznesowej aplikacji na klasy odpowiedzialne za poszczególne przypadki użycia, postępując zgodnie z zasadą pojedynczej odpowiedzialności. 
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{diagramy/soundManagers_diagram.png}
+  \caption{Diagram klas dźwiękowych}
+\end{figure}
+
 \subsection{SoundManager} \label{subsec:SoundManager}
+Centralnym elementem modułu audio jest klasa \texttt{SoundManager}. Ze względu na konieczność zapewnienia globalnego punktu dostępu do listy załadowanych plików oraz potrzebę współdzielenia jednej instancji obiektu przez wiele komponentów aplikacji, zastosowano w niej wzorzec projektowy Singleton. W polach wspomnianej instancji przechowywane są listy dźwięków krótkich, jak i długich. Rozróżnienie na typy dźwięków było niezbędne ze względu na odmienne ładowanie i odtwarzanie plików. Krótkie efekty dźwiękowe wymagają minimalnej latencji (czasu reakcji) przy odtwarzaniu, natomiast długie ścieżki dźwiękowe, charakteryzujące się rzadszą rotacją i mniejszą dynamiką zmian, nie podlegają tak rygorystycznym wymogom czasowym przy inicjalizacji. Do osiągnięcia tego wymagania należało zastosować oddzielne konfiguracje odtwarzaczy dźwięków (komponentów klasy \texttt{AudioPlayer}) — low latency mode (tryb minimalnego czasu reakcji) lub media player mode (tryb odtwarzania media). Mimo zastosowania tych trybów wysoki narzut obliczeniowy związany z  częstą inicjalizacją odtwarzaczy uniemożliwił odtwarzanie sygnałów dźwiękowych z wymaganą precyzją. Ograniczenie to zmusiło nas do wprowadzenia mechanizmu puli obiektów — \texttt{AudioPlayerPool} \ref{subsec:AudioPlayerPool}.
+
+ \todoJakub{Rozpisz poniższe}
+- fade in/out
+- ustawienie by dźwięki mogły lecieć razem
+
 \subsection{SingleSoundManager} \label{subsec:SingleSoundManager}
 \subsection{PlaylistManager} \label{subsec:PlaylistManager}
+\subsection{AudioPlayerPool} \label{subsec:AudioPlayerPool}
 \subsection{textToSpeech} \label{subsec:TTS}
 
 \section{Języki} \label{sec:Languages}

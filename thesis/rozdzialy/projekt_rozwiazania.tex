@@ -2,6 +2,7 @@
 
 \section{Projekt architektury systemu \Hania\ \Ola}
 
+
 \section{Projekt logiki aplikacji \Hania\ \Ola}
 
 \section{Projekt interfejsu użytkownika \Hania\ \Ola}
@@ -71,9 +72,12 @@ Ikony chyba z biblioteki "material"
 
 
 \section{Projekt struktury danych (treningi) \Jakub}
+
+Model danych oparto na strukturze hierarchicznej, której fundament stanowią trzy kluczowe klasy: \texttt{Trening}, \texttt{EtapTreningu} oraz \texttt{FazaOddechowa}. Główna encja, \texttt{Trening}, składa się z co najmniej jednego \texttt{EtapuTreningu} (relacja jeden do wielu). Każdy etap charakteryzuje się zdefiniowaną liczbą cykli (powtórzeń) oraz parametrem przyrostu czasu. Na najniższym poziomie hierarchii znajduje się \texttt{FazaOddechowa}. Etapy składają się z sekwencji faz o określonym czasie trwania oraz typie, wybieranym ze zbioru zdefiniowanych wartości: wdech, wydech, regeneracja lub~wstrzymanie. Opisywany projekt przedstawia rysunek~\ref{img/training_structure}, natomiast rozwinięcie i implementację tej struktury danych opisano w sekcji \ref{subsec:training_classes}.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{obrazki/projekt_rozwiazania/training_class_diagram.png}
-    \caption{Diagram klas dla treningu oddechowego}
-    \label{img/class_diagram}
+    \includegraphics[width=\textwidth]{obrazki/projekt_rozwiazania/Struktura_treningu.jpg}
+    \caption{Struktura treningu}
+    \label{img/training_structure}
 \end{figure}
