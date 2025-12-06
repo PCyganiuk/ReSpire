@@ -186,7 +186,7 @@ if (widget.isPaused && !oldWidget.isPaused) {
 \end{lstlisting}
 \end{figure}
 
-Dodatkowo utworzony został obiekt łączący \texttt{AnimatedCircle} oraz dwa koła statyczne typu \texttt{Container} wizualizujące maksymalną i minimalną wartość promiania koła \texttt{AnimatedCircle}, by umożliwić użytkownikowi lepiej ocenić przebieg wdechu i wydechu.
+Dodatkowo utworzony został obiekt łączący \texttt{AnimatedCircle} oraz dwa koła statyczne typu \texttt{Container} wizualizujące maksymalną i minimalną wartość promienia koła \texttt{AnimatedCircle}, by umożliwić użytkownikowi lepiej ocenić przebieg wdechu i wydechu.
 
 \subsection{InstructionSlider}
 \texttt{InstructionSlider} to animowany komponent odpowiadający za wizualizację ciągu instrukcji dla użytkownika w postaci trzech kafelków reprezentujących:
@@ -227,7 +227,7 @@ addNewBreathingPhase(widget.breathingPhasesQueue.elementAt(2));
 \end{lstlisting}
 \end{figure}
 
-\texttt{InstructionSlider} korzysta z \texttt{AnimationController}, który przy każdej zmianie fazy przesuwa wszystkie kafelki o jedną pozycję w lewo. Każdy kafelek ma przypisaną pozycję z przedziału od -2 do 2, gdzie wartości skrajne (-2 oraz 2) znajdują się poza obszarem widocznym dla użytkownika. W centrum ekranu znajdują się trzy środkowe pozycje: -1 odpowiada fazie poprzedniej, 0 fazie bieżącej, a 1 fazie nadchodzącej. Gdy kafelek na pozycji -2 ma zostać przesunięty zostaje usunięty w celach optymalizacyjnych. Dokładną implementację animacji przedstawiono w~kodzie \ref{code/slider/animation}. Dodatkowo wykorzystywany jest mechanizm skalowania środkowego kafelka w celu wizualnego podkreślenia aktualnie trwającej fazy.
+\texttt{InstructionSlider} korzysta z \texttt{AnimationController}, który przy każdej zmianie fazy przesuwa wszystkie kafelki o jedną pozycję w lewo. Każdy kafelek ma przypisaną pozycję z przedziału od -2 do 2. Wartości skrajne (-2 oraz 2) znajdują się poza obszarem widocznym dla użytkownika i służą jedynie do zapewnienia płynniejszej i estetczniejszej animacji. W centrum ekranu znajdują się trzy środkowe pozycje: -1 odpowiada fazie poprzedniej, 0 fazie bieżącej, a 1 fazie nadchodzącej. Gdy kafelek na pozycji -2 ma zostać przesunięty zostaje usunięty w celach optymalizacyjnych. Dokładną implementację animacji przedstawiono w~kodzie \ref{code/slider/animation}. Dodatkowo wykorzystywany jest mechanizm skalowania środkowego kafelka w celu wizualnego podkreślenia aktualnie trwającej fazy.
 
 \begin{figure}[h] 
 \centering

@@ -5,7 +5,7 @@
 \section{Projekt logiki aplikacji \Hania\ \Ola}
 
 \section{Projekt interfejsu użytkownika \Hania\ \Ola}
-Podrozdział ten poświęcony jest projektowaniu interfejsu użytkownika opracowanej aplikacji mobilnej. Głównym celem było stworzenie intuicyjnego, wizualnie estetycznego oraz w pełni responsywnego interfejsu, zapewniającego pozytywne doświadczenia użytkownika przy jednoczesnym spełnieniu wcześniej zdefiniowanych wymagań funkcjonalnych i niefunkcjonalnych.
+Podrozdział ten poświęcony jest projektowaniu interfejsu użytkownika opracowanej aplikacji mobilnej. Głównym celem było stworzenie intuicyjnej, wizualnie estetycznej oraz w pełni responsywnej warstwy użytkownika, zapewniającego pozytywne doświadczenia przy jednoczesnym spełnieniu wcześniej zdefiniowanych wymagań funkcjonalnych i niefunkcjonalnych.
 Do~kluczowych wymagań funkcjonalnych interfejsu należały:
 \begin{itemize}
     \item przeglądanie i zarządzanie listą treningów,
@@ -20,7 +20,7 @@ Spośród wymagań niefunkcjonalnych szczególnie uwzględniono:
     \item częściową zgodność z wytycznymi dostępności WCAG~2.1 na poziomie~AA.
 \end{itemize}
 
-Przy projektowaniu świadomie kierowano się wytycznymi dostępności WCAG~2.1 jako punktem odniesienia. Większość kluczowych zaleceń tego standardu - w tym odpowiedni kontrast tekstu (minimum 4.5:1), widoczny wskaźnik fokusu klawiatury czy tekstowe alternatywy dla elementów nietekstowych - została zastosowana. Ze względu na prototypowy charakter projektu wykonanego w narzędziu Figma, pełna zgodność z WCAG~2.1~AA nie była celem, a jedynie wskazówką projektową.
+Przy projektowaniu świadomie kierowano się wytycznymi dostępności WCAG~2.1 jako punktem odniesienia. Większość kluczowych zaleceń tego standardu - w tym odpowiedni kontrast tekstu (minimum 4.5:1), widoczny wskaźnik aktywnej klawiatury czy tekstowe alternatywy dla elementów nietekstowych - została zastosowana. Ze względu na prototypowy charakter projektu wykonanego w narzędziu Figma, pełna zgodność z WCAG~2.1~AA nie była celem, a jedynie wskazówką projektową.
 
 Proces projektowania oparto na następujących metodykach i podejściach:
 \begin{itemize}
@@ -30,10 +30,10 @@ Proces projektowania oparto na następujących metodykach i podejściach:
 \end{itemize}
 
 \subsection{Projekt w narzędziu Figma}
-Do zaprojektowania interfejsu użytkownika wybrano narzędzie Figma, które oferuje zaawansowane prototypowanie, w tym reakcję zmiany widoków po kliknięciu w dany obiekt. Dodatkowo narzędzie zostało wybrane również ze względu na jego znajomość członków zespołu i możliwość kolaboracji i łatwego udostępniania gotowego projektu.
+Do zaprojektowania interfejsu użytkownika wybrano narzędzie Figma, które oferuje zaawansowane prototypowanie, w tym reakcję zmiany widoków po kliknięciu w dany obiekt. Dodatkowo narzędzie zostało wybrane również ze względu na jego znajomość przez członków zespołu, możliwość współpracy i łatwego udostępniania gotowego projektu.
 
-W pierwotnej wersji ekran główny aplikacji stanowiła lista treningów oddechowych prezentowaną w formie kafelków. Dodawanie nowego treningu realizowane było za pomocą przycisku pływającego, umieszczonego pod kafelkami. Dostępne były również opcje w prawym górnym rogu. Każdy kafelek treningu obsługiwał gesty przesunięcia w lewo, dając możliwość jego usunięcia, i w prawo - dając możliwość jego edycji. Projekt można zobaczyć na rysunku \ref{img/respire_home}. 
-Mechanizmu przesuwalnych kafelków okazał się jednak nieintuicyjny dla użytkowników i postanowiono z niego zrezygnować. W finalnej wersji aplikacji każdy kafelek treningu po kliknięciu przenosi użytkownika na dedykowany ekran szczegółów treningu, na którym w wyraźny sposób udostępniono przyciski do edycji, usunięcia i włączenia treningu.
+W pierwotnej wersji ekran główny aplikacji stanowiła lista treningów oddechowych prezentowana w formie kafelków. Dodawanie nowego treningu realizowane było za pomocą przycisku pływającego, umieszczonego pod kafelkami. Dostępne były również opcje w prawym górnym rogu. Każdy kafelek treningu obsługiwał gesty przesunięcia w lewo, dając możliwość jego usunięcia, i w prawo - dając możliwość jego edycji. Projekt można zobaczyć na rysunku \ref{img/respire_home}. 
+Mechanizm przesuwalnych kafelków okazał się jednak nieintuicyjny dla użytkowników i postanowiono z niego zrezygnować. W finalnej wersji aplikacji każdy kafelek treningu po kliknięciu przenosi użytkownika na dedykowany ekran szczegółów treningu, na którym w wyraźny sposób udostępniono przyciski do edycji, usunięcia i włączenia treningu.
 
 \begin{figure}[H]
 \centering
@@ -42,7 +42,7 @@ Mechanizmu przesuwalnych kafelków okazał się jednak nieintuicyjny dla użytko
 \label{img/respire_home}
 \end{figure}
 
-Przebieg treningu oddechowego w prototypie aplikacji ReSpire zaprojektowano w sposób maksymalnie intuicyjny i czytelny dla użytkownika. W centralnej części ekranu znajduje się element animowany w postaci koła, które płynnie zmienia swój promień i wyświetla pozostały czas do końca obecnej fazy oddechowej. Bezpośrednio nad nim znajduje się komponent wyświetlający instrukcje w postaci trzech kafelków, przedstawiających kolejno od lewej fazę poprzednią, obecną i następną.Dodatkowo w tym samym obszarze prezentowany był globalny postęp treningu - liczba ukończonych cykli w stosunku do zaplanowanej liczby wszystkich cykli. Kliknięcie w~centralne koło miało powodować natychmiastowe wstrzymanie treningu, a ponowne jego kliknięcie wznawiało sesję od miejsca przerwania. Przy próbie opuszczenia ekranu treningu aplikacja miała wyświetlać potwierdzenie z informacją, iż bieżąca sesja zostanie przerwana i jej postęp nie zostanie zapisany. Projekt przebiegu treningu przedstawiono na rysunku \ref{img/respire_training}. 
+Przebieg treningu oddechowego w prototypie aplikacji ReSpire zaprojektowano w sposób maksymalnie intuicyjny i czytelny dla użytkownika. W centralnej części ekranu znajduje się element animowany w postaci koła, które płynnie zmienia swój promień i wyświetla pozostały czas do końca obecnej fazy oddechowej. Bezpośrednio nad nim znajduje się komponent wyświetlający instrukcje w postaci trzech kafelków, przedstawiających kolejno od lewej fazę poprzednią, obecną i następną. Dodatkowo w tym samym obszarze prezentowany był globalny postęp treningu - liczba ukończonych cykli w stosunku do zaplanowanej liczby wszystkich cykli. Kliknięcie w~centralne koło miało powodować natychmiastowe wstrzymanie treningu, a ponowne jego kliknięcie wznawiało sesję od miejsca przerwania. Przy próbie opuszczenia ekranu treningu aplikacja miała wyświetlać potwierdzenie z informacją, iż bieżąca sesja zostanie przerwana i jej postęp nie zostanie zapisany. Projekt przebiegu treningu przedstawiono na rysunku \ref{img/respire_training}. 
 
 \begin{figure}[H]
 \centering
