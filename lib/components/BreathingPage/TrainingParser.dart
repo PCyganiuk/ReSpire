@@ -51,6 +51,7 @@ class TrainingParser {
       "breathingPhase": progressedBreathingPhase,
       "remainingTime": (durationSeconds * 1000).truncate(),
       "trainingStageName": currentTrainingStage.name,
+      "doneReps": doneReps,
     };
   }
 

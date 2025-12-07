@@ -22,7 +22,9 @@ class TrainingController {
       ValueNotifier(Queue<breathing_phase.BreathingPhase?>());
   final Queue<String?> _trainingStageNameQueue = Queue<String?>();
   final Queue<String?> _trainingStageIdQueue =
-      Queue<String?>(); // Track stage ID for each phase
+      Queue<String?>(); 
+       final Queue<int?> _cycleIndexQueue =
+      Queue<int?>(); // Track stage ID for each phase
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
   final ValueNotifier<int> breathingPhasesCount = ValueNotifier(0);
@@ -30,7 +32,7 @@ class TrainingController {
   final ValueNotifier<int> currentStageIndex = ValueNotifier(0);
   final ValueNotifier<int> totalStages = ValueNotifier(0);
   final ValueNotifier<int> currentCycleIndex = ValueNotifier(0);
-  final ValueNotifier<bool> playCycleSound = ValueNotifier(false);
+  bool playCycleSound = false;
   final ValueNotifier<int> totalCycles = ValueNotifier(0);
   final ValueNotifier<bool> showLabels = ValueNotifier(true);
 
@@ -146,6 +148,7 @@ class TrainingController {
       return;
     }
 
+    _cycleIndexQueue.add(instructionData["doneReps"]);
     breathingPhasesQueue.value.add(instructionData["breathingPhase"]);
     _logQueue('ADD', phase: instructionData["breathingPhase"]);
     _trainingStageNameQueue.add(_resolveTrainingStageName(
@@ -441,6 +444,7 @@ class TrainingController {
                 Navigator.pop(_context);
           }
           if (_finishedLoadingBreathingPhases) {
+            tryUpdateStageCounter(); // try removing the last stage if needed
             final removedPhase = breathingPhasesQueue.value.removeFirst();
             _logQueue('REMOVE', phase: removedPhase);
             breathingPhasesQueue.value.add(null);
@@ -474,7 +478,7 @@ class TrainingController {
               previousSecond = (_remainingTime ~/ 1000)+1;
               skipFirstCounting = true;
             }
-            tryUpdateStageCounter(); // try removing the last stage if needed
+            
           } else {
             tryUpdateStageCounter(); // we have to try before removing the phase from the queue
             final removedPhase = breathingPhasesQueue.value.removeFirst();
@@ -510,43 +514,48 @@ class TrainingController {
       newStageId = _trainingStageIdQueue.elementAt(1);
     }
 
-    dev.log(
-        'TrainingController: Starting new phase with stageId: $newStageId (current: $_currentTrainingStageId, queue size: ${_trainingStageIdQueue.length})');
+    //dev.log('TrainingController: Starting new phase with stageId: $newStageId (current: $_currentTrainingStageId, queue size: ${_trainingStageIdQueue.length})');
 
     if (newStageId != null && _currentTrainingStageId != newStageId) 
     {
-      dev.log(
-          'TrainingController: Stage changed from $_currentTrainingStageId to $newStageId');
+      //dev.log('TrainingController: Stage changed from $_currentTrainingStageId to $newStageId');
       _currentTrainingStageId = newStageId;
       _playShortSound(parser.training.sounds.stageChangeSound.name);
       
       for (int i = 0; i < parser.training.trainingStages.length; i++) {
         if (parser.training.trainingStages[i].id == newStageId) {
           currentStageIndex.value = i + 1; // 1-indexed for display
-          dev.log('TrainingController: Stage index updated to ${i + 1}');
+          //dev.log('TrainingController: Stage index updated to ${i + 1}');
           break;
         }
       }
       
       if (_sounds.backgroundSoundScope == SoundScope.perStage) {
-        dev.log('TrainingController: SWITCHING PLAYLIST for stage $newStageId');
+        //dev.log('TrainingController: SWITCHING PLAYLIST for stage $newStageId');
         _switchToStagePlaylist(_currentTrainingStageId!);
       }
 
-      currentCycleIndex.value = 1;
       totalCycles.value = parser.training.trainingStages[currentStageIndex.value-1].reps;
     } 
-    else if (newStageId != null) {
-      dev.log('TrainingController: Same stage ($newStageId) - keeping playlist');
-      if (playCycleSound.value && !_endingInitiated) {
+    if (_currentTrainingStageId != null) {
+      dev.log("Queue: $_cycleIndexQueue PlayCycle: $playCycleSound");
+      //dev.log('TrainingController: Same stage ($newStageId) - keeping playlist');
+      if (playCycleSound && !_endingInitiated) {
         _playShortSound(parser.training.sounds.cycleChangeSound.name);
-        currentCycleIndex.value++;
-        playCycleSound.value = false;
+       playCycleSound = false;
       }
-      if (parser.doneReps == currentCycleIndex.value) {
-        playCycleSound.value = true;
-      }
+      if(_cycleIndexQueue.length > 1 &&
+          _cycleIndexQueue.elementAt(0) != _cycleIndexQueue.elementAt(1) && 
+          _cycleIndexQueue.elementAt(0) != totalCycles.value - 1){
+        playCycleSound = true;
+      } 
+      // if (_cycleIndexQueue.length > 1 &&
+      //      && 
+      //     ) {
+      //   playCycleSound = true;
+      // }
     }
+    currentCycleIndex.value = _cycleIndexQueue.isNotEmpty ? 1+(_cycleIndexQueue.removeFirst() ?? 0) : 1;
   }
 
   void dispose() {
