@@ -522,6 +522,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                                   _sounds.nextSound =
                                                                       v;
                                                                 }),
+                                                                includeNoneOption: false,
                                                             includeVoiceOption:
                                                                 true,
                                                                 isSoundSelection: true);

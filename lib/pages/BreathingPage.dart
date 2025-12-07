@@ -415,7 +415,12 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           ValueListenableBuilder<bool>(
             valueListenable: controller!.showLabels,
             builder: (context, phaseCount, _) {
-              return controller!.showLabels.value ? 
+              return Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: controller!.showLabels.value,
+                child:
                 ValueListenableBuilder<int>(
                   valueListenable: controller!.breathingPhasesCount,
                   builder: (context, breathingPhasesDone, _) {
@@ -435,8 +440,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                         ),
                       );
                   },
-                ) 
-                : SizedBox(height: 0);
+                ));
             }),
 
           //instructions
@@ -459,7 +463,12 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           ValueListenableBuilder<bool>(
             valueListenable: controller!.showLabels,
             builder: (context, phaseCount, _) {
-              return controller!.showLabels.value ? 
+              return Visibility(
+                visible: controller!.showLabels.value,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: 
                 //cycles counter
                 ValueListenableBuilder<int>(
                   valueListenable: controller!.currentCycleIndex,
@@ -487,8 +496,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                       }
                     );
                   }
-                )
-                : SizedBox(height: 0);
+                ));
             }),
 
           //circles

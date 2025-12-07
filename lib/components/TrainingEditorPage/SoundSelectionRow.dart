@@ -9,6 +9,7 @@ class SoundSelectionRow extends StatelessWidget {
   final String label;
   final SoundAsset selectedValue;
   final SoundListType soundListType;
+  final bool includeNoneOption;
   final bool includeVoiceOption;
   final ValueChanged<SoundAsset> onChanged;
   final TextStyle? labelStyle;
@@ -20,6 +21,7 @@ class SoundSelectionRow extends StatelessWidget {
     required this.label,
     required this.selectedValue,
     required this.soundListType,
+    this.includeNoneOption = true,
     required this.includeVoiceOption,
     required this.onChanged,
     this.labelStyle,
@@ -31,6 +33,7 @@ class SoundSelectionRow extends StatelessWidget {
     final result = await showDialog<SoundAsset>(
       context: context,
       builder: (_) => AudioSelectionPopup(
+        includeNoneOption: includeNoneOption,
         includeVoiceOption: includeVoiceOption,
         listType: soundListType,
         selectedValue: selectedValue.name,
