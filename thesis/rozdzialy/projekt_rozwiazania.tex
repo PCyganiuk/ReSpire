@@ -1,6 +1,6 @@
-\chapter{Projekt rozwiązania \Hania\ \Ola\ \Jakub}
+\chapter{Projekt rozwiązania (\Hania,\ \Ola,\ \Jakub)}
 
-\section{Projekt architektury systemu \Ola}
+\section{Projekt architektury systemu (\Ola)}
 Przy projektowaniu architektury aplikacji wzięte pod uwagę zostały dobre praktyki i koncepty proponowane w dokumentacji Fluttera \cite{flutter_architecture}, a także wzorce projektowe. Celem było stworzenie struktury, która będzie łatwa w utrzymaniu i rozwoju, ale równocześnie stabilna i wydajna.
 
 \subsection{Architektura warstwowa}
@@ -104,7 +104,7 @@ Rdzeń modelu danych stanowią trzy kluczowe klasy tworzące strukturę hierarch
     \item \texttt{Settings} --- klasa agregująca globalne parametry sesji treningowej. Przechowuje konfigurację czasów przygotowania (\texttt{preparationDuration}) i zakończenia (\texttt{endingDuration}), a~także ustawienia generatora dudnień różnicowych (status aktywacji oraz częstotliwość fali).
 \end{itemize}
 
-\section{Projekt interfejsu użytkownika \Hania\ \Ola}
+\section{Projekt interfejsu użytkownika (\Hania,\ \Ola)}
 Podrozdział ten poświęcony jest projektowaniu interfejsu użytkownika opracowanej aplikacji mobilnej. Głównym celem było stworzenie intuicyjnej, wizualnie estetycznej oraz w pełni responsywnej warstwy użytkownika, zapewniającego pozytywne doświadczenia przy jednoczesnym spełnieniu wcześniej zdefiniowanych wymagań funkcjonalnych i niefunkcjonalnych.
 Do~kluczowych wymagań funkcjonalnych interfejsu należały:
 \begin{itemize}
@@ -252,7 +252,7 @@ Wszytskie ikony używane w aplikacji pochodzą z otwartoźródłowej biblioteki 
 W aplikacji zastosowano lekkie, łatwo skalowalne animacje w formacie Lottie \cite{animations}. Umożliwia on zapis w formie plików JSON, są bazowane na grafice wektorowej i idealnie nadaje się do aplikacji mobilnych, zapewniając wysoką płynność i niskie wykorzystanie zasobów. Wykorzystane zostały dwie darmowe animacje - fala \cite{wave_animation} wykonana przez \textit{CosmoYo} oraz łódka \cite{boat_animation}, której autorem jest \textit{Sergey Riznyk} na podstawie licencji \textit{Lottie Simple License (FL 9.13.21)} \cite{animations_license}. Zostały one dostosowane do potrzeb aplikacji poprzez między innymi: zmianę kolorów, usunięcie niektórych elementów, spowolnienie tempa odtwarzania czy zmianę orientacji. Animacje ożywiają warstwę prezentacji, dopełniając przestrzenie ekranu głównego i strony ze szczegółami treningu. Dzięki powolnemu tempu wprowadzają spokój.
 
 
-\section{Projekt struktury danych (treningi) \Jakub}
+\section{Projekt struktury danych (\Jakub)}
 
 Model danych oparto na strukturze hierarchicznej, której fundament stanowią trzy kluczowe klasy: \texttt{Trening}, \texttt{EtapTreningu} oraz \texttt{FazaOddechowa}. Główna encja, \texttt{Trening}, składa się z co najmniej jednego \texttt{EtapuTreningu} (relacja jeden do wielu). Każdy etap charakteryzuje się zdefiniowaną liczbą cykli (powtórzeń) oraz parametrem przyrostu czasu. Na najniższym poziomie hierarchii znajduje się \texttt{FazaOddechowa}. Etapy składają się z sekwencji faz o określonym czasie trwania oraz typie, wybieranym ze zbioru zdefiniowanych wartości: wdech, wydech, regeneracja lub~wstrzymanie. Opisywany projekt przedstawia rysunek~\ref{img/training_structure}, natomiast rozwinięcie i implementację tej struktury danych opisano w sekcji~\ref{subsec:TrainingModel}.
 

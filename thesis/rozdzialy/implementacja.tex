@@ -1,7 +1,7 @@
-\chapter{Implementacja aplikacji mobilnej ReSpire \Hania\ \Ola\ \Jakub\ \Karol}
+\chapter{Implementacja aplikacji mobilnej ReSpire (\Hania,\ \Ola,\ \Jakub,\ \Karol)}
 Projekt został wykonany w środowisku Flutter za pomocą zestawu narzędzi dla programistów Flutter w wersji 3.27.2 wspierającego język Dart w wersji 3.6.1. Ten zestaw narzędzi dla programistów umożliwia tworzenie aplikacji na platformy Android, iOS, Linux, macOS oraz Windows z wykorzystaniem jednej bazy kodu źródłowego. Wybór Fluttera był podyktowany jego wydajnością, bogatym zestawem narzędzi do tworzenia interfejsów użytkownika oraz dużą dostępnością wsparcia. Zapewnie trwałości danych między uruchomieniami zostało zrealizowane przy użyciu lokalnej, nierelacyjnej bazy danych Hive w wersji 2.2.3, przygotowanej pod środowisko Flutter oraz obiektowy język programowania Dart.
 
-\section{Schemat plików/klas/modułów \Ola\ \Jakub}
+\section{Schemat plików/klas/modułów (\Ola,\ \Jakub)}
 Aplikacja ReSpire charakteryzuje się modułową budową, na którą składają się łącznie 63 pliki źródłowe w języku Dart. Projekt obejmuje 80 klas oraz ponad 400 metod realizujących logikę biznesową i interfejs użytkownika. Całkowity rozmiar projektu wynosi nieco ponad 10~KLOC (\textit{ Thousands (kilo) Lines of Code} -- pol. tysięcy linii kodu), z czego blisko 8900 stanowi tzw. czysty kod, określany jako SLOC (\textit{Source Lines of Code} -- pol. źródłowe linie kodu). Ze względu na taką złożoność struktury, diagramy klas i architektury zostały w niniejszej dokumentacji podzielone na logiczne fragmenty, aby zachować ich czytelność.
 
 Kod aplikacji składa się z wielu folderów, gdzie struktura i zawartość większości z nich została automatycznie wygnerowana przy tworzeniu projektu za pomocą zestawu narzędzi \textit{Flutter}, zapewniając elementy niezbędne do uruchomienia aplikacji na różnych platformach. Zostały one pokazane na rysunku \ref{fig:drzewko_glowne}. Foldery \textit{android/}, \textit{ios/}, \textit{macos/}, \textit{windows/} oraz \textit{linux/} zawierają natywne projekty dla platform mobilnych oraz systemów operacyjnych. W katalogu \textit{.idea/} umieszczone są pliki konfiguracji dla \textit{Android Studio}, natomiast zawartość folderu \textit{build/} jest automatycznie generowana przy budowie aplikacji. Główny kod źródłowy, który został napisany podczas tworzenia aplikacji, znajduje się w~folderze \textit{lib/}.
@@ -65,7 +65,7 @@ Konstrukcja folderu \textit{lib/} została przedstawiona na rysunku \ref{fig:drz
 Zasoby dostarczane do aplikacji umieszczone zostały w folderze \textit{assets/} znajdującym się na tym samym poziomie zagłębienia, co \textit{lib/}. Schemat przedstawiony został na rysunku \ref{fig:drzewko_zasobow}. Zasoby złożone są z: animacji przechowywanych w katalogu \textit{animations/}, plików JSON będących słownikami używanymi do tłumaczenia aplikacji w folderze\textit{languages/} oraz dźwięki w katalogu \textit{sounds/}, który został podzielony na trzy podfoldery dla różnych typów plików dźwiękowych. Do~zasobów należą także ilustracje logo umieszczone bezpośrednio w opisywanym folderze.
 \begin{figure}[H] 
   \centering
-  \begin{minipage}{3cm}
+  \begin{minipage}{4cm}
     \large
     \dirtree{%
     .1 assets/.
@@ -75,7 +75,7 @@ Zasoby dostarczane do aplikacji umieszczone zostały w folderze \textit{assets/}
     .3 counting/....
     .3 long/....
     .3 short/....
-    .3 gnerator.dart.
+    .3 generator.dart.
     .2 ....
     }
   \end{minipage}
@@ -83,7 +83,7 @@ Zasoby dostarczane do aplikacji umieszczone zostały w folderze \textit{assets/}
 \label{fig:drzewko_zasobow} 
 \end{figure}
 
-\section{Edytor treningów \Karol}
+\section{Edytor treningów (\Karol)}
 
 Edytor treningów został wykonany jako dedykowany widok \texttt{TrainingEditorPage}, który operuje bezpośrednio na przekazanym mu przez referencję konkretnym obiekcie \texttt{Training}. Struktura treningu przechowywana jest w odpowiednich obiektach klas (\texttt{TrainingStage}, \texttt{BreathingPhase}, \texttt{Sounds}, \texttt{Settings}), dzięki czemu każda modyfikacja wprowadzona w interfejsie natychmiast zostaje zapisana w pamięci a następnie po przejściu do poprzedniego etapu zostaje przekazana do zapisu stałego w bazie danych. 
 
@@ -179,7 +179,7 @@ TextField(
 
 Tak jak każdy element graficznego interfejsu użytkownika w aplikacji, edytor jest przetłumaczony z użyciem \texttt{TranslationProvider}, co umożliwia dynamiczne zmiany języka i konsekwentne stosowanie lokalnych etykiet w dialogach, walidatorach czy komunikatach ostrzegawczych. Dzięki temu moduł edytora zachowuje spójność wizualną i logiczną z resztą aplikacji oraz zapewnia użytkownikowi poczucie kontroli nad każdym aspektem treningu bez konieczności przełączania kontekstu.
 
-\section{Importowanie oraz eksportowanie treningów \Karol} \label{sec:Import}
+\section{Importowanie oraz eksportowanie treningów (\Karol)} \label{sec:Import}
 
 Funkcje importu oraz eksportu treningów w aplikacji zostały zaimplementowane w celu zapewnienia użytkownikom łatwej wymiany konfiguracji treningowych pomiędzy różnymi urządzeniami, oraz tworzenia kopii zapasowych swoich ustawień pod nieobecność systemu scentralizowanego serwera do trwałego zapisu i synchronizacji danych.
 
@@ -257,7 +257,7 @@ static Future<List<Training>?> importTrainings() async {
 \end{lstlisting}
 \end{figure}
 
-\section{Przebieg treningu \Hania}
+\section{Przebieg treningu (\Hania)}
 \subsection{Klasa TrainingParser} \label{subsec:TrainingParser}
 Klasa \texttt{TrainingParser} powstała w celu przekształcenia hierarchicznych danych treningowych pobranych z lokalnej bazy danych \textit{Hive} w ciąg występujących po sobie faz, oparty na skonfigurowanym uprzednio przez użytkownika wzorcu oddychania. Jej zadaniem jest zwracanie kolejnych faz do obiektu \texttt{TrainingController}. Dzięki temu logika przełączania faz i powtórzeń jest odseparowana od interfejsu. 
 
@@ -846,7 +846,7 @@ if(oldWidget.change != widget.change) {
 \end{lstlisting}
 \end{figure}
 
-\section{Dźwięki \Jakub} \label{sec:Sounds}
+\section{Dźwięki (\Jakub)} \label{sec:Sounds}
 
 Wysoki stopień konfigurowalności warstwy audio przez użytkownika i chęć postępowania zgodnie z \textit{Single Responsibility Principle} (pol. zasadą pojedynczej odpowiedzialności), sformułowaną przez R. C. Martina~\cite{agile}, wymusiły dekompozycję logiki biznesowej aplikacji na klasy odpowiedzialne za poszczególne przypadki użycia. Podział ten reprezentuje rysunek \ref{img/soundManagers}.
 
@@ -870,9 +870,8 @@ Kluczowym aspektem konfiguracji było również zapewnienie współbieżności e
 
 Klasa \texttt{SingleSoundManager} dedykowana jest do obsługi odtwarzania sygnałów w trybie wyłączności. W warstwie implementacyjnej deleguje ona zadania do globalnego \texttt{SoundManagera} opisanego w~rozdziale~\ref{subsec:SoundManager}, jednak w przeciwieństwie do niego, uniemożliwia współbieżne odtwarzanie wielu ścieżek --- w danym momencie odtwarzany może być tylko jeden plik.
 
-Informacja o aktywnym zasobie przechowywana jest w polu \texttt{currentlyPlaying}. Co istotne, odtwarzanie realizowane jest tutaj wyłącznie w trybie \textit{media player}. Pozwala to na nasłuchiwanie zdarzeń zakończenia emisji i automatyczne czyszczenie stanu zmiennej. Mechanizm ten znajduje zastosowanie m.in. podczas wyboru dźwięków w edytorze treningu, umożliwiając dynamiczną aktualizację interfejsu użytkownika w zależności od stanu odtwarzacza.
+Informacja o aktywnym zasobie przechowywana jest w polu \texttt{currentlyPlaying}. Co istotne, odtwarzanie realizowane jest tutaj wyłącznie w trybie \textit{media player}. Pozwala to na nasłuchiwanie zdarzeń zakończenia emisji i automatyczne czyszczenie stanu zmiennej. Mechanizm ten znajduje zastosowanie m.in. podczas wyboru dźwięków w edytorze treningu (w dodatku A, rozdział~\ref{img/dzwieki_uzytkownika}), umożliwiając dynamiczną aktualizację interfejsu użytkownika w zależności od stanu odtwarzacza.
 
-\todoJakub{ref do podglądu dźwięków}
 \subsection{PlaylistManager} \label{subsec:PlaylistManager}
 
 Za obsługę sekwencyjnego odtwarzania zbiorów plików muzycznych w trakcie treningu odpowiada klasa \texttt{PlaylistManager}. Enkapsuluje ona stan procesu, przechowując flagi sterujące (typu logicznego, \texttt{boolean}), kursor bieżącego utworu oraz listę ścieżek. Istotnym elementem jest również obiekt typu \texttt{Completer}, pełniący rolę prymitywu synchronizacyjnego służącego do obsługi zdarzeń przerwania odtwarzania. 
@@ -914,7 +913,7 @@ Konstruktor klasy przyjmuje parametr całkowitoliczbowy, definiujący rozmiar bu
 \end{lstlisting}
 \end{figure}
 
-\section{Języki \Jakub} \label{sec:Languages}
+\section{Języki (\Jakub)} \label{sec:Languages}
 
 Interfejs użytkownika został przystosowany do obsługi wielu wersji językowych, oferując obecnie pełne wsparcie dla języka polskiego oraz angielskiego. Zasoby tekstowe przechowywane są w zewnętrznych plikach formatu JSON, umieszczonych w katalogu \textit{assets/}. Przyjęta konwencja nazewnictwa plików opiera się na standardowych kodach lokalizacji (np. \texttt{pl\_PL.json}).
 
@@ -968,7 +967,7 @@ Za warstwę logiczną odpowiada serwis \texttt{TranslationProvider}. Przechowuje
 \end{lstlisting}
 \end{figure}
 
-\section{Generator list dźwięków \Ola}
+\section{Generator list dźwięków (\Ola)}
 W celu automatyzacji pracy i wyeliminowania ryzyka błędów z powodu ręcznego wprowadzania nazw oraz ścieżek do plików dźwiękowych, stworzony został prosty generator list dźwięków. Został on umieszczony w folderze \textit{assets/}, w podfolderze \textit{sounds/}, w pliku \textit{generator.dart}. Narzędzie to generuje plik \textit{Sounds\_lists.g.dart} zapisywany w folderze \textit{lib/} w podkatalogu \textit{components/Global}. Zawiera on klasę \texttt{ReSpireSounds}, w której znajdują się trzy mapy z kluczem będącym łańcuchem znaków reprezentującym nazwę dźwięku oraz wartością będącą typu \texttt{SoundAsset}. Ma on parametry takie jak nazwa, ścieżka do pliku oraz rodzaj dźwięku podawane w konstruktorze. Wyróżnione zostały trzy rodzaje dźwięków opisywane przez typ wyliczeniowy \texttt{SoundType}: krótkie efekty dźwiękowe (\texttt{SoundType.cue}), dłuższe nagrania (\texttt{SoundType.melody}) oraz dźwięki odliczania (\texttt{SoundType.counting}). Każda z trzech map grupuje dźwięki konkretnego typu. Przykładowy fragment wygenerowanego pliku przedstawiono w listingu kodu~\ref{code/mapa}.
 
 \begin{figure}[H]
@@ -1006,7 +1005,7 @@ W celu wywołania generatora należy uruchomić w terminalu nastepujące polecen
 \end{figure}
 
 \newpage
-\section{Baza danych \Karol}
+\section{Baza danych (\Karol)}
 W celu zapewnienia persystencji danych użytkownika w naszej aplikacji mobilnej zaimplementowaliśmy lokalną bazę danych. Zważywszy na wybrane wcześniej środowisko Flutter, wymaganie wspierania wielu platform oraz wysoką gęstość zapisu danych, wybraliśmy napisaną w języku Dart nierelacyjną bazę Hive w wersji 2.2.3. Jest to lekka baza typu \textit{key-value store}, która przechowuje dane w formacie binarnym bezpośrednio na urządzeniu użytkownika, bez konieczności łączenia się z serwerem zewnętrznym.
 
 \subsection{Architektura i generowanie kodu}
