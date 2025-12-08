@@ -100,7 +100,11 @@ Pierwsza zakładka \texttt{Trening} odpowiada za logiczny układ hierarchicznej 
 \subsection{Menu - dźwięki}
 Druga zakładka służy do zarządzania warstwą dźwiękową. Korzysta w tym celu ze współdzielonego obiektu klasy \texttt{Sounds}. Sprowadza się ona do przypisywania plików dźwiękowych do konkretnych sytuacji w treningu. Zakładka ta dzieli się na 3 grupy. \\
 
+<<<<<<< HEAD
 W \texttt{Dźwiękach treningu} użytkownik może ustawić sygnał odliczania, sposób odtwarzania komunikatów o nadejściu kolejnej fazy (brak, per faza, globalnie - wybierane z listy rozwijalnej) i wybrać wskazówki audio zmiany etapu oraz cyklu. \\
+=======
+W \texttt{Dźwiękach treningu} użytkownik może ustawić sygnał odliczania, sposób odtwarzania komunikatów o nadejściu kolejnej fazy (brak, per faza, globalnie - wybierane z listy rozwijalnej) i~wybrać wskazówki audio zmiany etapu oraz cyklu. 
+>>>>>>> 5939c70 (Orphans removing)
 
 W grupie \texttt{Muzyka treningu} może zdefiniować tło muzyczne w jednym z pięciu zakresów wybieranych z listy rozwijalnej: brak, globalnie, per etap, per faza, per faza w danym etapie. W trybie globalnym oraz trybie per etap wykorzystywane są komponenty edycji list odtwarzania. W zakresie globalnym jest to \texttt{PlaylistEditor}, który obsługują listy odtwarzania poprzez przeciąganie pozycji, usuwanie oraz dodawanie nowych ścieżek z okna \texttt{AudioSelectionPopup}. Dla wariantu per etap zastosowano \texttt{StagePlaylistsEditor} (korzystający z \texttt{PlaylistEditor}), przyporządkowujący listy odtwarzania na identyfikatory etapów (\texttt{TrainingStage.id}). We wszystkich miejscach obsługiwanych przez \texttt{AudioSelectionPopup} użytkownik może także zaimportować własne pliki audio poprzez \texttt{file\_picker}; pliki są zapisywane w lokalnym systemie plików aplikacji i natychmiast dostępne. Ponadto wszystkie dźwięki w \texttt{AudioSelectionPopup} można odsłuchiwać dzięki \texttt{SingleSoundManager}. Dodatkowo przewidziano osobne pola wyboru dla muzyki odtwarzanej podczas specjalnych faz przygotowawczej i końcowej. 
 
