@@ -977,7 +977,7 @@ W celu wywołania generatora należy uruchomić w terminalu nastepujące polecen
 
 \newpage
 \section{Baza danych (\Karol)}
-W celu zapewnienia persystencji danych użytkownika w naszej aplikacji mobilnej zaimplementowaliśmy lokalną bazę danych. Zważywszy na wybrane wcześniej środowisko Flutter, wymaganie wspierania wielu platform oraz wysoką gęstość zapisu danych, wybraliśmy napisaną w~języku Dart nierelacyjną bazę Hive w wersji 2.2.3. Jest to lekka baza typu \textit{key-value store}, która przechowuje dane w formacie binarnym bezpośrednio na urządzeniu użytkownika, bez konieczności łączenia się z serwerem zewnętrznym.
+W celu zapewnienia trwałego zapisu danych użytkownika w naszej aplikacji mobilnej zaimplementowaliśmy lokalną bazę danych. Zważywszy na wybrane wcześniej środowisko Flutter, wymaganie wspierania wielu platform oraz wysoką gęstość zapisu danych, wybraliśmy napisaną w~języku Dart nierelacyjną bazę Hive w wersji 2.2.3. Jest to lekka baza typu \textit{key-value store}, która przechowuje dane w formacie binarnym bezpośrednio na urządzeniu użytkownika, bez konieczności łączenia się z serwerem zewnętrznym.
 
 \subsection{Architektura i generowanie kodu}
 Hive wykorzystuje mechanizm generowania kodu adapterów zajmujących się niskopoziomowymi operacjami na plikach bazy danych. Dzięki bardzo dobrej integracji z językiem Dart umożliwia łatwe odwzorowanie klas w bazie danych poprzez dwie adnotacje: \texttt{@HiveType()} oraz \texttt{@HiveField()}. Adnotacja \texttt{@HiveType(typeId: n)} oznacza klasę jako typ możliwy do serializacji, gdzie \texttt{typeId} musi być unikalnym identyfikatorem liczbowym. Adnotacja \texttt{@HiveField(n)} oznacza poszczególne pola klasy, które mają być zapisywane do bazy.
