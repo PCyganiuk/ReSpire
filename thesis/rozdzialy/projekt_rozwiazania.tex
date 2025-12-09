@@ -262,3 +262,28 @@ Model danych oparto na strukturze hierarchicznej, której fundament stanowią tr
     \caption{Struktura treningu}
     \label{img/training_structure}
 \end{figure}
+
+\section{Wybór lokalnej bazy danych}
+
+W związku z potrzebą zapewnienia trwałości informacji między uruchomieniami w celu przechowywania danych treningów konieczne było wykonanie analizy kompatybilnych z Flutterem oraz Dartem baz danych, aby na podstawie tego dokonać wyboru tej odpowiedniej dla naszego rozwiązania. 
+
+Naszą analizę zawęziliśmy do tych zgodnych z Flutterem i Dartem. W ten sposób otrzymaliśmy 6 produktów do wyboru: Hive, Isar, ObjectBox, SQLite (sqflite), Drift, Floor.
+
+Jeśli chodzi o parametry porównawcze wybraliśmy: wydajność na relatywnie małej ilości danych, krzywa uczenia, otwartoźródłowość, relacyjność,  oraz licencję.
+
+Typ bazy, model danych, język rdzenia, wydajność na małych danych, czas inicjalizacji, narzut kodu konfiguracyjnego, bezpieczeństwo typów, migracja schematu, wpływ na rozmiar APK, złożoność zapytań, pobrania (pub.dev), polubienia (pub.dev), popularność (gwiazdki na GitHub), popularność (Google Trends), status rozwoju, ryzyko projektowe,
+
+\begin{table}[H]
+    \centering
+    \caption{Porównanie wybranych baz danych}
+    \label{tab:db_comparison}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        \textbf{Parametr porównawczy} & \textbf{Hive} & \textbf{Isar} & \textbf{ObjectBox} & \textbf{SQLite (sqflite)} & \textbf{Drift} & \textbf{Floor} \\
+        \hline
+         & & & & & & \\
+        \hline
+    \end{tabular}
+    }
+\end{table}
