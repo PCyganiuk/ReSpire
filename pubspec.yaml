@@ -1,14 +1,32 @@
 name: respire
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.1.0
+version: 1.6.0
 
 environment:
   sdk: ^3.6.0
 
 dependencies:
+  audioplayers: ^6.4.0
+  build_runner: ^2.4.15
   flutter:
     sdk: flutter
+  flutter_slidable: ^4.0.0
+  flutter_tts: ^4.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  hive_generator: ^2.0.1
+  numberpicker: ^2.1.2
+  shared_preferences: ^2.5.3
+  dropdown_button2: ^2.3.9
+  custom_sliding_segmented_control: ^1.0.0
+  flutter_launcher_icons: ^0.14.3
+  file_picker: ^10.3.2
+  uuid: ^4.5.1
+  path_provider: ^2.1.5
+  lottie: ^3.3.0
+  wakelock_plus: ^1.3.2
+  package_info_plus: ^8.3.1
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +35,26 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/logo_biale_tlo.png
+    - assets/logo_poziom.png
+    - assets/logo_bez_tla.png
+    - assets/sounds/short/
+    - assets/sounds/long/
+    - assets/sounds/counting/
+    - assets/languages/
+    - assets/animations/wave.json
+    - assets/animations/boat.json
+
+  fonts:
+    - family: Glacial
+      fonts:
+        - asset: fonts/GlacialIndifference-Regular.otf
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo_biale_tlo.jpg"
+  adaptive_icon_foreground: "assets/logo_bez_tla.png"
+  adaptive_icon_background: "#ffffff"
