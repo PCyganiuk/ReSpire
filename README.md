@@ -1,5 +1,5 @@
-# ReSpire
-
+# Fork of ReSpire
+Continuation of the project to add workout analyzing and sensor support.
 A mobile application developed as part of an engineering project.
 
 ## Technologies
