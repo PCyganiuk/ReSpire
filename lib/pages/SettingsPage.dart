@@ -94,16 +94,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(translationProvider.getTranslation("SettingsPage.visual_style"), style: TextStyle(fontSize: 16)),
                   DropdownButton2<VisualStyle>(
                     underline: SizedBox(),
-                    value: SettingsProvider().currentLanguage,
+                    value: SettingsProvider().currentStyle,
                     onChanged: (value) async {
-                      SettingsProvider().setLanguage(value!);
-                      await translationProvider.loadLanguage(value);
+                      SettingsProvider().setVisualStyle(value!.name);
                       setState(() {});
                     },
-                    items: AppLanguage.supportedLanguages
-                        .map((lang) => DropdownMenuItem<AppLanguage>(
-                      value: lang,
-                      child: Text(lang.name),
+                    items: VisualStyle.availableStyles
+                        .map((style) => DropdownMenuItem<VisualStyle>(
+                      value: style,
+                      child: Text(translationProvider.getTranslation("SettingsPage.${style.name}")),
                     ))
                         .toList(),
                     iconStyleData: IconStyleData(

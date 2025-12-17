@@ -28,7 +28,14 @@ class SettingsProvider extends ChangeNotifier {
     currentLanguage = AppLanguage.fromCode(newVoiceType);
     await sharedPreferences.setString('selectedLanguageCode', currentLanguage.code);
     notifyListeners();
-  } 
+  }
+
+  Future<void> setVisualStyle(String newVisualStyle) async {
+    var sharedPreferences = await SharedPreferences.getInstance();
+    currentStyle = VisualStyle.fromString(newVisualStyle);
+    await sharedPreferences.setString('selectedVisualStyle', currentStyle.name);
+    notifyListeners();
+  }
 
   Future<void> setLanguage(AppLanguage language) async {
     if (AppLanguage.supportedLanguages.contains(language)) {

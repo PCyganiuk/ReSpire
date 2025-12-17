@@ -28,7 +28,7 @@ class TranslationProvider extends ChangeNotifier {
       String loadingFile = "${language.localeCode}.json";
       String jsonContent = await rootBundle.loadString("assets/languages/$loadingFile");
       _translations = Map<String, dynamic>.from(json.decode(jsonContent));
-  print("Loading language: $language");
+  //print("Loading language: $language");
   notifyListeners();
     } catch (e) {
       _translations = {};
