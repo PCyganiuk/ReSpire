@@ -35,6 +35,8 @@ class TrainingController {
   bool playCycleSound = false;
   final ValueNotifier<int> totalCycles = ValueNotifier(0);
   final ValueNotifier<bool> showLabels = ValueNotifier(true);
+  final ValueNotifier<int> trainingElapsedMs = ValueNotifier(0);
+  final ValueNotifier<int> remainingMs = ValueNotifier(0);
 
   final int _updateInterval = 25; //in milliseconds
 
@@ -351,7 +353,12 @@ class TrainingController {
       final now = DateTime.now();
       final int elapsed = now.difference(lastTick).inMilliseconds;
       lastTick = now;
-      
+      trainingElapsedMs.value += elapsed;
+      if (!_preparationPhaseCompleted && breathingPhasesCount.value == 0) {
+        trainingElapsedMs.value = 0;
+      }
+
+
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
         previousSecond = _remainingTime ~/ 1000;
         second.value = previousSecond;
@@ -395,6 +402,7 @@ class TrainingController {
         _remainingTime = 0;
         //second.value = 0;
       }
+      remainingMs.value = _remainingTime; //TODO
 
       if (_remainingTime == 0) {
         breathingPhasesCount.value++;

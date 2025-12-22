@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:respire/components/BreathingPage/AnimatedCircle.dart';
+import 'package:respire/components/BreathingPage/BreathingWaveTimeline.dart';
 import 'package:respire/components/BreathingPage/InstructionSlider.dart';
 import 'package:respire/components/BreathingPage/PreloadingScreen.dart';
 import 'package:respire/components/BreathingPage/TrainingParser.dart';
@@ -541,13 +542,12 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                                 return ValueListenableBuilder<bool>(
                                     valueListenable: controller!.isPaused,
                                     builder: (context, isPaused, _) {
-                                      return AnimatedCircle(
-                                          breathingPhase: breathingPhases.first,
-                                          isPaused: isPaused);
+                                      return BreathingWaveTimeline(controller: controller!);
                                     });
                               }),
 
                           //foreground circle, min value
+                          /*
                           Container(
                             width: 125,
                             height: 125,
@@ -556,7 +556,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                               color: Color.fromRGBO(44, 173, 196, 1),
                             ),
                           ),
-
+                           */
                           isPaused
                               ? Text(
                                   translationProvider.getTranslation("BreathingPage.circle_paused_text"),
