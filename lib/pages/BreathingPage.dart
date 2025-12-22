@@ -12,6 +12,8 @@ import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:respire/services/SettingsProvider.dart';
+import 'package:respire/services/VisualStyle.dart';
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -235,14 +237,15 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '$value',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              if (SettingsProvider().currentStyle == VisualStyle.ring)
+                Text(
+                  '$value',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
             ],
           ),
         );
@@ -512,28 +515,29 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                         alignment: Alignment.center,
                         children: [
                           //background circle, max value
-                          Container(
-                            width: 300,
-                            height: 300,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(183, 244, 255, 1),
-                              boxShadow: [ //shadow from https://flutter-boxshadow.vercel.app/
-                                BoxShadow(
-                                  color: Color.fromRGBO(0, 0, 0, 0.1),
-                                  blurRadius: 3,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 1),
-                                ),
-                                BoxShadow(
-                                  color: Color.fromRGBO(0, 0, 0, 0.06),
-                                  blurRadius: 2,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 1),
-                                )
-                              ]
+                          if (SettingsProvider().currentStyle == VisualStyle.ring)
+                            Container(
+                              width: 300,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromRGBO(183, 244, 255, 1),
+                                boxShadow: [ //shadow from https://flutter-boxshadow.vercel.app/
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.1),
+                                    blurRadius: 3,
+                                    spreadRadius: 0,
+                                    offset: Offset(0, 1),
+                                  ),
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.06),
+                                    blurRadius: 2,
+                                    spreadRadius: 0,
+                                    offset: Offset(0, 1),
+                                  )
+                                ]
+                              ),
                             ),
-                          ),
 
                           //animated circle
                           ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
@@ -542,31 +546,44 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                                 return ValueListenableBuilder<bool>(
                                     valueListenable: controller!.isPaused,
                                     builder: (context, isPaused, _) {
-                                      return BreathingWaveTimeline(controller: controller!);
+                                      if (SettingsProvider().currentStyle == VisualStyle.ring) {
+                                        return AnimatedCircle(breathingPhase: breathingPhases.first,isPaused: isPaused);
+                                      } else {
+                                        return BreathingWaveTimeline(controller: controller!);
+                                      }
                                     });
                               }),
 
                           //foreground circle, min value
-                          /*
-                          Container(
-                            width: 125,
-                            height: 125,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(44, 173, 196, 1),
+                          if (SettingsProvider().currentStyle == VisualStyle.ring)
+                            Container(
+                              width: 125,
+                              height: 125,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromRGBO(44, 173, 196, 1),
+                              ),
                             ),
-                          ),
-                           */
-                          isPaused
-                              ? Text(
-                                  translationProvider.getTranslation("BreathingPage.circle_paused_text"),
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : textInCircle()
+
+                          // Replace your selection with this:
+                          Align(
+                            alignment: SettingsProvider().currentStyle == VisualStyle.ring
+                                ? Alignment.center        // Keep in center for ring style
+                                : Alignment.topCenter, // Move to bottom for other styles
+                            child: isPaused
+                                ? Text(
+                              translationProvider.getTranslation("BreathingPage.circle_paused_text"),
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: SettingsProvider().currentStyle == VisualStyle.ring
+                                ? Colors.white
+                                : Colors.black,
+                              ),
+                            )
+                                : textInCircle(),
+                          )
+
                         ],
                       ),
                     ),

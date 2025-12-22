@@ -151,12 +151,47 @@ class _BreathingWavePainter extends CustomPainter {
 
     /// ---- DOT ----
     final dotRadius = lerpDouble(16, 26, pulse)!;
+    final dotCenter = Offset(centerX, dotY);
 
     canvas.drawCircle(
-      Offset(centerX, dotY),
+      dotCenter,
       dotRadius,
       Paint()..color = const Color(0xFF2496A8),
     );
+    /// ---- CURRENT PHASE REMAINING TIME ----
+    int remainingPhaseMs = 0;
+
+    for (int i = 1; i < keys.length; i += 2) {
+      final start = keys[i - 1].time;
+      final end = keys[i].time;
+
+      if (clampedElapsed >= start && clampedElapsed < end) {
+        remainingPhaseMs = end - clampedElapsed;
+        break;
+      }
+    }
+
+    final remainingSeconds = (remainingPhaseMs / 1000).ceil();
+
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: (remainingSeconds-1).toString(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout();
+
+    final textOffset = dotCenter -
+        Offset(textPainter.width / 2, textPainter.height / 2);
+
+    textPainter.paint(canvas, textOffset);
   }
 
   @override
