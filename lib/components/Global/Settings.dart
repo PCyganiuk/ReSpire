@@ -19,5 +19,10 @@ class Settings {
   
   @HiveField(4)
   double binauralRightFrequency = 210.0; // Hz (10 Hz beat frequency)
-  
+
+  @HiveField(5)
+  bool dimScreenEnabled = false;
+
+  @HiveField(6)
+  int dimScreenAfterSeconds = 3; //in seconds
 }

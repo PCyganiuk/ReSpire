@@ -150,7 +150,8 @@ class _BreathingWavePainter extends CustomPainter {
     canvas.drawPath(path, paint);
 
     /// ---- DOT ----
-    final dotRadius = lerpDouble(16, 26, pulse)!;
+    //final dotRadius = lerpDouble(16, 26, pulse)!;
+    final dotRadius = 20.0;
     final dotCenter = Offset(centerX, dotY);
 
     canvas.drawCircle(

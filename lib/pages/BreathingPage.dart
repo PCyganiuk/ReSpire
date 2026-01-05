@@ -14,6 +14,8 @@ import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:respire/services/SettingsProvider.dart';
 import 'package:respire/services/VisualStyle.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'dart:async';
 
 class BreathingPage extends StatefulWidget {
   final Training training;
@@ -38,6 +40,10 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
   int _totalCount = 0;
   String? _currentlyLoading;
   bool _loadingFinalizing = false;
+  bool _screenDark = false;
+  Timer? _dimTimer;
+
+  double? _originalBrightness;
 
   late double preparationDuration;
   late double endingDuration;
@@ -51,7 +57,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     widget.training.updateSounds();
     parser = TrainingParser(training: widget.training);
     breathingPhases = parser.countBreathingPhases();
-    
+
     _preloadAudio();
   }
 
@@ -64,7 +70,49 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
       controller!.resume();
     }
   }
-  
+
+  Future<void> dimScreen() async {
+    _originalBrightness = await ScreenBrightness().current;
+    //await Future.delayed(const Duration(seconds: 3));
+    await ScreenBrightness().setScreenBrightness(0.00); // very dim
+  }
+
+  Future<void> restoreBrightness() async {
+    if (_originalBrightness != null) {
+      await ScreenBrightness().setScreenBrightness(_originalBrightness!);
+    }
+  }
+
+  void goDark() {
+    dimScreen();
+
+    setState(() {
+      _screenDark = true;
+    });
+  }
+
+  void _wakeScreen() {
+    setState(() {
+      _screenDark = false;
+    });
+
+    restoreBrightness(); // optional
+  }
+
+  void _resetDimTimer() {
+    _dimTimer?.cancel();
+
+    if (widget.training.settings.dimScreenEnabled) {
+      _dimTimer = Timer(
+        Duration(seconds: widget.training.settings.dimScreenAfterSeconds),
+            () {
+          if (mounted) goDark();
+        },
+      );
+    }
+  }
+
+
   Future<void> _preloadAudio() async {
     final soundManager = SoundManager();
     final soundsToPreload = <String>{};
@@ -158,8 +206,17 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     // All sounds loaded, create controller and show training
     if (mounted) {
       controller = TrainingController(parser);
+
+      //await dimScreen();
+
       setState(() {
         _isPreloading = false;
+      });
+
+      Future.delayed( Duration(seconds: widget.training.settings.dimScreenAfterSeconds), () {
+        if (mounted && !controller!.isPaused.value && widget.training.settings.dimScreenEnabled) {
+          goDark();
+        }
       });
     }
   }
@@ -194,7 +251,9 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
 
   @override
   void dispose() {
+    restoreBrightness();
     WakelockPlus.disable();
+    _dimTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     controller?.dispose();
     super.dispose();
@@ -253,15 +312,14 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMainContent() {
     if (_isPreloading || controller == null) {
       return PreloadingScreen(
-        progress: _preloadProgress,
-        loadedCount: _loadedCount,
-        totalCount: _totalCount,
-        currentlyLoading: _currentlyLoading,
-        finalizing: _loadingFinalizing
+          progress: _preloadProgress,
+          loadedCount: _loadedCount,
+          totalCount: _totalCount,
+          currentlyLoading: _currentlyLoading,
+          finalizing: _loadingFinalizing
       );
     }
     controller!.setContext(context);
@@ -301,10 +359,10 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
         ],
         title: Text(widget.training.title,
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Glacial',
-            ),
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Glacial',
           ),
+        ),
         centerTitle: true,
         backgroundColor: Color.fromRGBO(50, 183, 207, 1),
       ),
@@ -318,134 +376,134 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
               final trimmed = stageName.trim();
               _displayStageInfo = trimmed.isNotEmpty && !_isPreloading;
               return Visibility(
-                visible: _displayStageInfo,
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                        translationProvider
-                            .getTranslation("BreathingPage.current_training_stage_label"),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
+                  visible: _displayStageInfo,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          translationProvider
+                              .getTranslation("BreathingPage.current_training_stage_label"),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    const SizedBox(height: 4),
-                    Text(
-                        trimmed,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                        const SizedBox(height: 4),
+                        Text(
+                          trimmed,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                    const SizedBox(height: 8),
-                    ValueListenableBuilder<int>(
-                      valueListenable: controller!.breathingPhasesCount,
-                      builder: (context, phaseCount, _) {
-                        return ValueListenableBuilder<int>(
-                          valueListenable: controller!.currentStageIndex,
-                          builder: (context, currentIndex, _) {
+                        const SizedBox(height: 8),
+                        ValueListenableBuilder<int>(
+                          valueListenable: controller!.breathingPhasesCount,
+                          builder: (context, phaseCount, _) {
                             return ValueListenableBuilder<int>(
-                              valueListenable: controller!.totalStages,
-                              builder: (context, total, _) {
-                                return Visibility(
-                                  visible: _displayStageInfo,
-                                  maintainSize: true,
-                                  maintainAnimation: true,
-                                  maintainState: true,
-                                  child:Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color.fromRGBO(44, 173, 196, 0.8),
-                                        Color.fromRGBO(50, 183, 207, 0.8),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color.fromRGBO(44, 173, 196, 0.3),
-                                        blurRadius: 8,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.layers_outlined,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '$currentIndex ${translationProvider.getTranslation("BreathingPage.Counter.connector")} $total',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ));
+                              valueListenable: controller!.currentStageIndex,
+                              builder: (context, currentIndex, _) {
+                                return ValueListenableBuilder<int>(
+                                  valueListenable: controller!.totalStages,
+                                  builder: (context, total, _) {
+                                    return Visibility(
+                                        visible: _displayStageInfo,
+                                        maintainSize: true,
+                                        maintainAnimation: true,
+                                        maintainState: true,
+                                        child:Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Color.fromRGBO(44, 173, 196, 0.8),
+                                                Color.fromRGBO(50, 183, 207, 0.8),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius: BorderRadius.circular(16),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Color.fromRGBO(44, 173, 196, 0.3),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.layers_outlined,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                '$currentIndex ${translationProvider.getTranslation("BreathingPage.Counter.connector")} $total',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ));
+                                  },
+                                );
                               },
                             );
                           },
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              )
+                  )
               );
             },
           ),
 
           ValueListenableBuilder<bool>(
-            valueListenable: controller!.showLabels,
-            builder: (context, phaseCount, _) {
-              return Visibility(
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                visible: controller!.showLabels.value,
-                child:
-                ValueListenableBuilder<int>(
-                  valueListenable: controller!.breathingPhasesCount,
-                  builder: (context, breathingPhasesDone, _) {
-                    return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(44, 173, 196, 1).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${breathingPhasesDone <= breathingPhases ? breathingPhasesDone : breathingPhases} ${translationProvider.getTranslation("BreathingPage.Counter.connector")} $breathingPhases ${translationProvider.getTranslation("BreathingPage.phases")}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(44, 173, 196, 1),
+              valueListenable: controller!.showLabels,
+              builder: (context, phaseCount, _) {
+                return Visibility(
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    visible: controller!.showLabels.value,
+                    child:
+                    ValueListenableBuilder<int>(
+                      valueListenable: controller!.breathingPhasesCount,
+                      builder: (context, breathingPhasesDone, _) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(44, 173, 196, 1).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                      );
-                  },
-                ));
-            }),
+                          child: Text(
+                            '${breathingPhasesDone <= breathingPhases ? breathingPhasesDone : breathingPhases} ${translationProvider.getTranslation("BreathingPage.Counter.connector")} $breathingPhases ${translationProvider.getTranslation("BreathingPage.phases")}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(44, 173, 196, 1),
+                            ),
+                          ),
+                        );
+                      },
+                    ));
+              }),
 
           //instructions
           ValueListenableBuilder<Queue<breathing_phase.BreathingPhase?>>(
@@ -456,8 +514,8 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                 builder: (context, change, _) {
                   return InstructionSlider(
                       preparationTime: preparationDuration,
-                      endingTime: endingDuration, 
-                      breathingPhasesQueue: breathingPhasesQueue, 
+                      endingTime: endingDuration,
+                      breathingPhasesQueue: breathingPhasesQueue,
                       change: change);
                 },
               );
@@ -465,43 +523,43 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           ),
 
           ValueListenableBuilder<bool>(
-            valueListenable: controller!.showLabels,
-            builder: (context, phaseCount, _) {
-              return Visibility(
-                visible: controller!.showLabels.value,
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                child: 
-                //cycles counter
-                ValueListenableBuilder<int>(
-                  valueListenable: controller!.currentCycleIndex,
-                  builder: (context, phaseCount, _) {
-                    return 
+              valueListenable: controller!.showLabels,
+              builder: (context, phaseCount, _) {
+                return Visibility(
+                    visible: controller!.showLabels.value,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child:
+                    //cycles counter
                     ValueListenableBuilder<int>(
-                      valueListenable: controller!.totalCycles,
-                      builder: (context, phaseCount, _) {
-                        return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(44, 173, 196, 1).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          "${controller!.currentCycleIndex.value} ${translationProvider.getTranslation("BreathingPage.Counter.connector")} ${controller!.totalCycles.value} ${translationProvider.getTranslation("BreathingPage.cycles")}",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(44, 173, 196, 1),
-                          ),
-                        ),
-                      );
-                      }
-                    );
-                  }
-                ));
-            }),
+                        valueListenable: controller!.currentCycleIndex,
+                        builder: (context, phaseCount, _) {
+                          return
+                            ValueListenableBuilder<int>(
+                                valueListenable: controller!.totalCycles,
+                                builder: (context, phaseCount, _) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(44, 173, 196, 1).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      "${controller!.currentCycleIndex.value} ${translationProvider.getTranslation("BreathingPage.Counter.connector")} ${controller!.totalCycles.value} ${translationProvider.getTranslation("BreathingPage.cycles")}",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromRGBO(44, 173, 196, 1),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            );
+                        }
+                    ));
+              }),
 
           //circles
           ValueListenableBuilder<bool>(
@@ -510,7 +568,14 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                 return Expanded(
                   child: Center(
                     child: GestureDetector(
-                      onTap: isPaused ? controller!.resume : controller!.pause,
+                      //onTap: isPaused ? controller!.resume : controller!.pause,
+                      onTap: () async {
+                        if (isPaused) {
+                          controller!.resume();
+                        } else {
+                          controller!.pause();
+                        }
+                      },
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
@@ -520,22 +585,22 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                               width: 300,
                               height: 300,
                               decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color.fromRGBO(183, 244, 255, 1),
-                                boxShadow: [ //shadow from https://flutter-boxshadow.vercel.app/
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.1),
-                                    blurRadius: 3,
-                                    spreadRadius: 0,
-                                    offset: Offset(0, 1),
-                                  ),
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.06),
-                                    blurRadius: 2,
-                                    spreadRadius: 0,
-                                    offset: Offset(0, 1),
-                                  )
-                                ]
+                                  shape: BoxShape.circle,
+                                  color: Color.fromRGBO(183, 244, 255, 1),
+                                  boxShadow: [ //shadow from https://flutter-boxshadow.vercel.app/
+                                    BoxShadow(
+                                      color: Color.fromRGBO(0, 0, 0, 0.1),
+                                      blurRadius: 3,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 1),
+                                    ),
+                                    BoxShadow(
+                                      color: Color.fromRGBO(0, 0, 0, 0.06),
+                                      blurRadius: 2,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 1),
+                                    )
+                                  ]
                               ),
                             ),
 
@@ -577,8 +642,8 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: SettingsProvider().currentStyle == VisualStyle.ring
-                                ? Colors.white
-                                : Colors.black,
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             )
                                 : textInCircle(),
@@ -594,4 +659,37 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => _resetDimTimer(),
+        onPointerMove: (_) => _resetDimTimer(),
+        child: Stack(
+          children: [
+            _buildMainContent(),
+
+            // Dark overlay
+            AnimatedOpacity(
+              opacity: _screenDark ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 800),
+              child: IgnorePointer(
+                ignoring: !_screenDark,
+                child: GestureDetector(
+                  onTap: () {
+                    _wakeScreen();
+                    _resetDimTimer();
+                  },
+                  child: Container(color: Colors.black),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+

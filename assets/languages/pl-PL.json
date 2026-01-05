@@ -31,7 +31,7 @@
         "page_title":"Ustawienia",
         "app_section_title":"Aplikacja",
         "language_label":"Język",
-        "visual_style": "Styl widoku oddechu",
+        "visual_style": "Widok oddechu",
         "ring": "Pierścień",
         "timeline": "Oś czasu",
         "app_second_section_title":"O ReSpire",
@@ -165,7 +165,10 @@
             "preparation_sound_warning": "Czas przygotowania jest ustawiony na 0, a muzyka przygotowania jest wybrana. Muzyka zostanie odtworzona w całości.",
             "training_ending_label":"Zakończenie treningu",
             "ending_duration_label":"Czas zakończenia (s)",
-            "ending_sound_warning": "Czas zakończenia jest ustawiony na 0, a muzyka zakończenia jest wybrana. Muzyka zostanie odtworzona w całości."
+            "ending_sound_warning": "Czas zakończenia jest ustawiony na 0, a muzyka zakończenia jest wybrana. Muzyka zostanie odtworzona w całości.",
+            "dim_screen_label": "Wygaszanie ekranu",
+            "dim_screen_during_training" : "Wygaś ekranu podczas treningu",
+            "dim_screen_after": "Czas do wygaszenia ekranu (s)"
         },
 
         "Alert":{

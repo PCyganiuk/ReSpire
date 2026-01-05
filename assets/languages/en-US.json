@@ -165,7 +165,10 @@
             "preparation_sound_warning": "Preparation duration is set to 0 with preparation music selected. The music will play for its full duration.",
             "training_ending_label":"Training ending",
             "ending_duration_label":"Ending time (s)",
-            "ending_sound_warning": "Ending duration is set to 0 with ending music selected. The music will play for its full duration."
+            "ending_sound_warning": "Ending duration is set to 0 with ending music selected. The music will play for its full duration.",
+            "dim_screen_label": "Dim screen",
+            "dim_screen_during_training" : "Dim screen during training",
+            "dim_screen_after": "Time to dim screen (s)"
         },
 
                     

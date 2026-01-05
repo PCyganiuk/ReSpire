@@ -37,10 +37,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   late TextEditingController descriptionController;
   late TextEditingController preparationController;
   late TextEditingController endingController;
+  late TextEditingController dimAfterController;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _descriptionFocusNode = FocusNode();
   FocusNode? preparationFocusNode = FocusNode();
   FocusNode? endingFocusNode = FocusNode();
+  FocusNode? dimAfterFocusNode = FocusNode();
 
   int _selectedTab = 0;
   late Sounds _sounds;
@@ -80,6 +82,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         }
       }
     });
+
+    dimAfterController =  TextEditingController(text: widget.training.settings.dimScreenAfterSeconds.toString());
+    dimAfterFocusNode = FocusNode();
   }
 
   void addTrainingStage() {
@@ -1351,6 +1356,134 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                       ),
                                     ),
                                   ),
+                                  SizedBox(height: 12),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    elevation: 2,
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                                translationProvider.getTranslation(
+                                                    "TrainingEditorPage.OtherTab.dim_screen_label"),
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)),
+                                          ),
+                                          SizedBox(height: 8),
+                                          CheckboxListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            title: Text(
+                                              translationProvider.getTranslation(
+                                                  "TrainingEditorPage.OtherTab.dim_screen_during_training"),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            value: widget.training.settings.dimScreenEnabled,
+                                            activeColor: darkerblue,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                widget.training.settings.dimScreenEnabled = value ?? false;
+                                              });
+                                            },
+                                          ),
+
+                                          if (widget.training.settings.dimScreenEnabled)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 8),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      translationProvider.getTranslation(
+                                                          "TrainingEditorPage.OtherTab.dim_screen_after"),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 90,
+                                                    height: 35,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(18),
+                                                      border: Border.all(color: darkerblue, width: 2),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        // minus
+                                                        InkWell(
+                                                          borderRadius: BorderRadius.circular(18),
+                                                          onTap: () {
+                                                            int v = widget.training.settings.dimScreenAfterSeconds;
+                                                            v = (v - 1).clamp(1, 999);
+                                                            setState(() {
+                                                              widget.training.settings.dimScreenAfterSeconds = v;
+                                                              dimAfterController.text = v.toString();
+                                                            });
+                                                          },
+                                                          child: const Padding(
+                                                            padding: EdgeInsets.all(8),
+                                                            child: Icon(Icons.remove, size: 16),
+                                                          ),
+                                                        ),
+
+                                                        // value
+                                                        Expanded(
+                                                          child: TextField(
+                                                            controller: dimAfterController,
+                                                            focusNode: dimAfterFocusNode,
+                                                            keyboardType: TextInputType.number,
+                                                            textAlign: TextAlign.center,
+                                                            inputFormatters: [
+                                                              FilteringTextInputFormatter.digitsOnly,
+                                                            ],
+                                                            onChanged: (value) {
+                                                              int v = int.tryParse(value) ?? 1;
+                                                              setState(() {
+                                                                widget.training.settings.dimScreenAfterSeconds = v;
+                                                              });
+                                                            },
+                                                            decoration: const InputDecoration(
+                                                              border: InputBorder.none,
+                                                              isDense: true,
+                                                            ),
+                                                            style: const TextStyle(
+                                                                fontSize: 14, fontWeight: FontWeight.w500),
+                                                          ),
+                                                        ),
+
+                                                        // plus
+                                                        InkWell(
+                                                          borderRadius: BorderRadius.circular(18),
+                                                          onTap: () {
+                                                            int v = widget.training.settings.dimScreenAfterSeconds;
+                                                            v = (v + 1).clamp(1, 999);
+                                                            setState(() {
+                                                              widget.training.settings.dimScreenAfterSeconds = v;
+                                                              dimAfterController.text = v.toString();
+                                                            });
+                                                          },
+                                                          child: const Padding(
+                                                            padding: EdgeInsets.all(8),
+                                                            child: Icon(Icons.add, size: 16),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                        ]
+                                      )
+                                    )
+                                  )
                                 ],
                               ),
                       ),
