@@ -1,5 +1,7 @@
 # Fork of ReSpire
-Continuation of the project to add workout analyzing and sensor support.
+Continuation of the project that aims to implement training analysis and sensor support.
+
+## Original project
 A mobile application developed as part of an engineering project.
 
 ## Technologies
@@ -7,8 +9,11 @@ A mobile application developed as part of an engineering project.
 - Programming Language: Dart
 - Platforms: Android, iOS
 
-## Authors:
+## Authors of original project:
 - Hanna Banasiak
 - Aleksandra Bujny
 - Jakub Romanowski
 - Karol Zwierz
+
+# Author of continuation:
+- Paweł Cyganiuk
