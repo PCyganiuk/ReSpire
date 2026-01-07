@@ -1,4 +1,4 @@
-package com.example.respire
+package com.paveuu.respire
 
 import io.flutter.embedding.android.FlutterActivity
 
