@@ -16,11 +16,11 @@ class VisualStyle {
 
   static VisualStyle fromString(String? name) {
     if (name == null || name.isEmpty) {
-      return ring;
+      return timeline;
     }
     return availableStyles.firstWhere(
           (lang) => lang.name == name,
-      orElse: () => ring,
+      orElse: () => timeline,
     );
   }
 }

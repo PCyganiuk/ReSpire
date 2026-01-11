@@ -31,9 +31,6 @@
         "page_title":"Ustawienia",
         "app_section_title":"Aplikacja",
         "language_label":"Język",
-        "visual_style": "Widok oddechu",
-        "ring": "Pierścień",
-        "timeline": "Oś czasu",
         "app_second_section_title":"O ReSpire",
         "app_description":"ReSpire oferuje pełną kontrolę nad treningiem oddechowym. To aplikacja, która została zaprojektowana, aby pomóc wszystkim użytkownikom, niezależnie od ich poziomu zaawansowania. Można rozpocząć swoją przygodę z gotowymi ćwiczeniami lub szybko i wygodnie stworzyć własne treningi, dostosowane do swoich potrzeb. \nUsiądź wygodnie, zrelaksuj się i ReSpire.",
         "copyright":"Wszelkie prawa zastrzeżone"
@@ -168,7 +165,11 @@
             "ending_sound_warning": "Czas zakończenia jest ustawiony na 0, a muzyka zakończenia jest wybrana. Muzyka zostanie odtworzona w całości.",
             "dim_screen_label": "Wygaszanie ekranu",
             "dim_screen_during_training" : "Wygaś ekranu podczas treningu",
-            "dim_screen_after": "Czas do wygaszenia ekranu (s)"
+            "dim_screen_after": "Czas do wygaszenia ekranu (s)",
+            "visual_style_label": "Styl widoku oddechu",
+            "visual_style": "Widok oddechu",
+            "ring": "Pierścień",
+            "timeline": "Oś czasu"
         },
 
         "Alert":{

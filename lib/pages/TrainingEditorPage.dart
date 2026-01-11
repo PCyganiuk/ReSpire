@@ -19,6 +19,8 @@ import 'package:custom_sliding_segmented_control/custom_sliding_segmented_contro
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:respire/utils/TextUtils.dart';
 
+import '../services/VisualStyle.dart';
+
 class TrainingEditorPage extends StatefulWidget {
   final Training training;
 
@@ -1480,6 +1482,72 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 ],
                                               ),
                                             ),
+                                        ]
+                                      )
+                                    )
+                                  ),
+                                  SizedBox(height: 12),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(12)),
+                                    elevation: 2,
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                                translationProvider.getTranslation(
+                                                    "TrainingEditorPage.OtherTab.visual_style_label"),
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black)),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Card(
+                                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              side: BorderSide(color: mediumblue, width: 1),
+                                            ),
+                                            color: Colors.white,
+                                            child: Padding(
+                                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.visual_style"), style: TextStyle(fontSize: 16)),
+                                                  DropdownButton2<VisualStyle>(
+                                                    underline: SizedBox(),
+                                                    value: widget.training.settings.visualStyle,
+                                                    onChanged: (value) async {
+                                                      widget.training.settings.setVisualStyle(value!.name);
+                                                      setState(() {});
+                                                    },
+                                                    items: VisualStyle.availableStyles
+                                                        .map((style) => DropdownMenuItem<VisualStyle>(
+                                                      value: style,
+                                                      child: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.${style.name}")),
+                                                    ))
+                                                        .toList(),
+                                                    iconStyleData: IconStyleData(
+                                                      icon: Icon(Icons.arrow_drop_down, color: darkerblue),
+                                                    ),
+                                                    dropdownStyleData: DropdownStyleData(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ),
                                         ]
                                       )
                                     )

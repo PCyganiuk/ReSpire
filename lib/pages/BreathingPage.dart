@@ -296,7 +296,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (SettingsProvider().currentStyle == VisualStyle.ring)
+              if (widget.training.settings.visualStyle == VisualStyle.ring)
                 Text(
                   '$value',
                   style: const TextStyle(
@@ -580,7 +580,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                         alignment: Alignment.center,
                         children: [
                           //background circle, max value
-                          if (SettingsProvider().currentStyle == VisualStyle.ring)
+                          if (widget.training.settings.visualStyle == VisualStyle.ring)
                             Container(
                               width: 300,
                               height: 300,
@@ -611,7 +611,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                                 return ValueListenableBuilder<bool>(
                                     valueListenable: controller!.isPaused,
                                     builder: (context, isPaused, _) {
-                                      if (SettingsProvider().currentStyle == VisualStyle.ring) {
+                                      if (widget.training.settings.visualStyle == VisualStyle.ring) {
                                         return AnimatedCircle(breathingPhase: breathingPhases.first,isPaused: isPaused);
                                       } else {
                                         return BreathingWaveTimeline(controller: controller!);
@@ -620,7 +620,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                               }),
 
                           //foreground circle, min value
-                          if (SettingsProvider().currentStyle == VisualStyle.ring)
+                          if (widget.training.settings.visualStyle == VisualStyle.ring)
                             Container(
                               width: 125,
                               height: 125,
@@ -632,7 +632,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
 
                           // Replace your selection with this:
                           Align(
-                            alignment: SettingsProvider().currentStyle == VisualStyle.ring
+                            alignment: widget.training.settings.visualStyle == VisualStyle.ring
                                 ? Alignment.center        // Keep in center for ring style
                                 : Alignment.topCenter, // Move to bottom for other styles
                             child: isPaused
@@ -641,7 +641,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: SettingsProvider().currentStyle == VisualStyle.ring
+                                color: widget.training.settings.visualStyle == VisualStyle.ring
                                     ? Colors.white
                                     : Colors.black,
                               ),

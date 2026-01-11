@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:respire/services/VisualStyle.dart';
 
 part 'Settings.g.dart';
 
@@ -25,4 +26,11 @@ class Settings {
 
   @HiveField(6)
   int dimScreenAfterSeconds = 3; //in seconds
+
+  @HiveField(7)
+  VisualStyle visualStyle = VisualStyle.timeline; // true - timeline, false - ring
+
+  Future<void> setVisualStyle(String newVisualStyle) async {
+    visualStyle = VisualStyle.fromString(newVisualStyle);
+  }
 }

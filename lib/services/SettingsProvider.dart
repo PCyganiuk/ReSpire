@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:respire/services/TranslationProvider/AppLanguage.dart';
-import 'package:respire/services/VisualStyle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider extends ChangeNotifier {
@@ -12,28 +11,17 @@ class SettingsProvider extends ChangeNotifier {
   SettingsProvider._internal(){init();}
 
   AppLanguage currentLanguage = AppLanguage.english;
-  
-  VisualStyle currentStyle = VisualStyle.ring;
 
   Future<void> init() async {
     var sharedPreferences = await SharedPreferences.getInstance();
     currentLanguage = AppLanguage.fromCode(sharedPreferences.getString('selectedLanguageCode'));
     log("Loaded voice type: ${currentLanguage.name}");
-    currentStyle = VisualStyle.fromString(sharedPreferences.getString('selectedVisualStyle'));
-    log("Loaded visual style: ${currentStyle.name}");
   }
 
   Future<void> setVoiceType(String newVoiceType) async {
     var sharedPreferences = await SharedPreferences.getInstance();
     currentLanguage = AppLanguage.fromCode(newVoiceType);
     await sharedPreferences.setString('selectedLanguageCode', currentLanguage.code);
-    notifyListeners();
-  }
-
-  Future<void> setVisualStyle(String newVisualStyle) async {
-    var sharedPreferences = await SharedPreferences.getInstance();
-    currentStyle = VisualStyle.fromString(newVisualStyle);
-    await sharedPreferences.setString('selectedVisualStyle', currentStyle.name);
     notifyListeners();
   }
 

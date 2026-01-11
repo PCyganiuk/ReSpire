@@ -1,7 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
-import 'package:respire/services/VisualStyle.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:respire/services/TranslationProvider/AppLanguage.dart';
 import 'package:respire/services/SettingsProvider.dart';
@@ -79,46 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: mediumblue, width: 1),
-            ),
-            color: Colors.white,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(translationProvider.getTranslation("SettingsPage.visual_style"), style: TextStyle(fontSize: 16)),
-                  DropdownButton2<VisualStyle>(
-                    underline: SizedBox(),
-                    value: SettingsProvider().currentStyle,
-                    onChanged: (value) async {
-                      SettingsProvider().setVisualStyle(value!.name);
-                      setState(() {});
-                    },
-                    items: VisualStyle.availableStyles
-                        .map((style) => DropdownMenuItem<VisualStyle>(
-                      value: style,
-                      child: Text(translationProvider.getTranslation("SettingsPage.${style.name}")),
-                    ))
-                        .toList(),
-                    iconStyleData: IconStyleData(
-                      icon: Icon(Icons.arrow_drop_down, color: darkerblue),
-                    ),
-                    dropdownStyleData: DropdownStyleData(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
+
         ],
       ),
     );
@@ -165,10 +125,10 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ),
         SizedBox(height: 20),
-        Icon(
-          Icons.air,
-          size: 70,
-          color: darkerblue,
+        Image(image:
+        AssetImage('assets/group_logo.png'),
+          fit: BoxFit.contain,
+          height: 75,
         ),
         SizedBox(height: 20),
         Text(

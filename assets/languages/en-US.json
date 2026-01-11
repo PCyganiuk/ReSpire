@@ -31,9 +31,6 @@
         "page_title":"Settings",
         "app_section_title":"App",
         "language_label":"Language",
-        "visual_style": "Breath visual style",
-        "ring": "Ring",
-        "timeline": "Timeline",
         "app_second_section_title":"About ReSpire",
         "app_description":"ReSpire offers full control over breath training. It is an app designed to help all users, regardless of their skill level. You can start your journey with ready-made exercises or quickly and conveniently create your own trainings tailored to your needs. \nSit back, relax and ReSpire.",
         "copyright":"All rights reserved"
@@ -168,7 +165,11 @@
             "ending_sound_warning": "Ending duration is set to 0 with ending music selected. The music will play for its full duration.",
             "dim_screen_label": "Dim screen",
             "dim_screen_during_training" : "Dim screen during training",
-            "dim_screen_after": "Time to dim screen (s)"
+            "dim_screen_after": "Time to dim screen (s)",
+            "visual_style_label": "Breath visualization",
+            "visual_style": "Breath visual style",
+            "ring": "Ring",
+            "timeline": "Timeline"
         },
 
                     
