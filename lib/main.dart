@@ -13,6 +13,7 @@ import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 import 'package:respire/components/Global/BreathingPhaseSounds.dart';
+import 'package:respire/services/VisualStyle.dart';
 import 'theme/Colors.dart';
 
 void main() async{
@@ -41,6 +42,7 @@ Future<void> initialize() async
   Hive.registerAdapter(SoundsAdapter());
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(BreathingPhaseSoundsAdapter());
+  Hive.registerAdapter(VisualStyleAdapter());
   await Hive.openBox('respire');
   await Hive.openBox('userShortSounds');
   await Hive.openBox('userLongSounds');

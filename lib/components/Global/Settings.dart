@@ -30,6 +30,11 @@ class Settings {
   @HiveField(7)
   VisualStyle visualStyle = VisualStyle.timeline; // true - timeline, false - ring
 
+  @HiveField(8)
+  bool breathingSoundEnabled = true;
+
+  Settings();
+
   Future<void> setVisualStyle(String newVisualStyle) async {
     visualStyle = VisualStyle.fromString(newVisualStyle);
   }

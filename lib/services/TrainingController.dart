@@ -8,11 +8,13 @@ import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
 import 'package:respire/components/Global/Sounds.dart';
 import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
+import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/services/BinauralBeatGenerator.dart';
 import 'package:respire/services/SoundManagers/PlaylistManager.dart';
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'BreathingToneController.dart';
 
 class TrainingController {
   Timer? _timer;
@@ -45,6 +47,8 @@ class TrainingController {
   int _newBreathingPhaseRemainingTime = 0; //in milliseconds
   late int _endingDuration;
 
+  List<TrainingStage> trainingStages = [];
+
   bool end = false;
   bool _finishedLoadingBreathingPhases = false;
   bool _nextPhaseSoundPlayed = false;
@@ -58,6 +62,7 @@ class TrainingController {
   late SoundManager soundManager;
   late PlaylistManager playlistManager;
   late BinauralBeatGenerator binauralGenerator;
+  late BreathingToneController breathingToneController;
   bool _isUsingPlaylist = false;
   bool _preparationPhaseCompleted = false;
   bool _endingInitiated = false;
@@ -73,6 +78,9 @@ class TrainingController {
     soundManager.stopAllSounds();
     playlistManager = PlaylistManager();
     binauralGenerator = BinauralBeatGenerator();
+    if(parser.training.settings.breathingSoundEnabled) {
+      breathingToneController = BreathingToneController(baseFrequency: 100.0,);
+    }
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
     showLabels.value = false;
@@ -81,6 +89,7 @@ class TrainingController {
     if (parser.training.trainingStages.isNotEmpty) {
       _currentTrainingStageId = parser.training.trainingStages[0].id;
       totalStages.value = parser.training.trainingStages.length;
+      trainingStages = parser.training.trainingStages;
       currentStageIndex.value = 1;
       currentCycleIndex.value = 1;
       totalCycles.value = parser.training.trainingStages[0].reps;
@@ -136,7 +145,48 @@ class TrainingController {
     _fetchNextBreathingPhase();
     _nextRemainingTime = _newBreathingPhaseRemainingTime;
     _fetchNextBreathingPhase();
+    if(parser.training.settings.breathingSoundEnabled) {
+      _prepareBreathingTone();
+    }
   }
+
+  void _prepareBreathingTone() {
+    final List<BreathingPhase> phases = [];
+
+    /// ---- BUILD FULL PHASE LIST ----
+    //final phases = <breathing_phase.BreathingPhase>[];
+    //phases.add(breathing_phase.BreathingPhase(duration: 0,breathingPhaseType: breathing_phase.BreathingPhaseType.recovery));
+    for (final stage in trainingStages) {
+      for (int i = 0; i < stage.reps; i++) {
+        //phases.addAll(stage.breathingPhases);
+        for (final phase in stage.breathingPhases) {
+          phases.add(
+            BreathingPhase(
+              phase: _mapPhaseType(phase.breathingPhaseType),
+              durationSeconds: phase.duration,
+            ),
+          );
+        }
+      }
+    }
+
+    breathingToneController.prepareTraining(phases);
+  }
+
+  BreathingAudioPhase _mapPhaseType(
+      breathing_phase.BreathingPhaseType type) {
+    switch (type) {
+      case breathing_phase.BreathingPhaseType.inhale:
+        return BreathingAudioPhase.inhale;
+      case breathing_phase.BreathingPhaseType.exhale:
+        return BreathingAudioPhase.exhale;
+      case breathing_phase.BreathingPhaseType.retention:
+        return BreathingAudioPhase.retention;
+      case breathing_phase.BreathingPhaseType.recovery:
+        return BreathingAudioPhase.recovery;
+    }
+  }
+
 
   void _fetchNextBreathingPhase() {
     var instructionData = parser.nextInstruction();
@@ -196,6 +246,10 @@ class TrainingController {
     // to account for some longer counting sounds
     //(that are not stored in the _currentSound)
     soundManager.stopAllSounds();
+    if(parser.training.settings.breathingSoundEnabled) {
+      breathingToneController.pause();
+    }
+
     if (_isUsingPlaylist) {
       playlistManager.pausePlaylist();
     }
@@ -218,6 +272,9 @@ class TrainingController {
 
     if (_isUsingPlaylist) {
       playlistManager.resumePlaylist();
+    }
+    if(parser.training.settings.breathingSoundEnabled) {
+      breathingToneController.resume();
     }
     if (_settings.binauralBeatsEnabled) {
       binauralGenerator.resume();
@@ -402,7 +459,7 @@ class TrainingController {
         _remainingTime = 0;
         //second.value = 0;
       }
-      remainingMs.value = _remainingTime; //TODO
+      remainingMs.value = _remainingTime;
 
       if (_remainingTime == 0) {
         breathingPhasesCount.value++;
@@ -424,6 +481,10 @@ class TrainingController {
           _currentSound = null;
           _preparationPhaseCompleted = true;
           showLabels.value = true;
+          if(parser.training.settings.breathingSoundEnabled) {
+            breathingToneController.play();
+          }
+
           if (_sounds.backgroundSoundScope == SoundScope.global &&
               _sounds.trainingBackgroundPlaylist.isNotEmpty) {
             _isUsingPlaylist = true;
@@ -574,6 +635,9 @@ class TrainingController {
     _timer?.cancel();
     currentTrainingStageName.dispose();
     currentStageIndex.dispose();
+    if(parser.training.settings.breathingSoundEnabled) {
+      breathingToneController.dispose();
+    }
     totalStages.dispose();
   }
 

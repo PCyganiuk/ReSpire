@@ -1,7 +1,7 @@
 name: respire
 description: "Application for breathing exercise"
 publish_to: 'none'
-version: 1.7.3
+version: 1.7.4
 
 environment:
   sdk: ^3.6.0
@@ -29,6 +29,8 @@ dependencies:
   package_info_plus: ^8.3.1
   screen_brightness: ^0.2.2
   change_app_package_name: ^1.5.0
+  just_audio: ^0.9.36
+
 
 dev_dependencies:
   flutter_test:

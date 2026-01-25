@@ -594,8 +594,57 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 }),
                                             includeVoiceOption: false,
                                             blueBorder: true,
-                                            isSoundSelection: true)
-                                            ],
+                                            isSoundSelection: true),
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 4),
+                                            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: mediumblue,
+                                                width: 1,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.05),
+                                                  blurRadius: 4,
+                                                  offset: Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    translationProvider.getTranslation(
+                                                      "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_enabled",
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: darkerblue,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Switch(
+                                                  value: widget.training.settings.breathingSoundEnabled,
+                                                  activeColor: darkerblue,
+                                                  activeTrackColor: mediumblue.withOpacity(0.4),
+                                                  inactiveThumbColor: Colors.grey.shade400,
+                                                  inactiveTrackColor: Colors.grey.shade300,
+                                                  onChanged: (v) {
+                                                    setState(() {
+                                                      widget.training.settings.breathingSoundEnabled = v;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                        ],
                                       ),
                                     ),
                                   ),

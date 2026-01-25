@@ -1,6 +1,15 @@
+import 'package:hive/hive.dart';
+
+part 'VisualStyle.g.dart';
+
+
+@HiveType(typeId: 13)
 class VisualStyle {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   bool isSelected;
+
   VisualStyle({
     required this.name,
     required this.isSelected

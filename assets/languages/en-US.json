@@ -100,7 +100,8 @@
                     "for_each_breathing_phase":"change sound for each phase"
                 },
                 "stage_change_sound": "Stage change",
-                "cycle_change_sound": "Cycle change"
+                "cycle_change_sound": "Cycle change",
+                "breathing_sound_enabled": "Breathing sound"
             },
 
             "TrainingMusic":{
