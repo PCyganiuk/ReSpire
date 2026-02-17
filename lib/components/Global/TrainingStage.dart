@@ -48,4 +48,12 @@ class TrainingStage {
       breathingPhase.sounds.background = globalBackgroundSound;
     }
   }
+
+  double getTotalTimeSeconds() {
+    double totalTime = 0;
+    for (var breathingPhase in breathingPhases) {
+      totalTime += (breathingPhase.duration * reps);
+    }
+    return totalTime;
+  }
 }

@@ -172,21 +172,21 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Widget trainingOverviewHeader() {
     return GestureDetector(
-      onTap: () => setState(() => _expanded = !_expanded),
+      //onTap: () => setState(() => _expanded = !_expanded),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             Text(
-              translationProvider.getTranslation("TrainingPage.TrainingOverview.title"),
+              '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ' '${training.getTotalTimeSeconds().toStringAsFixed(1)} s',
               style: TextStyle(fontSize: 18, color: darkerblue, fontWeight: FontWeight.w500),
             ),
             Spacer(),
-            AnimatedRotation(
-              turns: _expanded ? 0.5 : 0.0,
-              duration: Duration(milliseconds: 200),
-              child: Icon(Icons.keyboard_arrow_down, color: darkerblue),
-            ),
+            //AnimatedRotation(
+            //  turns: _expanded ? 0.5 : 0.0,
+            //  duration: Duration(milliseconds: 200),
+            //  child: Icon(Icons.keyboard_arrow_down, color: darkerblue),
+            //),
           ],
         ),
       ),
@@ -198,8 +198,7 @@ class _TrainingPageState extends State<TrainingPage> {
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       child: ClipRect(
-        child: _expanded
-            ? Padding(
+        child: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: Column(
                   children: trainingStages.asMap().entries.map((entry) {
@@ -266,7 +265,6 @@ class _TrainingPageState extends State<TrainingPage> {
                   }).toList(),
                 ),
               )
-            : SizedBox.shrink(),
       ),
     );
   }

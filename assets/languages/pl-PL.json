@@ -42,7 +42,9 @@
         "description_placeholder_prefix":"Opis dla treningu",
         "TrainingOverview":{
             "title":"Przegląd treningu",
+            "duration":"Czas treningu",
             "training_stage":"Etap treningu",
+            "stage_duration":"Czas etapu",
             "reps":"Powtórzenia",
             "increment":"Przyrost"
         },

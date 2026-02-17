@@ -546,6 +546,14 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                         ),
                       ],
                     ),
+
+                    SizedBox(width: 12),
+
+                    Text(
+                      '${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage_duration")}\n' '${widget.trainingStage.getTotalTimeSeconds().toStringAsFixed(1)} s',
+                      style: TextStyle(fontSize: 12, color: darkerblue, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ],

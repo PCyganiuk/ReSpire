@@ -33,6 +33,8 @@ class SoundManager implements ISoundManager {
   final HashMap<String,AudioPlayer> _audioPlayers = HashMap<String,AudioPlayer>();
   final Map<String, AudioPlayerPool> _pools = {};
   final int _maxPoolSizePerSound = 5;
+  int _currentCycleIndex = 0;
+
 
   @override
   Map<String, SoundAsset> getSounds(SoundListType type) {
@@ -135,6 +137,11 @@ class SoundManager implements ISoundManager {
   Future<void> playSound(String? soundName) async {
     if (soundName == null || _availableSounds[soundName] == null) return;
     final asset = _availableSounds[soundName]!;
+    if (soundName=='count'){
+      _currentCycleIndex++;
+      _currentCycleIndex=_currentCycleIndex%11;
+      asset.path = 'sounds/short/$_currentCycleIndex.mp3';
+    }
     if (asset.type == SoundType.cue || asset.type == SoundType.counting) {
       await _playShortSound(soundName, asset);
       return;

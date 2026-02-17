@@ -46,6 +46,16 @@ class Training {
     trainingStages.removeWhere((stage) => stage.breathingPhases.isEmpty);
   }
 
+  double getTotalTimeSeconds() {
+    double totalTime = 0.0;
+    for (TrainingStage stage in trainingStages) {
+      for (BreathingPhase phase in stage.breathingPhases) {
+        totalTime += phase.duration * stage.reps;
+      }
+    }
+    return totalTime;
+  }
+
   bool isEmpty() {
     if(trainingStages.isEmpty) {
       return true;

@@ -614,7 +614,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                                       if (widget.training.settings.visualStyle == VisualStyle.ring) {
                                         return AnimatedCircle(breathingPhase: breathingPhases.first,isPaused: isPaused);
                                       } else {
-                                        return BreathingWaveTimeline(controller: controller!);
+                                        return BreathingWaveTimeline(controller: controller!, preparationDuration: preparationDuration,endingDuration: endingDuration,);
                                       }
                                     });
                               }),

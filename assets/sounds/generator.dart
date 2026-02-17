@@ -45,10 +45,16 @@ void main() async {
   buffer.writeln('  final Map<String, SoundAsset> shortSounds = {');
 
   for (var name in shortFiles) {
+    // Skip numbered files (1-9), they will be consolidated into "count"
+    if (RegExp(r'^\d+$').hasMatch(name)) continue;
+    
     final displayName = TextUtils.capitalizeAndRemoveTextSeparators(name);
     buffer.writeln(
         '    "$displayName": SoundAsset(name: "$displayName", path: "sounds/short/$name.mp3", type: SoundType.cue),');
   }
+  
+  // Add single "count" entry for all numbered sounds (1-9)
+  buffer.writeln('    "count": SoundAsset(name: "count", path: "sounds/short/1.mp3", type: SoundType.cue),');
   
   buffer.writeln('  };\n');
   buffer.writeln('  final Map<String, SoundAsset> countingSounds = {');

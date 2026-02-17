@@ -42,7 +42,9 @@
         "description_placeholder_prefix":"Description for training",
         "TrainingOverview":{
             "title":"Training Overview",
+            "duration":"Training Duration",
             "training_stage":"Training stage",
+            "stage_duration":"Stage Duration",
             "reps":"Reps",
             "increment":"Inc"
         },

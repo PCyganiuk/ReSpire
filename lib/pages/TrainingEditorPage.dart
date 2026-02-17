@@ -386,6 +386,20 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 ),
               ),
               SizedBox(height: 2),
+              if (_selectedTab == 0)
+                Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  color: Colors.white,
+                  elevation: 2,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                    '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ' '${widget.training.getTotalTimeSeconds().toStringAsFixed(1)} s',
+                    style: TextStyle(fontSize: 18, color: darkerblue, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                ),
               Expanded(
                 child: _selectedTab == 0
                     ? ReorderableListView(
@@ -595,55 +609,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             includeVoiceOption: false,
                                             blueBorder: true,
                                             isSoundSelection: true),
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 4),
-                                            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: mediumblue,
-                                                width: 1,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.05),
-                                                  blurRadius: 4,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    translationProvider.getTranslation(
-                                                      "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_enabled",
-                                                    ),
-                                                    style: TextStyle(
-                                                      color: darkerblue,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 14,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Switch(
-                                                  value: widget.training.settings.breathingSoundEnabled,
-                                                  activeColor: darkerblue,
-                                                  activeTrackColor: mediumblue.withOpacity(0.4),
-                                                  inactiveThumbColor: Colors.grey.shade400,
-                                                  inactiveTrackColor: Colors.grey.shade300,
-                                                  onChanged: (v) {
-                                                    setState(() {
-                                                      widget.training.settings.breathingSoundEnabled = v;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
                                         ],
                                       ),
                                     ),
@@ -1574,6 +1539,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                     underline: SizedBox(),
                                                     value: widget.training.settings.visualStyle,
                                                     onChanged: (value) async {
+                                                      if(value == VisualStyle.ring) {
+                                                        widget.training.settings
+                                                            .breathingSoundEnabled =
+                                                        false;
+                                                      }
                                                       widget.training.settings.setVisualStyle(value!.name);
                                                       setState(() {});
                                                     },
@@ -1596,6 +1566,42 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 ],
                                               ),
                                             )
+                                          ),
+                                          if((widget.training.settings.visualStyle == VisualStyle.timeline))
+                                          Card(
+                                              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                                side: BorderSide(color: mediumblue, width: 1),
+                                              ),
+                                              color: Colors.white,
+                                              child: Padding(
+                                                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    translationProvider.getTranslation(
+                                                      "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_enabled",
+                                                    ),
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                                Switch(
+                                                  value: widget.training.settings.breathingSoundEnabled,
+                                                  activeColor: darkerblue,
+                                                  activeTrackColor: mediumblue.withOpacity(0.4),
+                                                  inactiveThumbColor: Colors.grey.shade400,
+                                                  inactiveTrackColor: Colors.grey.shade300,
+                                                  onChanged: (v) {
+                                                    setState(() {
+                                                      widget.training.settings.breathingSoundEnabled = v;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                              )
                                           ),
                                         ]
                                       )

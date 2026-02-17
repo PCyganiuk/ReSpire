@@ -283,6 +283,8 @@ class TrainingController {
   }
 
   void _playCountingSound(previousSecond) {
+    if (_settings.breathingSoundEnabled) return;
+    
     switch (_sounds.countingSound.type) {
       case SoundType.voice:
         TextToSpeechService().readNumber(previousSecond + 1);
@@ -306,7 +308,13 @@ class TrainingController {
   }
 
   void _playShortSound(String soundName){
-        soundManager.playSound(soundName);
+        //soundName = 'count';
+        if(soundName == 'count'){
+          soundManager.playSound(soundName);
+        }
+        else {
+          soundManager.playSound(soundName);
+        }
         Future.delayed(const Duration(seconds: 1), () {
           soundManager.stopSound(soundName);
         });
@@ -314,6 +322,8 @@ class TrainingController {
 
   void _playPreBreathingPhaseSound(
       breathing_phase.BreathingPhase breathingPhase) {
+    if (_settings.breathingSoundEnabled) return;
+    
     switch (breathingPhase.sounds.preBreathingPhase.type) {
       case SoundType.voice:
         String breathingPhaseName = translationProvider.getTranslation(
@@ -359,6 +369,8 @@ class TrainingController {
 
   Future<void> _handleBackgroundSoundChange(
       String? nextBackgroundSound, int changeTime) async {
+    if (_settings.breathingSoundEnabled) return;
+    
     // For global playlist, it should play continuously - don't restart
     if (_sounds.backgroundSoundScope == SoundScope.global &&
         _sounds.trainingBackgroundPlaylist.isNotEmpty) {
@@ -411,9 +423,6 @@ class TrainingController {
       final int elapsed = now.difference(lastTick).inMilliseconds;
       lastTick = now;
       trainingElapsedMs.value += elapsed;
-      if (!_preparationPhaseCompleted && breathingPhasesCount.value == 0) {
-        trainingElapsedMs.value = 0;
-      }
 
 
       if (previousSecond > _remainingTime ~/ 1000 && !end) {
@@ -483,17 +492,17 @@ class TrainingController {
           showLabels.value = true;
           if(parser.training.settings.breathingSoundEnabled) {
             breathingToneController.play();
-          }
-
-          if (_sounds.backgroundSoundScope == SoundScope.global &&
-              _sounds.trainingBackgroundPlaylist.isNotEmpty) {
-            _isUsingPlaylist = true;
-            playlistManager.playPlaylist(
-                _sounds.trainingBackgroundPlaylist.map((s) => s.name).toList());
-          } else if (_sounds.backgroundSoundScope == SoundScope.perStage &&
-              _currentTrainingStageId != null) {
-            // Start first stage's playlist
-            _switchToStagePlaylist(_currentTrainingStageId!);
+          } else {
+            if (_sounds.backgroundSoundScope == SoundScope.global &&
+                _sounds.trainingBackgroundPlaylist.isNotEmpty) {
+              _isUsingPlaylist = true;
+              playlistManager.playPlaylist(
+                  _sounds.trainingBackgroundPlaylist.map((s) => s.name).toList());
+            } else if (_sounds.backgroundSoundScope == SoundScope.perStage &&
+                _currentTrainingStageId != null) {
+              // Start first stage's playlist
+              _switchToStagePlaylist(_currentTrainingStageId!);
+            }
           }
         }
 
@@ -528,7 +537,9 @@ class TrainingController {
               
               _endingInitiated = true; // Ending triggered
               soundManager.stopSound(_currentSound);
-              _playShortSound(parser.training.sounds.stageChangeSound.name);
+              if (!_settings.breathingSoundEnabled) {
+                _playShortSound(parser.training.sounds.stageChangeSound.name);
+              }
               _remainingTime = _endingDuration;
               _currentSound = _sounds.endingTrack.name;
               previousSecond = (_remainingTime ~/ 1000)+1;
@@ -589,7 +600,9 @@ class TrainingController {
     {
       //dev.log('TrainingController: Stage changed from $_currentTrainingStageId to $newStageId');
       _currentTrainingStageId = newStageId;
-      _playShortSound(parser.training.sounds.stageChangeSound.name);
+      if (!_settings.breathingSoundEnabled) {
+        _playShortSound(parser.training.sounds.stageChangeSound.name);
+      }
       
       for (int i = 0; i < parser.training.trainingStages.length; i++) {
         if (parser.training.trainingStages[i].id == newStageId) {
@@ -610,8 +623,10 @@ class TrainingController {
       dev.log("Queue: $_cycleIndexQueue PlayCycle: $playCycleSound");
       //dev.log('TrainingController: Same stage ($newStageId) - keeping playlist');
       if (playCycleSound && !_endingInitiated) {
-        _playShortSound(parser.training.sounds.cycleChangeSound.name);
-       playCycleSound = false;
+        if (!_settings.breathingSoundEnabled) {
+          _playShortSound(parser.training.sounds.cycleChangeSound.name);
+        }
+        playCycleSound = false;
       }
       if(_cycleIndexQueue.length > 1 &&
           _cycleIndexQueue.elementAt(0) != _cycleIndexQueue.elementAt(1) && 

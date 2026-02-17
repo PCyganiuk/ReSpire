@@ -6,10 +6,14 @@ import 'package:respire/services/TrainingController.dart';
 
 class BreathingWaveTimeline extends StatefulWidget {
   final TrainingController controller;
+  final double preparationDuration;
+  final double endingDuration;
 
   const BreathingWaveTimeline({
     super.key,
     required this.controller,
+    this.preparationDuration = 0.0,
+    this.endingDuration = 0.0,
   });
 
   @override
@@ -50,6 +54,8 @@ class _BreathingWaveTimelineState extends State<BreathingWaveTimeline>
                 controller: widget.controller,
                 elapsedMs: elapsedMs,
                 pulse: _pulse.value,
+                preparationDurationSecs: widget.preparationDuration,
+                endingDuration: widget.endingDuration,
               ),
             );
           },
@@ -63,25 +69,49 @@ class _BreathingWavePainter extends CustomPainter {
   final TrainingController controller;
   final int elapsedMs;
   final double pulse;
+  final double preparationDurationSecs;
+  final double endingDuration;
 
   _BreathingWavePainter({
     required this.controller,
     required this.elapsedMs,
     required this.pulse,
+    this.preparationDurationSecs = 0.0,
+    this.endingDuration = 0.0
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final training = controller.parser.training;
 
-    /// ---- BUILD FULL PHASE LIST ----
+    /// ---- BUILD FULL PHASE LIST (with preparation) ----
     final phases = <breathing_phase.BreathingPhase>[];
-    //phases.add(breathing_phase.BreathingPhase(duration: 0,breathingPhaseType: breathing_phase.BreathingPhaseType.recovery));
+    
+    // Add preparation phase as a recovery phase at the start
+    if (preparationDurationSecs > 0) {
+      phases.add(
+        breathing_phase.BreathingPhase(
+          duration: preparationDurationSecs,
+          breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
+        ),
+      );
+    }
+    
     for (final stage in training.trainingStages) {
       for (int i = 0; i < stage.reps; i++) {
         phases.addAll(stage.breathingPhases);
       }
     }
+
+    if (endingDuration > 0) {
+      phases.add(
+        breathing_phase.BreathingPhase(
+          duration: endingDuration,
+          breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
+        ),
+      );
+    }
+
     if (phases.isEmpty) return;
 
     /// ---- BUILD TIME ENVELOPE ----
@@ -98,6 +128,7 @@ class _BreathingWavePainter extends CustomPainter {
     }
 
     final totalMs = accMs;
+    // Clamp elapsed time to the total timeline (which now includes preparation)
     final clampedElapsed = elapsedMs.clamp(0, totalMs);
 
     /// ---- GEOMETRY ----
@@ -197,7 +228,7 @@ class _BreathingWavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _BreathingWavePainter old) =>
-      old.elapsedMs != elapsedMs || old.pulse != pulse;
+      old.elapsedMs != elapsedMs || old.pulse != pulse || old.preparationDurationSecs != preparationDurationSecs;
 }
 
 /// ---- HELPERS ----
