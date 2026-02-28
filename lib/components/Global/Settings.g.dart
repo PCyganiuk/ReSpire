@@ -24,13 +24,14 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..binauralRightFrequency = fields[4] as double
       ..dimScreenEnabled = fields[5] as bool
       ..dimScreenAfterSeconds = fields[6] as int
-      ..visualStyle = fields[7] as VisualStyle;
+      ..visualStyle = fields[7] as VisualStyle
+      ..breathingSoundEnabled = fields[8] as bool;
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.preparationDuration)
       ..writeByte(1)
@@ -46,7 +47,9 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(6)
       ..write(obj.dimScreenAfterSeconds)
       ..writeByte(7)
-      ..write(obj.visualStyle);
+      ..write(obj.visualStyle)
+      ..writeByte(8)
+      ..write(obj.breathingSoundEnabled);
   }
 
   @override

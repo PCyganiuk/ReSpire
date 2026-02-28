@@ -83,6 +83,8 @@ class _BreathingWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final training = controller.parser.training;
+    List<double> phaseIncrements = [];
+
 
     /// ---- BUILD FULL PHASE LIST (with preparation) ----
     final phases = <breathing_phase.BreathingPhase>[];
@@ -95,10 +97,20 @@ class _BreathingWavePainter extends CustomPainter {
           breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
         ),
       );
+      phaseIncrements.add(0.0);
     }
     
     for (final stage in training.trainingStages) {
       for (int i = 0; i < stage.reps; i++) {
+        for (int j = 0; j < stage.breathingPhases.length; j++) {
+          if(stage.breathingPhases[j].increment != null) {
+            double tmp = i * stage.breathingPhases[j].increment!.value;
+            phaseIncrements.add(tmp);
+          }
+          else {
+            phaseIncrements.add(0.0);
+          }
+        }
         phases.addAll(stage.breathingPhases);
       }
     }
@@ -110,6 +122,7 @@ class _BreathingWavePainter extends CustomPainter {
           breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
         ),
       );
+      phaseIncrements.add(0.0);
     }
 
     if (phases.isEmpty) return;
@@ -117,14 +130,15 @@ class _BreathingWavePainter extends CustomPainter {
     /// ---- BUILD TIME ENVELOPE ----
     final keys = <_KeyPoint>[];
     int accMs = 0;
-
+    int i = 0;
     for (final phase in phases) {
-      final durMs = (phase.duration * 1000).toInt();
+      final durMs = ((phase.duration + phaseIncrements[i]) * 1000).toInt();
       final (from, to) = _phaseEnvelope(phase);
 
       keys.add(_KeyPoint(accMs, from));
       accMs += durMs;
       keys.add(_KeyPoint(accMs, to));
+      i++;
     }
 
     final totalMs = accMs;
@@ -207,7 +221,7 @@ class _BreathingWavePainter extends CustomPainter {
 
     final textPainter = TextPainter(
       text: TextSpan(
-        text: (remainingSeconds-1).toString(),
+        text: (remainingSeconds).toString(),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 18,

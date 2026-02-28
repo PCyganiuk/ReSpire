@@ -18,8 +18,7 @@ class TrainingStageAdapter extends TypeAdapter<TrainingStage> {
     };
     return TrainingStage(
       reps: fields[2] as int,
-      increment: fields[3] as double,
-      breathingPhases: (fields[4] as List).cast<BreathingPhase>(),
+      breathingPhases: (fields[3] as List).cast<BreathingPhase>(),
       name: fields[1] as String,
     )..id = fields[0] as String;
   }
@@ -27,7 +26,7 @@ class TrainingStageAdapter extends TypeAdapter<TrainingStage> {
   @override
   void write(BinaryWriter writer, TrainingStage obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,8 +34,6 @@ class TrainingStageAdapter extends TypeAdapter<TrainingStage> {
       ..writeByte(2)
       ..write(obj.reps)
       ..writeByte(3)
-      ..write(obj.increment)
-      ..writeByte(4)
       ..write(obj.breathingPhases);
   }
 

@@ -1,7 +1,8 @@
 import 'dart:developer';
 
 import 'package:respire/components/Global/TrainingStage.dart';
-import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
+import 'package:respire/components/Global/BreathingPhase.dart'
+    as breathing_phase;
 import 'package:respire/components/Global/Training.dart';
 
 class TrainingParser {
@@ -34,10 +35,15 @@ class TrainingParser {
       breathingPhaseID++;
     }
 
-    currentBreathingPhase = currentTrainingStage.breathingPhases[breathingPhaseID];
+    currentBreathingPhase =
+        currentTrainingStage.breathingPhases[breathingPhaseID];
 
-
-  double durationSeconds = currentBreathingPhase.duration + (currentTrainingStage.increment * doneReps);
+    double durationSeconds = currentBreathingPhase.duration;
+    if (currentBreathingPhase.increment != null && doneReps > 0) {
+      final increment = currentBreathingPhase.increment!;
+      durationSeconds =
+          currentBreathingPhase.duration + (doneReps * increment.value);
+    }
 
     final progressedBreathingPhase = breathing_phase.BreathingPhase(
       duration: durationSeconds,
@@ -55,58 +61,76 @@ class TrainingParser {
     };
   }
 
-
   int countBreathingPhases() {
     int result = 0;
-    for (int i=0; i<training.trainingStages.length; i++) {
-      result += (training.trainingStages[i].breathingPhases.length * training.trainingStages[i].reps);
+    for (int i = 0; i < training.trainingStages.length; i++) {
+      result += (training.trainingStages[i].breathingPhases.length *
+          training.trainingStages[i].reps);
     }
     return result;
   }
 
   double calculateTotalDuration({double breathingPhaseDelaySeconds = 0.6}) {
     double totalSeconds = training.settings.preparationDuration.toDouble();
-    
+
     int totalBreathingPhases = 0;
-    
-    for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
+
+    for (int stageIdx = 0;
+        stageIdx < training.trainingStages.length;
+        stageIdx++) {
       final stage = training.trainingStages[stageIdx];
-      
+
       for (int rep = 0; rep < stage.reps; rep++) {
-        for (int phaseIdx = 0; phaseIdx < stage.breathingPhases.length; phaseIdx++) {
+        for (int phaseIdx = 0;
+            phaseIdx < stage.breathingPhases.length;
+            phaseIdx++) {
           final phase = stage.breathingPhases[phaseIdx];
-          totalSeconds += phase.duration + (stage.increment * rep);
+          double phaseDuration = phase.duration;
+          if (phase.increment != null && rep > 0) {
+            final increment = phase.increment!;
+            phaseDuration = phase.duration + (rep * increment.value);
+          }
+          totalSeconds += phaseDuration;
           totalBreathingPhases++;
         }
       }
     }
-    
+
     totalSeconds += totalBreathingPhases * breathingPhaseDelaySeconds;
-    
+
     return totalSeconds;
   }
 
-  double calculateTrainingDurationWithoutPreparation({double breathingPhaseDelaySeconds = 0.6}) {
+  double calculateTrainingDurationWithoutPreparation(
+      {double breathingPhaseDelaySeconds = 0.6}) {
     // Calculate only the breathing phases duration (without preparation)
     double totalSeconds = 0.0;
-    
+
     int totalBreathingPhases = 0;
-    
-    for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
+
+    for (int stageIdx = 0;
+        stageIdx < training.trainingStages.length;
+        stageIdx++) {
       final stage = training.trainingStages[stageIdx];
-      
+
       for (int rep = 0; rep < stage.reps; rep++) {
-        for (int phaseIdx = 0; phaseIdx < stage.breathingPhases.length; phaseIdx++) {
+        for (int phaseIdx = 0;
+            phaseIdx < stage.breathingPhases.length;
+            phaseIdx++) {
           final phase = stage.breathingPhases[phaseIdx];
-          totalSeconds += phase.duration + (stage.increment * rep);
+          double phaseDuration = phase.duration;
+          if (phase.increment != null && rep > 0) {
+            final increment = phase.increment!;
+            phaseDuration = phase.duration + (rep * increment.value);
+          }
+          totalSeconds += phaseDuration;
           totalBreathingPhases++;
         }
       }
     }
-    
+
     totalSeconds += totalBreathingPhases * breathingPhaseDelaySeconds;
-    
+
     return totalSeconds;
   }
-
 }

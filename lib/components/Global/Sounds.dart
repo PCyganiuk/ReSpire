@@ -21,13 +21,13 @@ class Sounds {
   SoundScope nextSoundScope = SoundScope.global;
   /// Next sound played between breathing phases
   @HiveField(3)
-  SoundAsset nextSound = SoundManager.shortSounds["Snap"]!;
+  SoundAsset nextSound = SoundAsset(name: 'Brak', type: SoundType.none);
 
   /// Preparation and ending tracks for the training session
   @HiveField(4)
-  SoundAsset preparationTrack = SoundManager.longSounds["Rain"]!;
+  SoundAsset preparationTrack = SoundAsset(name: 'Brak', type: SoundType.none);
   @HiveField(5)
-  SoundAsset endingTrack = SoundManager.longSounds["Ocean"]!;
+  SoundAsset endingTrack = SoundAsset(name: 'Brak', type: SoundType.none);
 
   /// Scope of the background audio during the training session
   @HiveField(6)
@@ -69,11 +69,14 @@ class Sounds {
 
   /// Sound played between stages
   @HiveField(13)
-  SoundAsset stageChangeSound = SoundManager.shortSounds["Bell"]!;
+  SoundAsset stageChangeSound = SoundAsset(name: 'Brak', type: SoundType.none);
 
   /// Sound played between cycles (repeated stage)
   @HiveField(14)
-  SoundAsset cycleChangeSound = SoundManager.shortSounds["Beep"]!;
+  SoundAsset cycleChangeSound = SoundAsset(name: 'Brak', type: SoundType.none);
+
+  @HiveField(15)
+  String changeSoundScope = 'stage_and_cycle';
 
   void clearUserSound(String soundName) {
     if (countingSound.name == soundName) {

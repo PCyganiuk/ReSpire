@@ -221,7 +221,7 @@ class _TrainingPageState extends State<TrainingPage> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.reps} | ${translationProvider.getTranslation("TrainingPage.TrainingOverview.increment")}: ${trainingStage.increment} [s]',
+                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.reps} ',
                                 style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 8),
@@ -246,9 +246,14 @@ class _TrainingPageState extends State<TrainingPage> {
                                               ),
                                               Spacer(),
                                               Text(
-                                                '${breathingPhase.duration} s',
-                                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                                              ),
+                                                breathingPhase.increment != null && breathingPhase.increment!.value > 0
+                                                    ? '${breathingPhase.duration} s + ${breathingPhase.increment!.value} s'
+                                                    : '${breathingPhase.duration} s',
+                                                style: TextStyle(
+                                                  color: darkerblue,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
                                             ],
                                           ),
                                         )

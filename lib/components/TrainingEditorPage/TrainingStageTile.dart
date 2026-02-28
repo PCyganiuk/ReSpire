@@ -28,11 +28,8 @@ class TrainingStageTile extends StatefulWidget {
 
 class _TrainingStageTileState extends State<TrainingStageTile> {
   late TextEditingController repsController;
-  late TextEditingController incrementController;
   late TextEditingController nameController;
-  late double incrementDuration;
   FocusNode? repsFocusNode;
-  FocusNode? incrementFocusNode;
   FocusNode? nameFocusNode;
   TranslationProvider translationProvider = TranslationProvider();
   bool _isExpanded = true;
@@ -41,11 +38,8 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   void initState() {
     super.initState();
     repsController = TextEditingController(text: widget.trainingStage.reps.toString());
-    incrementController = TextEditingController(text: widget.trainingStage.increment.toString());
-    // Initialize with actual name or default name
     nameController = TextEditingController(text: _getInitialName());
     repsFocusNode = FocusNode();
-    incrementFocusNode = FocusNode();
     nameFocusNode = FocusNode();
     repsFocusNode!.addListener(() {
       if (!(repsFocusNode?.hasFocus ?? true)) {
@@ -56,22 +50,12 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
         widget.onUpdate();
       }
     });
-    incrementFocusNode!.addListener(() {
-      if (!(incrementFocusNode?.hasFocus ?? true)) {
-        final value = double.tryParse(incrementController.text) ?? 0;
-        if (value >= 0 && value <= 100) {
-          setState(() => widget.trainingStage.increment = value);
-        }
-        widget.onUpdate();
-      }
-    });
     nameFocusNode!.addListener(() {
       if (!(nameFocusNode?.hasFocus ?? true)) {
         setState(() => widget.trainingStage.name = nameController.text);
         widget.onUpdate();
       }
     });
-    incrementDuration = widget.trainingStage.increment;
   }
 
   @override
@@ -79,9 +63,6 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.trainingStage.reps != widget.trainingStage.reps && !repsFocusNode!.hasFocus) {
       repsController.text = widget.trainingStage.reps.toString();
-    }
-    if (oldWidget.trainingStage.increment != widget.trainingStage.increment && !incrementFocusNode!.hasFocus) {
-      incrementController.text = widget.trainingStage.increment.toString();
     }
     if (oldWidget.trainingStage.name != widget.trainingStage.name && !nameFocusNode!.hasFocus) {
       nameController.text = _getInitialName();
@@ -95,25 +76,10 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   @override
   void dispose() {
     repsController.dispose();
-    incrementController.dispose();
     nameController.dispose();
     repsFocusNode?.dispose();
-    incrementFocusNode?.dispose();
     nameFocusNode?.dispose();
     super.dispose();
-  }
-
-  void commitIncrementDurationChange() {
-    double newDuration = incrementDuration;
-
-    incrementDuration = (newDuration * 10).roundToDouble() / 10;
-
-    widget.trainingStage.increment = incrementDuration;
-    incrementDuration = incrementDuration.clamp(0.1, double.infinity);
-
-    incrementController.text = incrementDuration.toStringAsFixed(1);
-    
-    widget.onUpdate();
   }
 
   void commitRepsDurationChange() {
@@ -304,7 +270,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                   ],
                 ),
                 SizedBox(height: 8),
-                // Reps and Increment Section (Second Row)
+                // Reps Section (Second Row)
                 Row(
                   children: [
                     SizedBox(width: 40), // Align with content after drag handle
@@ -424,131 +390,6 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                     
                     SizedBox(width: 12),
                     
-                    // Increment Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.increment"),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: darkerblue,
-                            fontSize: 12,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Container(
-                          width: 80,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: darkerblue, width: 1),
-                          ),
-                          child: Row(
-                            children: [
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(18),
-                                  onTap: () {
-                                    double currentValue = double.tryParse(incrementController.text) ?? 0;
-                                    double newValue = currentValue <= 1 ?
-                                    (currentValue - 0.1).clamp(0, 100) : (currentValue - 1).clamp(0, 100);
-                                    newValue = (newValue * 10).roundToDouble() / 10;
-                                    incrementController.text = newValue.toString();
-                                    setState(() {
-                                      widget.trainingStage.increment = newValue;
-                                    });
-                                    widget.onUpdate();
-                                  },
-                                  child: Container(
-                                    width: 24,
-                                    height: 35,
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: darkerblue,
-                                      size: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: TextField(
-                                  key: ValueKey('increment_${widget.trainingStage.hashCode}'),
-                                  controller: incrementController,
-                                  focusNode: incrementFocusNode,
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  inputFormatters: [
-                                    CommaToDecimalFormatter(),
-                                    FilteringTextInputFormatter.allow(
-                                        RegExp(r'^\d*\.?\d*'))
-                                  ],
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.zero,
-                                    isDense: true,
-                                  ),
-                                  style: TextStyle(
-                                    color: darkerblue,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
-                                  onChanged: (value) {
-                                    double newIncrement = double.tryParse(value) ?? 0;
-                                    if (newIncrement >= 0 && newIncrement <= 100) {
-                                      setState(() {
-                                        newIncrement = (newIncrement * 10).roundToDouble() / 10;
-                                        incrementDuration = newIncrement;
-                                      });
-                                    }
-                                  },
-                                  onEditingComplete: () {
-                                    commitIncrementDurationChange();
-                                    widget.onUpdate();
-                                  },
-                                  onTapOutside: (event) {
-                                    commitIncrementDurationChange();
-                                    FocusScope.of(context).unfocus();
-                                    widget.onUpdate();
-                                  },
-                                ),
-                              ),
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(18),
-                                  onTap: () {
-                                    double currentValue = double.tryParse(incrementController.text) ?? 0;
-                                    double newValue = currentValue >= 1 ?
-                                    (currentValue + 1).clamp(0, 100) : (currentValue + 0.1).clamp(0, 100);
-                                    newValue = (newValue * 10).roundToDouble() / 10;
-                                    incrementController.text = newValue.toString();
-                                    setState(() {
-                                      widget.trainingStage.increment = newValue;
-                                    });
-                                    widget.onUpdate();
-                                  },
-                                  child: Container(
-                                    width: 24,
-                                    height: 35,
-                                    child: Icon(
-                                      Icons.add,
-                                      color: darkerblue,
-                                      size: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(width: 12),
-
                     Text(
                       '${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage_duration")}\n' '${widget.trainingStage.getTotalTimeSeconds().toStringAsFixed(1)} s',
                       style: TextStyle(fontSize: 12, color: darkerblue, fontWeight: FontWeight.w500),

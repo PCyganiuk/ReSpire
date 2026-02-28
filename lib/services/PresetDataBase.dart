@@ -26,13 +26,13 @@ class PresetDataBase {
     try {
       final stored = _box.get('presets');
       final version = _box.get('presets_version', defaultValue: 0);
-      
+
       if (stored == null) {
         createInitialData();
         updateDataBase();
       } else {
         loadData();
-        
+
         if (version < 1) {
           _migrateSounds();
           _box.put('presets_version', 1);
@@ -46,109 +46,67 @@ class PresetDataBase {
       updateDataBase();
     }
   }
-  
-  void _migrateSounds() {
-    for (var training in presetList) {
-      bool hasNoSounds = training.sounds.preparationTrack.type == SoundType.none &&
-                         training.sounds.trainingBackgroundPlaylist.isEmpty;
-      
-      if (hasNoSounds) {
-        int index = presetList.indexOf(training);
-        switch (index % 3) {
-          case 0:
-            training.sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Birds"]!];
-            training.sounds.preparationTrack = SoundManager.longSounds["Ocean"]!;
-            training.sounds.endingTrack = SoundManager.longSounds["Rain"]!;
-            break;
-          case 1:
-            training.sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Rain"]!];
-            training.sounds.preparationTrack = SoundManager.longSounds["Ainsa"]!;
-            training.sounds.endingTrack = SoundManager.longSounds["Ocean"]!;
-            break;
-          case 2:
-            training.sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Ainsa"]!];
-            training.sounds.preparationTrack = SoundManager.longSounds["Birds"]!;
-            training.sounds.endingTrack = SoundManager.longSounds["Ocean"]!;
-            break;
-        }
-        training.sounds.backgroundSoundScope = SoundScope.global;
-        training.updateSounds();
-      }
-    }
-  }
 
   void createInitialData() {
-  presetList = [
+    presetList = [
+      Training(
+          title: "Box Breathing",
+          description: "Technique used by Navy SEALs to enhance focus and reduce stress.",
+          trainingStages: [
+            TrainingStage(
+                reps: 5,
+                breathingPhases: [
+                  BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
+                  BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.retention),
+                  BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.exhale),
+                  BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.recovery),
+                ],
+                name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
+            )
+          ]
+      ),
+      Training(
+          title: "4-7-8",
+          description: "Dr. Andrew Weil's technique ideal for stress reduction and falling asleep.",
+          trainingStages: [
+            TrainingStage(
+                reps: 4,
+                breathingPhases: [
+                  BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
+                  BreathingPhase(duration: 7, breathingPhaseType: BreathingPhaseType.retention),
+                  BreathingPhase(duration: 8, breathingPhaseType: BreathingPhaseType.exhale),
+                  BreathingPhase(duration: 2, breathingPhaseType: BreathingPhaseType.recovery),
+                ],
+                name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
+            )
+          ]
+      ),
+      Training(
+          title: "Coherent Method",
+          description: "Steady 6-second inhale and exhale to balance the nervous system, reduce stress and improve heart rate variability (HRV).",
+          trainingStages: [
+            TrainingStage(
+                reps: 10,
+                breathingPhases: [
+                  BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.inhale),
+                  BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.exhale),
+                ],
+                name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
+            )
+          ]
+      ),
+    ];
+  }
 
-    Training(
-      title: "Box Breathing",
-      description: "Technique used by Navy SEALs to enhance focus and reduce stress.",
-      trainingStages: [
-        TrainingStage(
-          reps: 5,
-          breathingPhases: [
-            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
-            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.retention),
-            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.exhale),
-            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.recovery),
-          ],
-          increment: 0,
-          name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
-        )
-      ]
-    )
-      ..sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Birds"]!]
-      ..sounds.preparationTrack = SoundManager.longSounds["Ocean"]!
-      ..sounds.endingTrack = SoundManager.longSounds["Rain"]!
-      ..sounds.backgroundSoundScope = SoundScope.global
-      ..updateSounds(),
-
-
-    Training(
-      title: "4-7-8",
-      description: "Dr. Andrew Weil's technique ideal for stress reduction and falling asleep.",
-      trainingStages: [
-        TrainingStage(
-          reps: 4,
-          breathingPhases: [
-            BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
-            BreathingPhase(duration: 7, breathingPhaseType: BreathingPhaseType.retention),
-            BreathingPhase(duration: 8, breathingPhaseType: BreathingPhaseType.exhale),
-            BreathingPhase(duration: 2, breathingPhaseType: BreathingPhaseType.recovery),
-          ],
-          increment: 0,
-          name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
-        )
-      ]
-    )
-      ..sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Rain"]!]
-      ..sounds.preparationTrack = SoundManager.longSounds["Ainsa"]!
-      ..sounds.endingTrack = SoundManager.longSounds["Ocean"]!
-      ..sounds.backgroundSoundScope = SoundScope.global
-      ..updateSounds(),
-
-    Training(
-      title: "Coherent Method",
-      description: "Steady 6-second inhale and exhale to balance the nervous system, reduce stress and improve heart rate variability (HRV).",
-      trainingStages: [
-        TrainingStage(
-          reps: 10,
-          breathingPhases: [
-            BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.inhale),
-            BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.exhale),
-          ],
-          increment: 0,
-          name: "${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name")} 1"
-        )
-      ]
-    )
-      ..sounds.trainingBackgroundPlaylist = [SoundManager.longSounds["Ainsa"]!]
-      ..sounds.preparationTrack = SoundManager.longSounds["Birds"]!
-      ..sounds.endingTrack = SoundManager.longSounds["Ocean"]!
-      ..sounds.backgroundSoundScope = SoundScope.global
-      ..updateSounds(),
-  ];
-}
+  void _migrateSounds() {
+    for (var training in presetList) {
+      training.sounds.preparationTrack = SoundAsset(name: 'Brak', type: SoundType.none);
+      training.sounds.endingTrack = SoundAsset(name: 'Brak', type: SoundType.none);
+      training.sounds.trainingBackgroundPlaylist = [];
+      training.sounds.backgroundSoundScope = SoundScope.global;
+      training.updateSounds();
+    }
+  }
 
 
   void deletePreset(int index) {

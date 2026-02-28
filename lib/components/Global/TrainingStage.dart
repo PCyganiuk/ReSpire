@@ -17,15 +17,15 @@ class TrainingStage {
   @HiveField(2)
   int reps;
 
-  @HiveField(3)
-  double increment;
+  //@HiveField(3)
+  //double increment;
   
-  @HiveField(4)
+  @HiveField(3)
   List<BreathingPhase> breathingPhases;
 
   TrainingStage({
     required this.reps,
-    required this.increment,
+    //required this.increment,
     required this.breathingPhases,
     this.name = '',
   });
@@ -51,8 +51,15 @@ class TrainingStage {
 
   double getTotalTimeSeconds() {
     double totalTime = 0;
-    for (var breathingPhase in breathingPhases) {
-      totalTime += (breathingPhase.duration * reps);
+    for (var phase in breathingPhases) {
+      for(int i = 0; i < reps; i++){
+        if(phase.increment != null) {
+          totalTime += phase.duration + (phase.increment!.value * i);
+        }
+        else{
+          totalTime += phase.duration;
+        }
+      }
     }
     return totalTime;
   }

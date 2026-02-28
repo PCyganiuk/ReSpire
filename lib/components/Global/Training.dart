@@ -50,7 +50,14 @@ class Training {
     double totalTime = 0.0;
     for (TrainingStage stage in trainingStages) {
       for (BreathingPhase phase in stage.breathingPhases) {
-        totalTime += phase.duration * stage.reps;
+        for(int i = 0; i < stage.reps; i++){
+          if(phase.increment != null) {
+            totalTime += phase.duration + (phase.increment!.value * i);
+          }
+          else{
+            totalTime += phase.duration;
+          }
+        }
       }
     }
     return totalTime;

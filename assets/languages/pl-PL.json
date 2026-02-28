@@ -83,8 +83,8 @@
             },
 
             "BreathingPhaseTile":{
-                "time":"Czas (s)",
-                "type":"Typ",
+                "time":"Czas trwania (s)",
+                "type":"Typ Fazy",
                 "remove_breathing_phase_dialog_title":"Usunąć fazę oddechu?",
                 "remove_breathing_phase_dialog_content":"Na pewno chcesz usunąć fazę oddechu?"
             }
@@ -103,7 +103,14 @@
                 },
                 "stage_change_sound": "Zmiana etapu",
                 "cycle_change_sound": "Zmiana cyklu",
-                "breathing_sound_enabled": "Dźwięk oddechu"
+                "breathing_sound_enabled": "Dźwięk oddechu",
+                "change_sounds_title": "Dźwięk zmiany: ",
+                "change_sounds_scope":{
+                    "none":"Brak",
+                    "stage":"Dla etapów",
+                    "cycle":"Dla cykli",
+                    "stage_and_cycle":"Dla etapów i cykli"
+                }
             },
 
             "TrainingMusic":{

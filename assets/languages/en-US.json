@@ -77,14 +77,14 @@
                 "name":"Training stage name",
                 "name_placeholder":"Enter training stage name",
                 "reps":"Reps",
-                "increment":"Inc (s)",
+                "increment":"Increment (s)",
                 "add_breathing_phase_button_label":"Add breathing phase",
                 "characters":"characters"
             },
 
             "BreathingPhaseTile":{
-                "time":"Time (s)",
-                "type":"Type",
+                "time":"Duration (s)",
+                "type":"Phase Type",
                 "remove_breathing_phase_dialog_title":"Remove breathing phase?",
                 "remove_breathing_phase_dialog_content":"Are you sure you want to remove this breathing phase?"
             }
@@ -103,7 +103,14 @@
                 },
                 "stage_change_sound": "Stage change",
                 "cycle_change_sound": "Cycle change",
-                "breathing_sound_enabled": "Breathing sound"
+                "breathing_sound_enabled": "Breathing sound",
+                "change_sounds_title": "Change sound: ",
+                "change_sounds_scope":{
+                  "none":"None",
+                  "stage":"For stages",
+                  "cycle":"For cycles",
+                  "stage_and_cycle":"For stages and cycles"
+                }
             },
 
             "TrainingMusic":{
@@ -170,7 +177,7 @@
             "dim_screen_during_training" : "Dim screen during training",
             "dim_screen_after": "Time to dim screen (s)",
             "visual_style_label": "Breath visualization",
-            "visual_style": "Breath visual style",
+            "visual_style": "Visual style",
             "ring": "Ring",
             "timeline": "Timeline"
         },
