@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - 1.8.x-microphone-monitor
 
 permissions:
   contents: write

@@ -1,7 +1,7 @@
 name: respire
 description: "Application for breathing exercise"
 publish_to: 'none'
-version: 1.8.0
+version: 1.8.1
 
 environment:
   sdk: ^3.6.0
