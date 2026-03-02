@@ -12,6 +12,7 @@ import 'package:respire/services/TrainingImportExportService.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:math';
+import 'package:respire/components/Global/BreathMonitorWidget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -392,7 +393,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
           ),
-
+          /*
           Positioned(
             bottom: size * 0.05,    // mały margines od dołu
             width: size * 0.5,      // 50% szerokości ekranu
@@ -406,7 +407,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
           ),
-
+          */
           RefreshIndicator(
             onRefresh: _refreshPresets,
             color: Colors.white,
@@ -512,6 +513,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               },
             ),
           ),
+          BreathMonitorWidget(),
         ],
       ),
     );
