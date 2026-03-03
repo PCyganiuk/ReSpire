@@ -35,6 +35,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "TAG_NAME=v${{ env.APP_VERSION }}-rc" >> $GITHUB_ENV
             echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/1.8.x-microphone-monitor" ]]; then
+            echo "TAG_NAME=v${{ env.APP_VERSION }}-mc-tst" >> $GITHUB_ENV
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           fi
 
       - name: Create and Push Tag
