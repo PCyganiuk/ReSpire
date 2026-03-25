@@ -71,8 +71,8 @@ class TrainingImportExportService {
       final String timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
       final String defaultFileName = fileName ??
           (trainings.length == 1
-              ? '${TextUtils.sanitizeFileName(trainings.first.title)}_training.zip'
-              : 'respire_trainings_$timestamp.zip');
+              ? '${TextUtils.sanitizeFileName(trainings.first.title)}_training.rsp'
+              : 'respire_trainings_$timestamp.rsp');
 
       // Build zip archive
       final archive = Archive();
@@ -94,7 +94,7 @@ class TrainingImportExportService {
         dialogTitle: TranslationProvider().getTranslation("FilePicker.save_trainings"),
         fileName: defaultFileName,
         type: FileType.custom,
-        allowedExtensions: ['zip'],
+        allowedExtensions: ['rsp'],
         bytes: zipBytes,
       );
 
@@ -115,7 +115,7 @@ class TrainingImportExportService {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['zip', 'json'],
+        allowedExtensions: ['rsp', 'json'],
         allowMultiple: false,
       );
 
@@ -151,7 +151,7 @@ class TrainingImportExportService {
 
     final jsonFile = archive.findFile('trainings.json');
     if (jsonFile == null) {
-      debugPrint('No trainings.json found in zip');
+      debugPrint('No trainings.json found in rsp file');
       return null;
     }
     final jsonString = utf8.decode(jsonFile.content as List<int>);
@@ -261,7 +261,7 @@ class TrainingImportExportService {
   static Future<Training?> importTrainingFromPath(String filePath) async {
     try {
       final bytes = await File(filePath).readAsBytes();
-      if (filePath.endsWith('.zip')) {
+      if (filePath.endsWith('.rsp')) {
         final trainings = await _importFromZip(bytes);
         return trainings?.isNotEmpty == true ? trainings!.first : null;
       }

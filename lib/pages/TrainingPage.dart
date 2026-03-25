@@ -178,7 +178,7 @@ class _TrainingPageState extends State<TrainingPage> {
         child: Row(
           children: [
             Text(
-              '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ' '${training.getTotalTimeSeconds().toStringAsFixed(1)} s',
+              '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ' '${training.getTotalTimeApprox()}',
               style: TextStyle(fontSize: 18, color: darkerblue, fontWeight: FontWeight.w500),
             ),
             Spacer(),

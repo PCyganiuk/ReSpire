@@ -41,6 +41,7 @@ class TrainingController {
   final ValueNotifier<int> remainingMs = ValueNotifier(0);
 
   final int _updateInterval = 25; //in milliseconds
+  int countingStep = 0;
 
   int _remainingTime = 0; //in milliseconds
   int _nextRemainingTime = 0; //in milliseconds
@@ -73,6 +74,8 @@ class TrainingController {
 
   final longSoundNames = ['Wdech', 'Wstrzymanie', 'Wydech', 'Zatrzymanie'];
 
+  int _countingElapsedMs = 0;
+
   TrainingController(this.parser) {
     soundManager = SoundManager();
     soundManager.stopAllSounds();
@@ -81,6 +84,7 @@ class TrainingController {
     if(parser.training.settings.breathingSoundEnabled) {
       breathingToneController = BreathingToneController(baseFrequency: 100.0,);
     }
+    countingStep = parser.training.sounds.countingFrequencyMs.toInt();
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
     showLabels.value = false;
@@ -287,7 +291,7 @@ class TrainingController {
     
     switch (_sounds.countingSound.type) {
       case SoundType.voice:
-        TextToSpeechService().readNumber(previousSecond + 1);
+        //TextToSpeechService().readNumber(previousSecond + 1);
         break;
       case SoundType.none:
         break;
@@ -415,7 +419,8 @@ class TrainingController {
     int previousSecond = _remainingTime ~/ 1000;
     DateTime lastTick = DateTime.now();
     soundManager.playSound(_currentSound);
-    bool skipFirstCounting = false;
+    //bool skipFirstCounting = false;
+    int counter = 0;
 
     _timer =
         Timer.periodic(Duration(milliseconds: _updateInterval), (Timer timer) {
@@ -425,16 +430,15 @@ class TrainingController {
       trainingElapsedMs.value += elapsed;
 
 
-      if (previousSecond > _remainingTime ~/ 1000 && !end) {
-        previousSecond = _remainingTime ~/ 1000;
-        second.value = previousSecond;
-        if(!skipFirstCounting && // skip counting to avoid overlapping and too frequent sounds
+      if (trainingElapsedMs.value > counter && !end) {
+        counter += countingStep;
+        //previousSecond = _remainingTime ~/ 1000;
+        //second.value = previousSecond;
+        if( // skip counting to avoid overlapping and too frequent sounds
         ((!_preparationPhaseCompleted && _sounds.preparationTrack.type == SoundType.none) || // play during preparation if no sound was set
          (_preparationPhaseCompleted && !_endingInitiated) || // play mid training 
          (_endingInitiated && _sounds.endingTrack.type == SoundType.none))){ // play during ending if no sound was set
           _playCountingSound(previousSecond);
-        }else{
-          skipFirstCounting = false;
         }
       }
 
@@ -543,7 +547,6 @@ class TrainingController {
               _remainingTime = _endingDuration;
               _currentSound = _sounds.endingTrack.name;
               previousSecond = (_remainingTime ~/ 1000)+1;
-              skipFirstCounting = true;
 
               if (_isUsingPlaylist) {
                 playlistManager.completePlaylist();
@@ -556,7 +559,6 @@ class TrainingController {
             } else {
               _remainingTime = _nextRemainingTime;
               previousSecond = (_remainingTime ~/ 1000)+1;
-              skipFirstCounting = true;
             }
             
           } else {
@@ -573,7 +575,6 @@ class TrainingController {
 
             _nextRemainingTime = _newBreathingPhaseRemainingTime;
             previousSecond = (_remainingTime ~/ 1000)+1;
-            skipFirstCounting = true;
             _fetchNextBreathingPhase();
             _nextPhaseSoundPlayed = false;
             breathingPhasesQueue.value =

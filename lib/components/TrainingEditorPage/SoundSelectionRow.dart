@@ -16,6 +16,10 @@ class SoundSelectionRow extends StatelessWidget {
   final bool blueBorder;
   final bool isSoundSelection;
 
+  final bool showSlider;
+  final double? sliderValue;
+  final ValueChanged<double>? onSliderChanged;
+
   const SoundSelectionRow({
     super.key,
     required this.label,
@@ -27,6 +31,10 @@ class SoundSelectionRow extends StatelessWidget {
     this.labelStyle,
     this.blueBorder = false,
     required this.isSoundSelection,
+
+    this.showSlider = false,
+    this.sliderValue,
+    this.onSliderChanged,
   });
 
   Future<void> _openPopup(BuildContext context) async {
@@ -65,44 +73,85 @@ class SoundSelectionRow extends StatelessWidget {
             offset: Offset(0, 2),
           ),
         ],
-    ), 
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: labelStyle ?? const TextStyle(),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 150),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => _openPopup(context),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      selectedValue.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+    ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: labelStyle ?? const TextStyle(),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => _openPopup(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            selectedValue.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.music_note, size: 20),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.music_note, size: 20),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ),
-      ]
-    ),
+
+          // OPTIONAL SLIDER
+          if (showSlider &&
+              sliderValue != null &&
+              onSliderChanged != null &&
+              selectedValue.name != 'Brak') ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    value: sliderValue!,
+                    min: 200,
+                    max: 1000,
+                    divisions: 16,
+                    activeColor: darkerblue,
+                    onChanged: onSliderChanged,
+                  ),
+                ),
+                //const SizedBox(width: 8),
+                SizedBox(
+                  width: 50,
+                  child: Text(
+                    sliderValue! >= 1000
+                        ? "${(sliderValue! / 1000).toStringAsFixed(1).replaceAll('.0', '')} s"
+                        : "${sliderValue!.round()} ms",
+                    style: TextStyle(
+                      color: darkerblue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

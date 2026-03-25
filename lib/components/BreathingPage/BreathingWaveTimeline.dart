@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phase;
+import 'package:respire/components/Global/BreathingPhase.dart';
 import 'package:respire/services/TrainingController.dart';
 
 class BreathingWaveTimeline extends StatefulWidget {
@@ -83,18 +83,19 @@ class _BreathingWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final training = controller.parser.training;
+    const double pxPerSecond = 15.0;
     List<double> phaseIncrements = [];
 
 
     /// ---- BUILD FULL PHASE LIST (with preparation) ----
-    final phases = <breathing_phase.BreathingPhase>[];
+    final phases = <BreathingPhase>[];
     
     // Add preparation phase as a recovery phase at the start
     if (preparationDurationSecs > 0) {
       phases.add(
-        breathing_phase.BreathingPhase(
+        BreathingPhase(
           duration: preparationDurationSecs,
-          breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
+          breathingPhaseType: BreathingPhaseType.recovery,
         ),
       );
       phaseIncrements.add(0.0);
@@ -117,9 +118,9 @@ class _BreathingWavePainter extends CustomPainter {
 
     if (endingDuration > 0) {
       phases.add(
-        breathing_phase.BreathingPhase(
+        BreathingPhase(
           duration: endingDuration,
-          breathingPhaseType: breathing_phase.BreathingPhaseType.recovery,
+          breathingPhaseType: BreathingPhaseType.recovery,
         ),
       );
       phaseIncrements.add(0.0);
@@ -130,15 +131,26 @@ class _BreathingWavePainter extends CustomPainter {
     /// ---- BUILD TIME ENVELOPE ----
     final keys = <_KeyPoint>[];
     int accMs = 0;
-    int i = 0;
-    for (final phase in phases) {
-      final durMs = ((phase.duration + phaseIncrements[i]) * 1000).toInt();
-      final (from, to) = _phaseEnvelope(phase);
-
+    bool prevWasInhale = false;
+    for (int j = 0; j < phases.length; j++) {
+      final phase = phases[j];
+      final bool nextIsInhale = (j + 1 < phases.length) && (phases[j + 1].breathingPhaseType == BreathingPhaseType.inhale);
+      final durMs = ((phase.duration + phaseIncrements[j]) * 1000).toInt();
+      final (from, to) = _phaseEnvelope(phase, nextIsInhale, prevWasInhale);
+      prevWasInhale = (j != 0) && (phase.breathingPhaseType == BreathingPhaseType.inhale);
       keys.add(_KeyPoint(accMs, from));
       accMs += durMs;
-      keys.add(_KeyPoint(accMs, to));
-      i++;
+      if (to == 0.5){
+        accMs -= 500;
+        keys.add(_KeyPoint(accMs, to));
+
+        keys.add(_KeyPoint(accMs, 0.5));
+        accMs += 500;
+        keys.add(_KeyPoint(accMs, 0.5));
+      }
+      else {
+        keys.add(_KeyPoint(accMs, to));
+      }
     }
 
     final totalMs = accMs;
@@ -149,10 +161,10 @@ class _BreathingWavePainter extends CustomPainter {
     final centerX = size.width / 2;
     final centerY = size.height / 2;
     final waveHeight = size.height * 0.45;
-    final stretch = size.width * 3;
+    //final stretch = size.width * 3;
 
     /// ---- SCROLL OFFSET ----
-    final scrollX = (clampedElapsed / totalMs) * stretch;
+    final scrollX = (clampedElapsed / 1000.0) * pxPerSecond;
 
     /// ---- PAINT ----
     final paint = Paint()
@@ -169,8 +181,8 @@ class _BreathingWavePainter extends CustomPainter {
     //double dotY = 0;
 
     for (int t = 0; t <= totalMs; t += stepMs) {
-      final progress = t / totalMs;
-      final x = centerX + progress * stretch - scrollX;
+      final timeSec = t / 1000.0;
+      final x = centerX + timeSec * pxPerSecond - scrollX;
 
       if (x < -100 || x > size.width + 100) continue;
 
@@ -247,15 +259,22 @@ class _BreathingWavePainter extends CustomPainter {
 
 /// ---- HELPERS ----
 
-(double, double) _phaseEnvelope(breathing_phase.BreathingPhase phase) {
+(double, double) _phaseEnvelope(BreathingPhase phase, bool nextIsInhale, bool prevWasInhale) {
+
   switch (phase.breathingPhaseType) {
-    case breathing_phase.BreathingPhaseType.inhale:
+    case BreathingPhaseType.inhale:
+      if(nextIsInhale) {
+        return (0.0, 0.5);
+      }
+      else if (prevWasInhale){
+        return(0.5, 1.0);
+      }
       return (0.0, 1.0); // rise
-    case breathing_phase.BreathingPhaseType.retention:
+    case BreathingPhaseType.retention:
       return (1.0, 1.0); // stay high
-    case breathing_phase.BreathingPhaseType.exhale:
+    case BreathingPhaseType.exhale:
       return (1.0, 0.0); // fall
-    case breathing_phase.BreathingPhaseType.recovery:
+    case BreathingPhaseType.recovery:
       return (0.0, 0.0); // stay low
   }
 }

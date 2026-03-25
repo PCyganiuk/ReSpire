@@ -38,13 +38,14 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
               k as String, (v as Map).cast<BreathingPhaseType, SoundAsset>()))
       ..stageChangeSound = fields[13] as SoundAsset
       ..cycleChangeSound = fields[14] as SoundAsset
-      ..changeSoundScope = fields[15] as String;
+      ..changeSoundScope = fields[15] as String
+      ..countingFrequencyMs = fields[16] as double;
   }
 
   @override
   void write(BinaryWriter writer, Sounds obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(1)
       ..write(obj.countingSound)
       ..writeByte(2)
@@ -74,7 +75,9 @@ class SoundsAdapter extends TypeAdapter<Sounds> {
       ..writeByte(14)
       ..write(obj.cycleChangeSound)
       ..writeByte(15)
-      ..write(obj.changeSoundScope);
+      ..write(obj.changeSoundScope)
+      ..writeByte(16)
+      ..write(obj.countingFrequencyMs);
   }
 
   @override

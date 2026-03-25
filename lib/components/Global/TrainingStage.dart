@@ -49,18 +49,24 @@ class TrainingStage {
     }
   }
 
-  double getTotalTimeSeconds() {
-    double totalTime = 0;
+  String getTotalTimeFormatted() {
+    double totalTime = 0.0;
+
     for (var phase in breathingPhases) {
-      for(int i = 0; i < reps; i++){
-        if(phase.increment != null) {
+      for (int i = 0; i < reps; i++) {
+        if (phase.increment != null) {
           totalTime += phase.duration + (phase.increment!.value * i);
-        }
-        else{
+        } else {
           totalTime += phase.duration;
         }
       }
     }
-    return totalTime;
+
+    if (totalTime < 60) {
+      return "${totalTime.round()} sec";
+    }
+
+    int minutes = (totalTime / 60).round();
+    return "~$minutes min";
   }
 }

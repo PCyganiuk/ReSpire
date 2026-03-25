@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/SoundAsset.dart';
 import 'package:respire/components/Global/SoundScope.dart';
@@ -77,6 +79,9 @@ class Sounds {
 
   @HiveField(15)
   String changeSoundScope = 'stage_and_cycle';
+
+  @HiveField(16)
+  double countingFrequencyMs = 1000;
 
   void clearUserSound(String soundName) {
     if (countingSound.name == soundName) {

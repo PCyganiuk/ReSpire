@@ -387,18 +387,30 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
               ),
               SizedBox(height: 2),
               if (_selectedTab == 0)
-                Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  color: Colors.white,
-                  elevation: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                    '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ' '${widget.training.getTotalTimeSeconds().toStringAsFixed(1)} s',
-                    style: TextStyle(fontSize: 18, color: darkerblue, fontWeight: FontWeight.w500),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0), // match other cards
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: darkerblue, // your dark blue border
+                        width: 1.5,        // adjust thickness
+                      ),
+                    ),
+                    elevation: 2,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        '${translationProvider.getTranslation("TrainingPage.TrainingOverview.duration")} ${widget.training.getTotalTimeApprox()}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: darkerblue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
                 ),
               Expanded(
                 child: _selectedTab == 0
@@ -454,6 +466,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             label: translationProvider
                                                 .getTranslation(
                                                     "TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"),
+                                            showSlider: true,
+                                            sliderValue: _sounds.countingFrequencyMs,
+                                            onSliderChanged: (v) => setState(() {
+                                              _sounds.countingFrequencyMs = v;
+                                            }),
                                             selectedValue:
                                                 _sounds.countingSound,
                                             soundListType:

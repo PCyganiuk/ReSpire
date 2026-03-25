@@ -46,21 +46,44 @@ class Training {
     trainingStages.removeWhere((stage) => stage.breathingPhases.isEmpty);
   }
 
-  double getTotalTimeSeconds() {
+  int getTotalTrainingTime() {
     double totalTime = 0.0;
+
     for (TrainingStage stage in trainingStages) {
       for (BreathingPhase phase in stage.breathingPhases) {
-        for(int i = 0; i < stage.reps; i++){
-          if(phase.increment != null) {
+        for (int i = 0; i < stage.reps; i++) {
+          if (phase.increment != null) {
             totalTime += phase.duration + (phase.increment!.value * i);
-          }
-          else{
+          } else {
             totalTime += phase.duration;
           }
         }
       }
     }
-    return totalTime;
+    return totalTime.toInt();
+  }
+
+  String getTotalTimeApprox() {
+    double totalTime = 0.0;
+
+    for (TrainingStage stage in trainingStages) {
+      for (BreathingPhase phase in stage.breathingPhases) {
+        for (int i = 0; i < stage.reps; i++) {
+          if (phase.increment != null) {
+            totalTime += phase.duration + (phase.increment!.value * i);
+          } else {
+            totalTime += phase.duration;
+          }
+        }
+      }
+    }
+
+    if (totalTime < 60) {
+      return "${totalTime.round()} sec";
+    }
+
+    int minutes = (totalTime / 60).round();
+    return "~$minutes min";
   }
 
   bool isEmpty() {

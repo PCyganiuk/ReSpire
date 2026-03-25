@@ -272,6 +272,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                 SizedBox(height: 8),
                 // Reps Section (Second Row)
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(width: 40), // Align with content after drag handle
                     // Repetitions Section
@@ -387,14 +388,36 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                         ),
                       ],
                     ),
-                    
-                    SizedBox(width: 12),
-                    
-                    Text(
-                      '${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage_duration")}\n' '${widget.trainingStage.getTotalTimeSeconds().toStringAsFixed(1)} s',
-                      style: TextStyle(fontSize: 12, color: darkerblue, fontWeight: FontWeight.w500),
-                      textAlign: TextAlign.center,
-                    ),
+
+                    Spacer(),
+
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${translationProvider.getTranslation("TrainingPage.TrainingOverview.stage_duration")}\n',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: darkerblue,
+                                fontSize: 12, // first line font
+                                height: 1.8
+                              ),
+                            ),
+                            TextSpan(
+                              text: widget.trainingStage.getTotalTimeFormatted(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: darkerblue,
+                                fontSize: 16, // second line bigger font
+                              ),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    )
                   ],
                 ),
               ],
