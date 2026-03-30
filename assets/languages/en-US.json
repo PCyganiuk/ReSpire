@@ -104,6 +104,7 @@
                 "stage_change_sound": "Stage change",
                 "cycle_change_sound": "Cycle change",
                 "breathing_sound_enabled": "Breathing sound",
+                "breathing_sound_warning": "Warning! Enabling this feature will disable background music and binaural beats.",
                 "change_sounds_title": "Change sound: ",
                 "change_sounds_scope":{
                   "none":"None",
@@ -146,12 +147,12 @@
             },
 
             "BinauralBeats":{
-                "warning":"Warning! Enabling this feature will disable background music.",
+                "warning":"Warning! Enabling this feature will disable background music and breathing sound.",
                 "binaural_beats_label":"Binaural Beats",
                 "binaural_beats_enabled":"Enable binaural beats",
-                "left_frequency_label":"Left ear frequency",
-                "right_frequency_label":"Right ear frequency",
-                "beat_frequency_label":"Beat frequency"
+                "left_frequency_label":"Base frequency",
+                "right_frequency_label":"Beat",
+                "beat_frequency_label":"Offset frequency"
             },
 
             "RemovingUserSoundPopup":{

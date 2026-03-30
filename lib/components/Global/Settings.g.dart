@@ -20,8 +20,8 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..preparationDuration = fields[0] as int
       ..endingDuration = fields[1] as int
       ..binauralBeatsEnabled = fields[2] as bool
-      ..binauralLeftFrequency = fields[3] as double
-      ..binauralRightFrequency = fields[4] as double
+      ..binauralBaseFrequency = fields[3] as double
+      ..binauralBeatFrequency = fields[4] as double
       ..dimScreenEnabled = fields[5] as bool
       ..dimScreenAfterSeconds = fields[6] as int
       ..visualStyle = fields[7] as VisualStyle
@@ -39,9 +39,9 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(2)
       ..write(obj.binauralBeatsEnabled)
       ..writeByte(3)
-      ..write(obj.binauralLeftFrequency)
+      ..write(obj.binauralBaseFrequency)
       ..writeByte(4)
-      ..write(obj.binauralRightFrequency)
+      ..write(obj.binauralBeatFrequency)
       ..writeByte(5)
       ..write(obj.dimScreenEnabled)
       ..writeByte(6)

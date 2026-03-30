@@ -119,7 +119,7 @@ class SoundSelectionRow extends StatelessWidget {
           if (showSlider &&
               sliderValue != null &&
               onSliderChanged != null &&
-              selectedValue.name != 'Brak') ...[
+              selectedValue.name != 'Brak' && selectedValue.name != 'Lektor') ...[
             const SizedBox(height: 6),
             Row(
               children: [

@@ -481,10 +481,10 @@ class TrainingController {
           final trainingDuration =
               parser.calculateTrainingDurationWithoutPreparation();
           dev.log(
-              'Starting binaural beats: Left=${_settings.binauralLeftFrequency}Hz, Right=${_settings.binauralRightFrequency}Hz, Duration=${trainingDuration}s');
+              'Starting binaural beats: Left=${_settings.binauralBaseFrequency}Hz, Right=${_settings.binauralBeatFrequency}Hz, Duration=${trainingDuration}s');
           binauralGenerator.start(
-            _settings.binauralLeftFrequency,
-            _settings.binauralRightFrequency,
+            _settings.binauralBaseFrequency,
+            _settings.binauralBeatFrequency + _settings.binauralBaseFrequency,
             durationSeconds: trainingDuration,
           );
         }

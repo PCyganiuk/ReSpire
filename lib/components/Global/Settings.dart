@@ -16,10 +16,10 @@ class Settings {
   bool binauralBeatsEnabled = false;
   
   @HiveField(3)
-  double binauralLeftFrequency = 200.0; // Hz
+  double binauralBaseFrequency = 200.0; // Hz
   
   @HiveField(4)
-  double binauralRightFrequency = 210.0; // Hz (10 Hz beat frequency)
+  double binauralBeatFrequency = 10.0; // Hz (10 Hz beat frequency)
 
   @HiveField(5)
   bool dimScreenEnabled = false;

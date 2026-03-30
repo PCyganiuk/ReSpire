@@ -143,8 +143,8 @@ class TrainingJsonConverter {
       'preparationDuration': settings.preparationDuration,
       'endingDuration': settings.endingDuration,
       'binauralBeatsEnabled': settings.binauralBeatsEnabled,
-      'binauralLeftFrequency': settings.binauralLeftFrequency,
-      'binauralRightFrequency': settings.binauralRightFrequency,
+      'binauralLeftFrequency': settings.binauralBaseFrequency,
+      'binauralRightFrequency': settings.binauralBeatFrequency,
     };
   }
 
@@ -153,9 +153,9 @@ class TrainingJsonConverter {
       ..preparationDuration = json['preparationDuration'] ?? 3
       ..endingDuration = json['endingDuration'] ?? false
       ..binauralBeatsEnabled = json['binauralBeatsEnabled'] ?? false
-      ..binauralLeftFrequency =
+      ..binauralBaseFrequency =
           (json['binauralLeftFrequency'] ?? 200.0).toDouble()
-      ..binauralRightFrequency =
+      ..binauralBeatFrequency =
           (json['binauralRightFrequency'] ?? 210.0).toDouble();
   }
 

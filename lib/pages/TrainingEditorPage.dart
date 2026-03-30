@@ -51,6 +51,20 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   final int titleMaxLength = 15;
 
+  final List<double> solfeggioFrequencies = [
+    174,
+    285,
+    396,
+    417,
+    528,
+    639,
+    741,
+    852,
+    963,
+  ];
+
+  late int selectedIndex;
+
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
@@ -87,6 +101,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
     dimAfterController =  TextEditingController(text: widget.training.settings.dimScreenAfterSeconds.toString());
     dimAfterFocusNode = FocusNode();
+
+    selectedIndex = solfeggioFrequencies.indexOf(
+      widget.training.settings.binauralBeatFrequency,
+    );
+
+    if (selectedIndex == -1) selectedIndex = 0;
   }
 
   void addTrainingStage() {
@@ -254,6 +274,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
         );
       },
     );
+  }
+
+  String getBrainwaveState(double beatHz) {
+    if (beatHz <= 4) return "Delta";
+    if (beatHz <= 8) return "Theta";
+    if (beatHz <= 12) return "Alpha";
+    return "Beta";
   }
 
   void _showAlert(int emptyStages) {
@@ -924,7 +951,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                             FontWeight.w500),
                                                   ),
                                                   Text(
-                                                    '${widget.training.settings.binauralLeftFrequency.toStringAsFixed(1)} Hz',
+                                                    '${widget.training.settings.binauralBaseFrequency.toStringAsFixed(0)} Hz',
                                                     style: TextStyle(
                                                         fontSize: 12,
                                                         color:
@@ -933,16 +960,21 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 ],
                                               ),
                                               subtitle: Slider(
-                                                value: widget.training.settings
-                                                    .binauralLeftFrequency,
-                                                min: 100,
-                                                max: 500,
-                                                divisions: 80,
+                                                value: selectedIndex.toDouble(),
+                                                min: 0,
+                                                max: (solfeggioFrequencies.length - 1).toDouble(),
+                                                divisions: solfeggioFrequencies.length - 1,
                                                 activeColor: darkerblue,
                                                 inactiveColor: Colors.grey[300],
-                                                onChanged: (v) => setState(() =>
-                                                    widget.training.settings
-                                                        .binauralLeftFrequency = v),
+                                                //label: "${solfeggioFrequencies[selectedIndex].toInt()} Hz",
+                                                onChanged: (v) {
+                                                  setState(() {
+                                                    int index = v.round();
+                                                    widget.training.settings.binauralBaseFrequency =
+                                                    solfeggioFrequencies[index];
+                                                    selectedIndex = index;
+                                                  });
+                                                },
                                               ),
                                             ),
                                             ListTile(
@@ -960,7 +992,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                             FontWeight.w500),
                                                   ),
                                                   Text(
-                                                    '${widget.training.settings.binauralRightFrequency.toStringAsFixed(1)} Hz',
+                                                    '${(widget.training.settings.binauralBeatFrequency).toStringAsFixed(0)} Hz',
                                                     style: TextStyle(
                                                         fontSize: 12,
                                                         color:
@@ -970,15 +1002,15 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               ),
                                               subtitle: Slider(
                                                 value: widget.training.settings
-                                                    .binauralRightFrequency,
-                                                min: 100,
-                                                max: 500,
-                                                divisions: 80,
+                                                    .binauralBeatFrequency,
+                                                min: 1,
+                                                max: 30,
+                                                divisions: 29,
                                                 activeColor: darkerblue,
                                                 inactiveColor: Colors.grey[300],
                                                 onChanged: (v) => setState(() =>
                                                     widget.training.settings
-                                                        .binauralRightFrequency = v),
+                                                        .binauralBeatFrequency = v),
                                               ),
                                             ),
                                             Padding(
@@ -986,7 +1018,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 16),
                                               child: Text(
-                                                '${translationProvider.getTranslation("TrainingEditorPage.SoundsTab.BinauralBeats.beat_frequency_label")}: ${(widget.training.settings.binauralRightFrequency - widget.training.settings.binauralLeftFrequency).abs().toStringAsFixed(1)} Hz',
+                                                '${translationProvider.getTranslation("TrainingEditorPage.SoundsTab.BinauralBeats.beat_frequency_label")}: ${getBrainwaveState(widget.training.settings.binauralBeatFrequency)}',
                                                 style: TextStyle(
                                                     fontSize: 13,
                                                     color: darkerblue,
@@ -1623,7 +1655,21 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                               ),
                                             )
                                           ),
-                                          if((widget.training.settings.visualStyle == VisualStyle.timeline))
+                                          if((widget.training.settings.visualStyle == VisualStyle.timeline)) ... [
+                                          SizedBox(height: 4),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 16, right: 16),
+                                            child: Text(
+                                              TextUtils.addNoBreakingSpaces(translationProvider.getTranslation(
+                                                "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_warning",
+                                              )),
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
                                           Card(
                                               margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                                               shape: RoundedRectangleBorder(
@@ -1646,12 +1692,28 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                                 Switch(
                                                   value: widget.training.settings.breathingSoundEnabled,
                                                   activeColor: darkerblue,
-                                                  activeTrackColor: mediumblue.withOpacity(0.4),
-                                                  inactiveThumbColor: Colors.grey.shade400,
-                                                  inactiveTrackColor: Colors.grey.shade300,
+                                                  inactiveTrackColor: Colors.white,
+                                                  inactiveThumbColor: Colors.grey,
+                                                  trackOutlineColor:
+                                                  WidgetStateProperty.resolveWith<
+                                                  Color?>(
+                                                  (Set<WidgetState> states) {
+                                                  if (!states.contains(
+                                                  WidgetState.selected) &&
+                                                  !states.contains(
+                                                  WidgetState.disabled)) {
+                                                  return mediumblue;
+                                                  }
+                                                  return null;
+                                                  }),
                                                   onChanged: (v) {
                                                     setState(() {
                                                       widget.training.settings.breathingSoundEnabled = v;
+                                                      if (v) {
+                                                        widget.training.settings
+                                                            .binauralBeatsEnabled =
+                                                        false;
+                                                      }
                                                     });
                                                   },
                                                 ),
@@ -1659,6 +1721,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                             ),
                                               )
                                           ),
+                                          ]
                                         ]
                                       )
                                     )
@@ -1691,6 +1754,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       if (value == true) {
         _previousBackgroundScope = _sounds.backgroundSoundScope;
         _sounds.backgroundSoundScope = SoundScope.none;
+        widget.training.settings.breathingSoundEnabled = false;
       } else {
         _sounds.backgroundSoundScope = _previousBackgroundScope;
       }

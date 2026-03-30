@@ -105,28 +105,24 @@ class BreathingToneController {
           partials        = _inhalePartials();
           baseAmp         = 0.30;
           strikeIntensity = 0.50;
-          freqCenter      = baseFrequency * 1.0;
           break;
 
         case BreathingAudioPhase.retention:
           partials        = _retentionPartials();
           baseAmp         = 0.26;
           strikeIntensity = 0.30;
-          freqCenter      = baseFrequency * 1.20;
           break;
 
         case BreathingAudioPhase.exhale:
           partials        = _exhalePartials();
-          baseAmp         = 0.27;
+          baseAmp         = 0.24;
           strikeIntensity = 0.40;
-          freqCenter      = baseFrequency * 0.98;
           break;
 
         case BreathingAudioPhase.recovery:
           partials        = _recoveryPartials();
           baseAmp         = 0.22;
           strikeIntensity = 0.28;
-          freqCenter      = baseFrequency * 1.10;
           break;
       }
 
@@ -155,7 +151,7 @@ class BreathingToneController {
         // ------------------------------------------------
         double toneSample = 0.0;
         for (final p in partials) {
-          final double partialFreq = freqCenter * p.freqRatio;
+          final double partialFreq = baseFrequency * p.freqRatio;
           p.phase += 2 * pi * partialFreq / sampleRate;
           final double partialAmp = p.weight * exp(-t * p.decayRate);
           toneSample += partialAmp * sin(p.phase);
