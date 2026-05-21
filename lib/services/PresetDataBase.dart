@@ -54,6 +54,7 @@ class PresetDataBase {
           description: "Technique used by Navy SEALs to enhance focus and reduce stress.",
           trainingStages: [
             TrainingStage(
+                stageReps: 1,
                 reps: 5,
                 breathingPhases: [
                   BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
@@ -70,6 +71,7 @@ class PresetDataBase {
           description: "Dr. Andrew Weil's technique ideal for stress reduction and falling asleep.",
           trainingStages: [
             TrainingStage(
+                stageReps: 1,
                 reps: 4,
                 breathingPhases: [
                   BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
@@ -86,6 +88,7 @@ class PresetDataBase {
           description: "Steady 6-second inhale and exhale to balance the nervous system, reduce stress and improve heart rate variability (HRV).",
           trainingStages: [
             TrainingStage(
+                stageReps: 1,
                 reps: 10,
                 breathingPhases: [
                   BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.inhale),

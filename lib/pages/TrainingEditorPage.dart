@@ -129,7 +129,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       trainingStages.add(TrainingStage(
           reps: 1,
           breathingPhases: [],
-          //increment: 0,
+          stageReps: 1,
           name:
               "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} ${trainingStages.length + 1}"));
 

@@ -79,6 +79,7 @@
                 "name":"Training stage name",
                 "name_placeholder":"Enter training stage name",
                 "reps":"Phases reps",
+                "stage_reps":"Stage reps",
                 "increment":"Increment (s)",
                 "add_breathing_phase_button_label":"Add breathing phase",
                 "characters":"characters"

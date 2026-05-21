@@ -7,34 +7,34 @@ import 'package:respire/components/Global/SoundAsset.dart';
 class ReSpireSounds {
   final Map<String, SoundAsset> longSounds = {
     "Ainsa": SoundAsset(name: "Ainsa", path: "sounds/long/Ainsa.mp3", type: SoundType.melody),
-    "Chanting 1": SoundAsset(name: "Chanting 1", path: "sounds/long/Chanting-1.mp3", type: SoundType.melody),
-    "Chanting 2": SoundAsset(name: "Chanting 2", path: "sounds/long/Chanting-2.mp3", type: SoundType.melody),
-    "Earth resonance": SoundAsset(name: "Earth resonance", path: "sounds/long/Earth-resonance.mp3", type: SoundType.melody),
     "Low hz": SoundAsset(name: "Low hz", path: "sounds/long/Low-hz.mp3", type: SoundType.melody),
-    "Odlicz wstecz": SoundAsset(name: "Odlicz wstecz", path: "sounds/long/Odlicz-wstecz.mp3", type: SoundType.melody),
-    "Odlicz": SoundAsset(name: "Odlicz", path: "sounds/long/odlicz.mp3", type: SoundType.melody),
-    "Relaxing sounds": SoundAsset(name: "Relaxing sounds", path: "sounds/long/Relaxing-sounds.mp3", type: SoundType.melody),
     "Solfeggio Frequency": SoundAsset(name: "Solfeggio Frequency", path: "sounds/long/Solfeggio-Frequency.mp3", type: SoundType.melody),
-    "Theta": SoundAsset(name: "Theta", path: "sounds/long/Theta.mp3", type: SoundType.melody),
+    "Odlicz": SoundAsset(name: "Odlicz", path: "sounds/long/odlicz.mp3", type: SoundType.melody),
     "Zakończ": SoundAsset(name: "Zakończ", path: "sounds/long/Zakończ.mp3", type: SoundType.melody),
+    "Chanting 2": SoundAsset(name: "Chanting 2", path: "sounds/long/Chanting-2.mp3", type: SoundType.melody),
+    "Odlicz wstecz": SoundAsset(name: "Odlicz wstecz", path: "sounds/long/Odlicz-wstecz.mp3", type: SoundType.melody),
+    "Chanting 1": SoundAsset(name: "Chanting 1", path: "sounds/long/Chanting-1.mp3", type: SoundType.melody),
+    "Earth resonance": SoundAsset(name: "Earth resonance", path: "sounds/long/Earth-resonance.mp3", type: SoundType.melody),
+    "Theta": SoundAsset(name: "Theta", path: "sounds/long/Theta.mp3", type: SoundType.melody),
+    "Relaxing sounds": SoundAsset(name: "Relaxing sounds", path: "sounds/long/Relaxing-sounds.mp3", type: SoundType.melody),
   };
 
   final Map<String, SoundAsset> shortSounds = {
-    "Beep": SoundAsset(name: "Beep", path: "sounds/short/Beep.mp3", type: SoundType.cue),
+    "Heart beat": SoundAsset(name: "Heart beat", path: "sounds/short/Heart-beat.mp3", type: SoundType.cue),
+    "Wstrzymanie": SoundAsset(name: "Wstrzymanie", path: "sounds/short/Wstrzymanie.mp3", type: SoundType.cue),
     "Bell": SoundAsset(name: "Bell", path: "sounds/short/Bell.mp3", type: SoundType.cue),
     "Gong": SoundAsset(name: "Gong", path: "sounds/short/Gong.mp3", type: SoundType.cue),
-    "Harp": SoundAsset(name: "Harp", path: "sounds/short/Harp.mp3", type: SoundType.cue),
-    "Heart beat beep": SoundAsset(name: "Heart beat beep", path: "sounds/short/Heart-beat-beep.mp3", type: SoundType.cue),
-    "Heart beat": SoundAsset(name: "Heart beat", path: "sounds/short/Heart-beat.mp3", type: SoundType.cue),
-    "Wdech": SoundAsset(name: "Wdech", path: "sounds/short/Wdech.mp3", type: SoundType.cue),
-    "Wstrzymanie": SoundAsset(name: "Wstrzymanie", path: "sounds/short/Wstrzymanie.mp3", type: SoundType.cue),
-    "Wydech": SoundAsset(name: "Wydech", path: "sounds/short/Wydech.mp3", type: SoundType.cue),
     "Zatrzymanie": SoundAsset(name: "Zatrzymanie", path: "sounds/short/Zatrzymanie.mp3", type: SoundType.cue),
+    "Heart beat beep": SoundAsset(name: "Heart beat beep", path: "sounds/short/Heart-beat-beep.mp3", type: SoundType.cue),
+    "Wdech": SoundAsset(name: "Wdech", path: "sounds/short/Wdech.mp3", type: SoundType.cue),
+    "Wydech": SoundAsset(name: "Wydech", path: "sounds/short/Wydech.mp3", type: SoundType.cue),
+    "Harp": SoundAsset(name: "Harp", path: "sounds/short/Harp.mp3", type: SoundType.cue),
+    "Beep": SoundAsset(name: "Beep", path: "sounds/short/Beep.mp3", type: SoundType.cue),
     "count": SoundAsset(name: "count", path: "sounds/short/1.mp3", type: SoundType.cue),
   };
 
   final Map<String, SoundAsset> countingSounds = {
-    "Clock": SoundAsset(name: "Clock", path: "sounds/counting/Clock.mp3", type: SoundType.counting),
     "Metronome": SoundAsset(name: "Metronome", path: "sounds/counting/Metronome.mp3", type: SoundType.counting),
+    "Clock": SoundAsset(name: "Clock", path: "sounds/counting/Clock.mp3", type: SoundType.counting),
   };
 }

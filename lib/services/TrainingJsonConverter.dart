@@ -105,6 +105,7 @@ class TrainingJsonConverter {
   static TrainingStage _stageFromJson(Map<String, dynamic> json) {
     final phases = (json['breathingPhases'] as List?) ?? [];
     return TrainingStage(
+      stageReps: json['reps'] ?? 1,
       reps: json['reps'] ?? 1,
       name: json['name'] ?? '',
       breathingPhases:

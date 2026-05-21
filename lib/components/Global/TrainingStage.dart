@@ -23,10 +23,14 @@ class TrainingStage {
   @HiveField(3)
   List<BreathingPhase> breathingPhases;
 
+  @HiveField(4, defaultValue: 1)
+  int stageReps;
+
   TrainingStage({
     required this.reps,
     //required this.increment,
     required this.breathingPhases,
+    required this.stageReps,
     this.name = '',
   });
 
