@@ -72,11 +72,13 @@
             "remove_training_stage_dialog_content":"Czy na pewno chcesz usunąć etap treningu?",
             "add_training_stage_button_label":"Dodaj etap treningu",
             "default_training_stage_name":"Etap treningu",
+            "expand_all": "Rozwiń",
+            "collapse_all": "Zwiń",
 
             "TrainingStageTile":{
                 "name":"Nazwa etapu",
                 "name_placeholder":"Wpisz nazwę etapu",
-                "reps":"Powtórzenia",
+                "reps":"Powtórzenia faz",
                 "increment":"Przyrost (s)",
                 "add_breathing_phase_button_label":"Dodaj fazę oddechu",
                 "characters":"znaków"

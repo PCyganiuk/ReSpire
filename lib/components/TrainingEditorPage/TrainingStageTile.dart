@@ -11,6 +11,8 @@ class TrainingStageTile extends StatefulWidget {
   final int trainingStageIndex;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
+  final bool isExpanded;
+  final ValueChanged<bool> onExpandedChanged;
 
   final int trainingStageNameMaxLength = 25;
 
@@ -20,6 +22,8 @@ class TrainingStageTile extends StatefulWidget {
     required this.trainingStageIndex,
     required this.onDelete,
     required this.onUpdate,
+    required this.isExpanded,
+    required this.onExpandedChanged,
   }) : super(key: key);
 
   @override
@@ -32,7 +36,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   FocusNode? repsFocusNode;
   FocusNode? nameFocusNode;
   TranslationProvider translationProvider = TranslationProvider();
-  bool _isExpanded = true;
+  //bool _isExpanded = true;
 
   @override
   void initState() {
@@ -260,11 +264,9 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                     ),
                     IconButton(
                       padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
-                      icon: Icon(_isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: darkerblue),
+                      icon: Icon(widget.isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: darkerblue),
                       onPressed: () {
-                        setState(() {
-                          _isExpanded = !_isExpanded;
-                        });
+                        widget.onExpandedChanged(!widget.isExpanded);
                       },
                     ),
                   ],
@@ -426,7 +428,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
           AnimatedSize(
             duration: Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            child: _isExpanded
+            child: widget.isExpanded
                 ? Column(
                     children: [
                       ClipRRect(

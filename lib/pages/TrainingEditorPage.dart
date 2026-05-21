@@ -48,7 +48,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   //String _changeSoundScope = 'none';
   int _selectedTab = 0;
   late Sounds _sounds;
-
+  late List<bool> expandedStates;
   final int titleMaxLength = 15;
 
   final List<double> solfeggioFrequencies = [
@@ -71,6 +71,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void initState() {
     super.initState();
     trainingStages = widget.training.trainingStages;
+    expandedStates = List.generate(trainingStages.length, (_) => true);
     _sounds = widget.training.sounds;
     descriptionController =
         TextEditingController(text: widget.training.description);
@@ -109,6 +110,20 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (selectedIndex == -1) selectedIndex = 0;
   }
 
+  void expandAllStages() {
+    setState(() {
+      expandedStates =
+          List.generate(trainingStages.length, (_) => true);
+    });
+  }
+
+  void collapseAllStages() {
+    setState(() {
+      expandedStates =
+          List.generate(trainingStages.length, (_) => false);
+    });
+  }
+
   void addTrainingStage() {
     setState(() {
       trainingStages.add(TrainingStage(
@@ -117,6 +132,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
           //increment: 0,
           name:
               "${translationProvider.getTranslation("TrainingPage.TrainingOverview.training_stage")} ${trainingStages.length + 1}"));
+
+      expandedStates.add(true);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -163,6 +180,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (confirmDelete ?? false) {
       setState(() {
         trainingStages.removeAt(index);
+        expandedStates.removeAt(index);
       });
     }
   }
@@ -170,8 +188,12 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
   void reorderTrainingStage(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) newIndex -= 1;
+
       final trainingStage = trainingStages.removeAt(oldIndex);
       trainingStages.insert(newIndex, trainingStage);
+
+      final expanded = expandedStates.removeAt(oldIndex);
+      expandedStates.insert(newIndex, expanded);
     });
   }
 
@@ -439,6 +461,31 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                     ),
                   ),
                 ),
+              if (_selectedTab == 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: expandAllStages,
+                        icon: Icon(Icons.unfold_more, color: darkerblue),
+                        label: Text(
+                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.expand_all"),
+                          style: TextStyle(color: darkerblue),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: collapseAllStages,
+                        icon: Icon(Icons.unfold_less, color: darkerblue),
+                        label: Text(
+                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.collapse_all"),
+                          style: TextStyle(color: darkerblue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               Expanded(
                 child: _selectedTab == 0
                     ? ReorderableListView(
@@ -456,10 +503,21 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                               key: ValueKey('stage_$index'),
                               trainingStage: trainingStages[index],
                               trainingStageIndex: index,
+
+                              isExpanded: expandedStates[index],
+
+                              onExpandedChanged: (value) {
+                                setState(() {
+                                  expandedStates[index] = value;
+                                });
+                              },
+
                               onDelete: () => removeTrainingStage(index),
+
                               onUpdate: () {
-                                setState(() => widget.training.trainingStages =
-                                    trainingStages);
+                                setState(() {
+                                  widget.training.trainingStages = trainingStages;
+                                });
                               },
                             ),
                         ],

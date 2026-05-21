@@ -77,19 +77,18 @@ class _BreathingWavePainter extends CustomPainter {
     required this.elapsedMs,
     required this.pulse,
     this.preparationDurationSecs = 0.0,
-    this.endingDuration = 0.0
+    this.endingDuration = 0.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final training = controller.parser.training;
-    const double pxPerSecond = 15.0;
+
     List<double> phaseIncrements = [];
 
 
     /// ---- BUILD FULL PHASE LIST (with preparation) ----
     final phases = <BreathingPhase>[];
-    
     // Add preparation phase as a recovery phase at the start
     if (preparationDurationSecs > 0) {
       phases.add(
@@ -128,6 +127,9 @@ class _BreathingWavePainter extends CustomPainter {
 
     if (phases.isEmpty) return;
 
+    final minPhaseSec = getMinNonZeroPhase(phases).clamp(0.3, double.infinity);
+    const minPhasePx = 40.0;
+    final pxPerSecond = minPhasePx / minPhaseSec;
     /// ---- BUILD TIME ENVELOPE ----
     final keys = <_KeyPoint>[];
     int accMs = 0;
@@ -229,11 +231,11 @@ class _BreathingWavePainter extends CustomPainter {
       }
     }
 
-    final remainingSeconds = (remainingPhaseMs / 1000).ceil();
+    final remainingSeconds = (remainingPhaseMs / 1000);
 
     final textPainter = TextPainter(
       text: TextSpan(
-        text: (remainingSeconds).toString(),
+        text: remainingSeconds.toStringAsFixed(1),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
@@ -292,6 +294,19 @@ double _interpolate(List<_KeyPoint> keys, int t) {
     }
   }
   return 0.5;
+}
+
+double getMinNonZeroPhase(List<BreathingPhase> phases) {
+  double min = double.infinity;
+
+  for (final p in phases) {
+    final d = p.duration;
+    if (d > 0 && d < min) {
+      min = d;
+    }
+  }
+
+  return min == double.infinity ? 0.3 : min;
 }
 
 class _KeyPoint {
