@@ -110,6 +110,190 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (selectedIndex == -1) selectedIndex = 0;
   }
 
+  void _showBulkEditStageRepsDialog() {
+    if (trainingStages.isEmpty) return;
+
+    int newStageReps = 1;
+    List<bool> selectedStages = List.generate(trainingStages.length, (index) => false);
+    bool selectAll = false;
+
+    // Controllers for the dialog's textfield
+    TextEditingController bulkRepsController = TextEditingController(text: "1");
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+
+            void commitRepsChange() {
+              int val = int.tryParse(bulkRepsController.text) ?? 1;
+              val = val.clamp(1, 999);
+              bulkRepsController.text = val.toString();
+              setStateDialog(() => newStageReps = val);
+            }
+
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                translationProvider.getTranslation("TrainingEditorPage.TrainingTab.bulk_reps_title") != ""
+                    ? translationProvider.getTranslation("TrainingEditorPage.TrainingTab.bulk_reps_title")
+                    : "Set Stage Reps",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: darkerblue),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // --- Reps Counter ---
+                    Text(
+                      translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.stage_reps") != ""
+                          ? translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.stage_reps")
+                          : "Stage Reps",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue, fontSize: 14),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      width: 120,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: darkerblue, width: 2),
+                      ),
+                      child: Row(
+                        children: [
+                          InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () {
+                              int val = int.tryParse(bulkRepsController.text) ?? 1;
+                              val = (val - 1).clamp(1, 999);
+                              bulkRepsController.text = val.toString();
+                              commitRepsChange();
+                            },
+                            child: SizedBox(width: 36, child: Icon(Icons.remove, color: darkerblue)),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: bulkRepsController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              decoration: InputDecoration(border: InputBorder.none, isDense: true),
+                              style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 16),
+                              onChanged: (value) {
+                                int? val = int.tryParse(value);
+                                if (val != null && val > 0) {
+                                  newStageReps = val.clamp(1, 999);
+                                }
+                              },
+                              onEditingComplete: () {
+                                FocusScope.of(context).unfocus();
+                                commitRepsChange();
+                              },
+                              onTapOutside: (_) {
+                                FocusScope.of(context).unfocus();
+                                commitRepsChange();
+                              },
+                            ),
+                          ),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () {
+                              int val = int.tryParse(bulkRepsController.text) ?? 1;
+                              val = (val + 1).clamp(1, 999);
+                              bulkRepsController.text = val.toString();
+                              commitRepsChange();
+                            },
+                            child: SizedBox(width: 36, child: Icon(Icons.add, color: darkerblue)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Divider(color: mediumblue),
+
+                    // --- Select All Checkbox ---
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        translationProvider.getTranslation("TrainingEditorPage.TrainingTab.select_all") != ""
+                            ? translationProvider.getTranslation("TrainingEditorPage.TrainingTab.select_all")
+                            : "Select All",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue),
+                      ),
+                      value: selectAll,
+                      activeColor: darkerblue,
+                      onChanged: (val) {
+                        setStateDialog(() {
+                          selectAll = val ?? false;
+                          selectedStages = List.generate(trainingStages.length, (_) => selectAll);
+                        });
+                      },
+                    ),
+                    Divider(color: mediumblue),
+
+                    // --- List of Stages ---
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: trainingStages.length,
+                        itemBuilder: (context, index) {
+                          return CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(_getStageName(index), overflow: TextOverflow.ellipsis),
+                            value: selectedStages[index],
+                            activeColor: darkerblue,
+                            onChanged: (val) {
+                              setStateDialog(() {
+                                selectedStages[index] = val ?? false;
+                                // Update selectAll if not all are selected anymore
+                                selectAll = selectedStages.every((element) => element);
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
+                  onPressed: () {
+                    // 1. Update the actual objects
+                    bool changesMade = false;
+                    for (int i = 0; i < trainingStages.length; i++) {
+                      if (selectedStages[i]) {
+                        trainingStages[i].stageReps = newStageReps;
+                        changesMade = true;
+                      }
+                    }
+                    // 2. Trigger main UI update if changes happened
+                    if (changesMade) {
+                      setState(() {
+                        widget.training.trainingStages = trainingStages;
+                      });
+                    }
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(translationProvider.getTranslation("PopupButton.save"), style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void expandAllStages() {
     setState(() {
       expandedStates =
@@ -339,6 +523,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     );
   }
 
+  String _getStageName(int index) {
+    final trimmed = trainingStages[index].name.trim();
+    if (trimmed.isNotEmpty) {
+      return trimmed;
+    }
+    final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name");
+    if (template.contains('{number}')) {
+      return template.replaceAll('{number}', (index + 1).toString());
+    }
+    return 'Stage ${index + 1}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -465,23 +661,38 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // <-- Changed this
                     children: [
+                      // --- NEW: Bulk Edit Button on the Left ---
                       TextButton.icon(
-                        onPressed: expandAllStages,
-                        icon: Icon(Icons.unfold_more, color: darkerblue),
+                        onPressed: trainingStages.isEmpty ? null : _showBulkEditStageRepsDialog,
+                        icon: Icon(Icons.library_add_check, color: trainingStages.isEmpty ? Colors.grey : darkerblue),
                         label: Text(
-                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.expand_all"),
-                          style: TextStyle(color: darkerblue),
+                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.bulk_reps_button"),
+                          style: TextStyle(color: trainingStages.isEmpty ? Colors.grey : darkerblue),
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: collapseAllStages,
-                        icon: Icon(Icons.unfold_less, color: darkerblue),
-                        label: Text(
-                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.collapse_all"),
-                          style: TextStyle(color: darkerblue),
-                        ),
+
+                      // --- EXISTING: Expand/Collapse grouped on the Right ---
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: expandAllStages,
+                            icon: Icon(Icons.unfold_more, color: darkerblue),
+                            label: Text(
+                              translationProvider.getTranslation("TrainingEditorPage.TrainingTab.expand_all"),
+                              style: TextStyle(color: darkerblue),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: collapseAllStages,
+                            icon: Icon(Icons.unfold_less, color: darkerblue),
+                            label: Text(
+                              translationProvider.getTranslation("TrainingEditorPage.TrainingTab.collapse_all"),
+                              style: TextStyle(color: darkerblue),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

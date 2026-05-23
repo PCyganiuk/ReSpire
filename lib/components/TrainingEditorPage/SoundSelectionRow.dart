@@ -125,12 +125,32 @@ class SoundSelectionRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: Slider(
-                    value: sliderValue!,
-                    min: 200,
-                    max: 1000,
-                    divisions: 16,
+                    // Map the actual value (200-10000) to a 0-100 slider scale
+                    value: (sliderValue! <= 1000)
+                        ? 50.0 * (sliderValue! - 200) / (1000 - 200)
+                        : 50.0 + 50.0 * (sliderValue! - 1000) / (10000 - 1000),
+                    min: 0,
+                    max: 100,
                     activeColor: darkerblue,
-                    onChanged: onSliderChanged,
+                    onChanged: (sliderPos) {
+                      double actualValue;
+
+                      // Map the 0-100 slider scale back to actual values
+                      if (sliderPos <= 50) {
+                        actualValue = 200 + (sliderPos / 50.0) * (1000 - 200);
+                        // Snap to nearest 10ms
+                        actualValue = (actualValue / 10).round() * 10.0;
+                      } else {
+                        actualValue = 1000 + ((sliderPos - 50.0) / 50.0) * (10000 - 1000);
+                        // Snap to nearest 100ms
+                        actualValue = (actualValue / 100).round() * 100.0;
+                      }
+
+                      // Ensure it stays strictly within bounds just in case
+                      actualValue = actualValue.clamp(200.0, 10000.0);
+
+                      onSliderChanged?.call(actualValue);
+                    },
                   ),
                 ),
                 //const SizedBox(width: 8),
@@ -148,7 +168,7 @@ class SoundSelectionRow extends StatelessWidget {
                   ),
                 )
               ],
-            ),
+            )
           ],
         ],
       ),

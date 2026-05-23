@@ -74,6 +74,9 @@
             "default_training_stage_name":"Etap treningu",
             "expand_all": "Rozwiń",
             "collapse_all": "Zwiń",
+            "bulk_reps_button": "Zaznacz etapy",
+            "bulk_reps_title": "Zaznacz etapy do modyfikacji",
+            "select_all": "Zaznacz wszystko",
 
             "TrainingStageTile":{
                 "name":"Nazwa etapu",
@@ -226,7 +229,7 @@
         "inhale":"Wdech",
         "exhale":"Wydech",
         "retention":"Wstrzymanie",
-        "recovery":"Regeneracja"
+        "recovery":"Zatrzymanie"
     },
 
     "SoundScope":{

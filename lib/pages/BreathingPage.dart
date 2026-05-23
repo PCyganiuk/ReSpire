@@ -12,7 +12,6 @@ import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:respire/services/SettingsProvider.dart';
 import 'package:respire/services/VisualStyle.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'dart:async';

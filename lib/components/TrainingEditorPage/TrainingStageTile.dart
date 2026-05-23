@@ -83,17 +83,22 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   @override
   void didUpdateWidget(TrainingStageTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.trainingStage.reps != widget.trainingStage.reps && !repsFocusNode!.hasFocus) {
+
+    // Compare controller text to the model value, because the model is mutated in place.
+    if (repsController.text != widget.trainingStage.reps.toString() && !(repsFocusNode?.hasFocus ?? false)) {
       repsController.text = widget.trainingStage.reps.toString();
     }
-    if (oldWidget.trainingStage.stageReps != widget.trainingStage.stageReps && !stageRepsFocusNode!.hasFocus) {
+
+    if (stageRepsController.text != widget.trainingStage.stageReps.toString() && !(stageRepsFocusNode?.hasFocus ?? false)) {
       stageRepsController.text = widget.trainingStage.stageReps.toString();
     }
-    if (oldWidget.trainingStage.name != widget.trainingStage.name && !nameFocusNode!.hasFocus) {
+
+    if (nameController.text != widget.trainingStage.name && !(nameFocusNode?.hasFocus ?? false)) {
       nameController.text = _getInitialName();
     }
+
     // Update if training stage index changed (reordering)
-    if (oldWidget.trainingStageIndex != widget.trainingStageIndex && !nameFocusNode!.hasFocus) {
+    if (oldWidget.trainingStageIndex != widget.trainingStageIndex && !(nameFocusNode?.hasFocus ?? false)) {
       nameController.text = _getInitialName();
     }
   }
@@ -312,7 +317,7 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: darkerblue, width: 1),
                         ),
                         child: Row(

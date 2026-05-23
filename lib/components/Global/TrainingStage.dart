@@ -54,17 +54,20 @@ class TrainingStage {
   }
 
   String getTotalTimeFormatted() {
-    double totalTime = 0.0;
+    double singleStageCycleTime = 0.0;
 
     for (var phase in breathingPhases) {
       for (int i = 0; i < reps; i++) {
         if (phase.increment != null) {
-          totalTime += phase.duration + (phase.increment!.value * i);
+          singleStageCycleTime += phase.duration + (phase.increment!.value * i);
         } else {
-          totalTime += phase.duration;
+          singleStageCycleTime += phase.duration;
         }
       }
     }
+
+    // Multiply the time of one complete cycle by the number of stageReps
+    double totalTime = singleStageCycleTime * stageReps;
 
     if (totalTime < 60) {
       return "${totalTime.round()} sec";

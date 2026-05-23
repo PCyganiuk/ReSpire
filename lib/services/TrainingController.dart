@@ -432,8 +432,6 @@ class TrainingController {
 
       if (trainingElapsedMs.value > counter && !end) {
         counter += countingStep;
-        //previousSecond = _remainingTime ~/ 1000;
-        //second.value = previousSecond;
         if( // skip counting to avoid overlapping and too frequent sounds
         ((!_preparationPhaseCompleted && _sounds.preparationTrack.type == SoundType.none) || // play during preparation if no sound was set
          (_preparationPhaseCompleted && !_endingInitiated) || // play mid training 

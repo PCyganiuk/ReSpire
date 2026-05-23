@@ -86,7 +86,6 @@ class _BreathingWavePainter extends CustomPainter {
 
     List<double> phaseIncrements = [];
 
-
     /// ---- BUILD FULL PHASE LIST (with preparation) ----
     final phases = <BreathingPhase>[];
     // Add preparation phase as a recovery phase at the start
@@ -99,19 +98,22 @@ class _BreathingWavePainter extends CustomPainter {
       );
       phaseIncrements.add(0.0);
     }
-    
+
     for (final stage in training.trainingStages) {
-      for (int i = 0; i < stage.reps; i++) {
-        for (int j = 0; j < stage.breathingPhases.length; j++) {
-          if(stage.breathingPhases[j].increment != null) {
-            double tmp = i * stage.breathingPhases[j].increment!.value;
-            phaseIncrements.add(tmp);
+      for (int sr = 0; sr < stage.stageReps; sr++) { // Add stageRep loop here!
+        for (int i = 0; i < stage.reps; i++) {
+          for (int j = 0; j < stage.breathingPhases.length; j++) {
+            // Note: 'i' resets to 0 for every new 'sr', perfectly matching the increment reset requirement
+            if(stage.breathingPhases[j].increment != null) {
+              double tmp = i * stage.breathingPhases[j].increment!.value;
+              phaseIncrements.add(tmp);
+            }
+            else {
+              phaseIncrements.add(0.0);
+            }
           }
-          else {
-            phaseIncrements.add(0.0);
-          }
+          phases.addAll(stage.breathingPhases);
         }
-        phases.addAll(stage.breathingPhases);
       }
     }
 
@@ -130,6 +132,7 @@ class _BreathingWavePainter extends CustomPainter {
     final minPhaseSec = getMinNonZeroPhase(phases).clamp(0.3, double.infinity);
     const minPhasePx = 40.0;
     final pxPerSecond = minPhasePx / minPhaseSec;
+
     /// ---- BUILD TIME ENVELOPE ----
     final keys = <_KeyPoint>[];
     int accMs = 0;
@@ -163,7 +166,6 @@ class _BreathingWavePainter extends CustomPainter {
     final centerX = size.width / 2;
     final centerY = size.height / 2;
     final waveHeight = size.height * 0.45;
-    //final stretch = size.width * 3;
 
     /// ---- SCROLL OFFSET ----
     final scrollX = (clampedElapsed / 1000.0) * pxPerSecond;
@@ -180,7 +182,6 @@ class _BreathingWavePainter extends CustomPainter {
     bool started = false;
 
     const stepMs = 30;
-    //double dotY = 0;
 
     for (int t = 0; t <= totalMs; t += stepMs) {
       final timeSec = t / 1000.0;
@@ -197,19 +198,15 @@ class _BreathingWavePainter extends CustomPainter {
       } else {
         path.lineTo(x, y);
       }
-      if ((x - centerX).abs() < stepMs) {
-        //dotY = y;
-      }
     }
+
     // ---- DOT POSITION (DIRECT, TIME-BASED) ----
     final dotValue = _interpolate(keys, clampedElapsed);
     final dotY = centerY - (dotValue - 0.5) * waveHeight;
 
-
     canvas.drawPath(path, paint);
 
     /// ---- DOT ----
-    //final dotRadius = lerpDouble(16, 26, pulse)!;
     final dotRadius = 20.0;
     final dotCenter = Offset(centerX, dotY);
 
@@ -218,6 +215,7 @@ class _BreathingWavePainter extends CustomPainter {
       dotRadius,
       Paint()..color = const Color(0xFF2496A8),
     );
+
     /// ---- CURRENT PHASE REMAINING TIME ----
     int remainingPhaseMs = 0;
 
@@ -262,7 +260,6 @@ class _BreathingWavePainter extends CustomPainter {
 /// ---- HELPERS ----
 
 (double, double) _phaseEnvelope(BreathingPhase phase, bool nextIsInhale, bool prevWasInhale) {
-
   switch (phase.breathingPhaseType) {
     case BreathingPhaseType.inhale:
       if(nextIsInhale) {
@@ -314,6 +311,3 @@ class _KeyPoint {
   final double value;
   _KeyPoint(this.time, this.value);
 }
-
-
-

@@ -72,8 +72,11 @@
             "remove_training_stage_dialog_title":"Remove training stage?",
             "remove_training_stage_dialog_content":"Are you sure you want to remove this training stage?",
             "default_training_stage_name":"Training stage",
-            "expand_all": "Expand all",
-            "collapse_all": "Collapse all",
+            "expand_all": "Expand",
+            "collapse_all": "Collapse",
+            "bulk_reps_button": "Select stages",
+            "bulk_reps_title": "Select stages to modify",
+            "select_all": "Select all",
 
             "TrainingStageTile":{
                 "name":"Training stage name",

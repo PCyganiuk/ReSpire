@@ -46,36 +46,25 @@ class Training {
     trainingStages.removeWhere((stage) => stage.breathingPhases.isEmpty);
   }
 
-  int getTotalTrainingTime() {
-    double totalTime = 0.0;
-
-    for (TrainingStage stage in trainingStages) {
-      for (BreathingPhase phase in stage.breathingPhases) {
-        for (int i = 0; i < stage.reps; i++) {
-          if (phase.increment != null) {
-            totalTime += phase.duration + (phase.increment!.value * i);
-          } else {
-            totalTime += phase.duration;
-          }
-        }
-      }
-    }
-    return totalTime.toInt();
-  }
-
   String getTotalTimeApprox() {
     double totalTime = 0.0;
 
     for (TrainingStage stage in trainingStages) {
+      double singleStageCycleTime = 0.0;
+
       for (BreathingPhase phase in stage.breathingPhases) {
         for (int i = 0; i < stage.reps; i++) {
           if (phase.increment != null) {
-            totalTime += phase.duration + (phase.increment!.value * i);
+            singleStageCycleTime += phase.duration + (phase.increment!.value * i);
           } else {
-            totalTime += phase.duration;
+            singleStageCycleTime += phase.duration;
           }
         }
       }
+
+      // Multiply the time of one complete cycle by the number of stageReps
+      // This perfectly mimics the increments resetting back to 0 for the next stage rep!
+      totalTime += (singleStageCycleTime * stage.stageReps);
     }
 
     if (totalTime < 60) {

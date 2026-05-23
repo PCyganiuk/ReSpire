@@ -221,7 +221,7 @@ class _TrainingPageState extends State<TrainingPage> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.reps} ',
+                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.stageReps} X ${trainingStage.reps} ',
                                 style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 8),

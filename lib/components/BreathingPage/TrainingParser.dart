@@ -2,13 +2,14 @@ import 'dart:developer';
 
 import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/components/Global/BreathingPhase.dart'
-    as breathing_phase;
+as breathing_phase;
 import 'package:respire/components/Global/Training.dart';
 
 class TrainingParser {
   int trainingStageID = 0;
   int breathingPhaseID = -1;
   int doneReps = 0;
+  int doneStageReps = 0; // Added tracker for Stage Reps
 
   Training training;
   TrainingStage currentTrainingStage;
@@ -23,11 +24,20 @@ class TrainingParser {
       doneReps++;
 
       if (doneReps == currentTrainingStage.reps) {
-        trainingStageID++;
-        if (trainingStageID == training.trainingStages.length) {
-          return null;
+        doneStageReps++; // Completed a full cycle of phase reps
+
+        if (doneStageReps == currentTrainingStage.stageReps) {
+          // Completed all stage reps, move to next stage
+          trainingStageID++;
+          if (trainingStageID == training.trainingStages.length) {
+            return null;
+          } else {
+            currentTrainingStage = training.trainingStages[trainingStageID];
+            doneReps = 0;
+            doneStageReps = 0;
+          }
         } else {
-          currentTrainingStage = training.trainingStages[trainingStageID];
+          // Repeat the stage. Reset doneReps so increments start from 0 again.
           doneReps = 0;
         }
       }
@@ -36,9 +46,10 @@ class TrainingParser {
     }
 
     currentBreathingPhase =
-        currentTrainingStage.breathingPhases[breathingPhaseID];
+    currentTrainingStage.breathingPhases[breathingPhaseID];
 
     double durationSeconds = currentBreathingPhase.duration;
+    // doneReps resets to 0 on every new stageRep, so the increment calculation resets perfectly!
     if (currentBreathingPhase.increment != null && doneReps > 0) {
       final increment = currentBreathingPhase.increment!;
       durationSeconds =
@@ -58,6 +69,7 @@ class TrainingParser {
       "remainingTime": (durationSeconds * 1000).truncate(),
       "trainingStageName": currentTrainingStage.name,
       "doneReps": doneReps,
+      "doneStageReps": doneStageReps,
     };
   }
 
@@ -65,7 +77,8 @@ class TrainingParser {
     int result = 0;
     for (int i = 0; i < training.trainingStages.length; i++) {
       result += (training.trainingStages[i].breathingPhases.length *
-          training.trainingStages[i].reps);
+          training.trainingStages[i].reps *
+          training.trainingStages[i].stageReps); // Include stageReps
     }
     return result;
   }
@@ -76,22 +89,24 @@ class TrainingParser {
     int totalBreathingPhases = 0;
 
     for (int stageIdx = 0;
-        stageIdx < training.trainingStages.length;
-        stageIdx++) {
+    stageIdx < training.trainingStages.length;
+    stageIdx++) {
       final stage = training.trainingStages[stageIdx];
 
-      for (int rep = 0; rep < stage.reps; rep++) {
-        for (int phaseIdx = 0;
-            phaseIdx < stage.breathingPhases.length;
-            phaseIdx++) {
-          final phase = stage.breathingPhases[phaseIdx];
-          double phaseDuration = phase.duration;
-          if (phase.increment != null && rep > 0) {
-            final increment = phase.increment!;
-            phaseDuration = phase.duration + (rep * increment.value);
+      for (int sr = 0; sr < stage.stageReps; sr++) { // Stage Reps Loop
+        for (int rep = 0; rep < stage.reps; rep++) {
+          for (int phaseIdx = 0;
+          phaseIdx < stage.breathingPhases.length;
+          phaseIdx++) {
+            final phase = stage.breathingPhases[phaseIdx];
+            double phaseDuration = phase.duration;
+            if (phase.increment != null && rep > 0) {
+              final increment = phase.increment!;
+              phaseDuration = phase.duration + (rep * increment.value);
+            }
+            totalSeconds += phaseDuration;
+            totalBreathingPhases++;
           }
-          totalSeconds += phaseDuration;
-          totalBreathingPhases++;
         }
       }
     }
@@ -109,22 +124,24 @@ class TrainingParser {
     int totalBreathingPhases = 0;
 
     for (int stageIdx = 0;
-        stageIdx < training.trainingStages.length;
-        stageIdx++) {
+    stageIdx < training.trainingStages.length;
+    stageIdx++) {
       final stage = training.trainingStages[stageIdx];
 
-      for (int rep = 0; rep < stage.reps; rep++) {
-        for (int phaseIdx = 0;
-            phaseIdx < stage.breathingPhases.length;
-            phaseIdx++) {
-          final phase = stage.breathingPhases[phaseIdx];
-          double phaseDuration = phase.duration;
-          if (phase.increment != null && rep > 0) {
-            final increment = phase.increment!;
-            phaseDuration = phase.duration + (rep * increment.value);
+      for (int sr = 0; sr < stage.stageReps; sr++) { // Stage Reps Loop
+        for (int rep = 0; rep < stage.reps; rep++) {
+          for (int phaseIdx = 0;
+          phaseIdx < stage.breathingPhases.length;
+          phaseIdx++) {
+            final phase = stage.breathingPhases[phaseIdx];
+            double phaseDuration = phase.duration;
+            if (phase.increment != null && rep > 0) {
+              final increment = phase.increment!;
+              phaseDuration = phase.duration + (rep * increment.value);
+            }
+            totalSeconds += phaseDuration;
+            totalBreathingPhases++;
           }
-          totalSeconds += phaseDuration;
-          totalBreathingPhases++;
         }
       }
     }
