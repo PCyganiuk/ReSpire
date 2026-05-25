@@ -27,7 +27,7 @@ class TrainingPage extends StatefulWidget {
 class _TrainingPageState extends State<TrainingPage> {
   late Training training;
   late List<TrainingStage> trainingStages;
-  bool _expanded = false;
+  bool _expanded = true;
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
@@ -172,7 +172,7 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Widget trainingOverviewHeader() {
     return GestureDetector(
-      //onTap: () => setState(() => _expanded = !_expanded),
+      onTap: () => setState(() => _expanded = !_expanded),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -182,11 +182,11 @@ class _TrainingPageState extends State<TrainingPage> {
               style: TextStyle(fontSize: 18, color: darkerblue, fontWeight: FontWeight.w500),
             ),
             Spacer(),
-            //AnimatedRotation(
-            //  turns: _expanded ? 0.5 : 0.0,
-            //  duration: Duration(milliseconds: 200),
-            //  child: Icon(Icons.keyboard_arrow_down, color: darkerblue),
-            //),
+            AnimatedRotation(
+              turns: _expanded ? 0.5 : 0.0,
+              duration: Duration(milliseconds: 200),
+              child: Icon(Icons.keyboard_arrow_down, color: darkerblue),
+            ),
           ],
         ),
       ),
@@ -198,7 +198,8 @@ class _TrainingPageState extends State<TrainingPage> {
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       child: ClipRect(
-        child: Padding(
+        child: _expanded
+              ? Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: Column(
                   children: trainingStages.asMap().entries.map((entry) {
@@ -270,6 +271,7 @@ class _TrainingPageState extends State<TrainingPage> {
                   }).toList(),
                 ),
               )
+            : SizedBox.shrink(),
       ),
     );
   }

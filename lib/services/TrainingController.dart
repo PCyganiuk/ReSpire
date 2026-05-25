@@ -47,6 +47,7 @@ class TrainingController {
   int _nextRemainingTime = 0; //in milliseconds
   int _newBreathingPhaseRemainingTime = 0; //in milliseconds
   late int _endingDuration;
+  late int preparationDurationMs;
 
   List<TrainingStage> trainingStages = [];
 
@@ -72,10 +73,6 @@ class TrainingController {
 
   TranslationProvider translationProvider = TranslationProvider();
 
-  final longSoundNames = ['Wdech', 'Wstrzymanie', 'Wydech', 'Zatrzymanie'];
-
-  int _countingElapsedMs = 0;
-
   TrainingController(this.parser) {
     soundManager = SoundManager();
     soundManager.stopAllSounds();
@@ -87,6 +84,7 @@ class TrainingController {
     countingStep = parser.training.sounds.countingFrequencyMs.toInt();
     _sounds = parser.training.sounds;
     _settings = parser.training.settings;
+    preparationDurationMs = _settings.preparationDuration * 1000;
     showLabels.value = false;
 
     // Initialize current stage ID to the first stage
@@ -430,7 +428,7 @@ class TrainingController {
       trainingElapsedMs.value += elapsed;
 
 
-      if (trainingElapsedMs.value > counter && !end) {
+      if ((trainingElapsedMs.value - preparationDurationMs) > counter && !end) {
         counter += countingStep;
         if( // skip counting to avoid overlapping and too frequent sounds
         ((!_preparationPhaseCompleted && _sounds.preparationTrack.type == SoundType.none) || // play during preparation if no sound was set
