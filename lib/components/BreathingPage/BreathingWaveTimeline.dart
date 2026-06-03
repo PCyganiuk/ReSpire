@@ -88,6 +88,7 @@ class _BreathingWavePainter extends CustomPainter {
 
     /// ---- BUILD FULL PHASE LIST (with preparation) ----
     final phases = <BreathingPhase>[];
+
     // Add preparation phase as a recovery phase at the start
     if (preparationDurationSecs > 0) {
       phases.add(
@@ -99,20 +100,33 @@ class _BreathingWavePainter extends CustomPainter {
       phaseIncrements.add(0.0);
     }
 
-    for (final stage in training.trainingStages) {
-      for (int sr = 0; sr < stage.stageReps; sr++) { // Add stageRep loop here!
-        for (int i = 0; i < stage.reps; i++) {
-          for (int j = 0; j < stage.breathingPhases.length; j++) {
-            // Note: 'i' resets to 0 for every new 'sr', perfectly matching the increment reset requirement
-            if(stage.breathingPhases[j].increment != null) {
-              double tmp = i * stage.breathingPhases[j].increment!.value;
-              phaseIncrements.add(tmp);
+    // --- BIG LOOP LOGIC ---
+    List<int> stagesDoneReps = List.filled(training.trainingStages.length, 0);
+    bool stagesRemaining = true;
+
+    while (stagesRemaining) {
+      stagesRemaining = false; // Assume we are done unless proven otherwise
+
+      for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
+        final stage = training.trainingStages[stageIdx];
+
+        if (stagesDoneReps[stageIdx] < stage.stageReps) {
+          stagesRemaining = true; // We still have stages to process in future passes!
+
+          for (int i = 0; i < stage.reps; i++) {
+            for (int j = 0; j < stage.breathingPhases.length; j++) {
+              if (stage.breathingPhases[j].increment != null) {
+                double tmp = i * stage.breathingPhases[j].increment!.value;
+                phaseIncrements.add(tmp);
+              } else {
+                phaseIncrements.add(0.0);
+              }
             }
-            else {
-              phaseIncrements.add(0.0);
-            }
+            phases.addAll(stage.breathingPhases);
           }
-          phases.addAll(stage.breathingPhases);
+
+          // Mark this pass as completed for this specific stage
+          stagesDoneReps[stageIdx]++;
         }
       }
     }
