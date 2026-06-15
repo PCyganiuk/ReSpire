@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/components/Global/Settings.dart';
@@ -26,11 +27,22 @@ class Training {
   @HiveField(4)
   Settings settings = Settings();
 
+  @HiveField(5)
+  List<int> colorValues;
+
+
   Training({
     required this.title,
     required this.trainingStages,
-    this.description = ''
+    this.description = '',
+    this.colorValues = const [],
   });
+
+  List<Color> get colors => colorValues.map((val) => Color(val)).toList();
+
+  set colors(List<Color> newColors) {
+    colorValues = newColors.map((color) => color.value).toList();
+  }
 
   int countEmptyStages() {
     int emptyStages = 0;

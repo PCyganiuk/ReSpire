@@ -108,6 +108,7 @@ class TrainingJsonConverter {
       stageReps: json['reps'] ?? 1,
       reps: json['reps'] ?? 1,
       name: json['name'] ?? '',
+      groupId: json['group_id'] ?? 0,
       breathingPhases:
           phases.map((phase) => _phaseFromJson(_ensureMap(phase))).toList(),
     )..id = json['id'] ?? Uuid().v4();

@@ -56,6 +56,7 @@ class PresetDataBase {
             TrainingStage(
                 stageReps: 1,
                 reps: 5,
+                groupId: 0,
                 breathingPhases: [
                   BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
                   BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.retention),
@@ -73,6 +74,7 @@ class PresetDataBase {
             TrainingStage(
                 stageReps: 1,
                 reps: 4,
+                groupId: 0,
                 breathingPhases: [
                   BreathingPhase(duration: 4, breathingPhaseType: BreathingPhaseType.inhale),
                   BreathingPhase(duration: 7, breathingPhaseType: BreathingPhaseType.retention),
@@ -90,6 +92,7 @@ class PresetDataBase {
             TrainingStage(
                 stageReps: 1,
                 reps: 10,
+                groupId: 0,
                 breathingPhases: [
                   BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.inhale),
                   BreathingPhase(duration: 6, breathingPhaseType: BreathingPhaseType.exhale),

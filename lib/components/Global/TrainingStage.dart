@@ -26,11 +26,15 @@ class TrainingStage {
   @HiveField(4, defaultValue: 1)
   int stageReps;
 
+  @HiveField(5, defaultValue: 0)
+  int groupId;
+
   TrainingStage({
     required this.reps,
     //required this.increment,
     required this.breathingPhases,
     required this.stageReps,
+    required this.groupId,
     this.name = '',
   });
 

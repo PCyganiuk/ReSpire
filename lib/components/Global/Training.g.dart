@@ -20,6 +20,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
       title: fields[0] as String,
       trainingStages: (fields[2] as List).cast<TrainingStage>(),
       description: fields[1] as String,
+      colorValues: fields[5] == null ? [] : (fields[5] as List).cast<int>(),
     )
       ..sounds = fields[3] as Sounds
       ..settings = fields[4] as Settings;
@@ -28,7 +29,7 @@ class TrainingAdapter extends TypeAdapter<Training> {
   @override
   void write(BinaryWriter writer, Training obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class TrainingAdapter extends TypeAdapter<Training> {
       ..writeByte(3)
       ..write(obj.sounds)
       ..writeByte(4)
-      ..write(obj.settings);
+      ..write(obj.settings)
+      ..writeByte(5)
+      ..write(obj.colorValues);
   }
 
   @override
