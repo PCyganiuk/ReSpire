@@ -21,7 +21,7 @@ import 'package:respire/utils/TextUtils.dart';
 
 import '../services/VisualStyle.dart';
 
-// --- NEW: Helper class to manage list blocks for the UI ---
+// --- Helper class to manage list blocks for the UI ---
 class _TrainingBlock {
   final int groupId;
   final List<TrainingStage> stages;
@@ -34,6 +34,167 @@ class _TrainingBlock {
     required this.expandedStates,
     this.groupColor,
   });
+}
+
+// --- NEW: Group Header Widget to manage Reps Controller ---
+class _GroupHeaderWidget extends StatefulWidget {
+  final _TrainingBlock block;
+  final int blockIndex;
+  final VoidCallback onUngroup;
+  final ValueChanged<int> onRepsChanged;
+  final TranslationProvider translationProvider;
+
+  const _GroupHeaderWidget({
+    Key? key,
+    required this.block,
+    required this.blockIndex,
+    required this.onUngroup,
+    required this.onRepsChanged,
+    required this.translationProvider,
+  }) : super(key: key);
+
+  @override
+  __GroupHeaderWidgetState createState() => __GroupHeaderWidgetState();
+}
+
+class __GroupHeaderWidgetState extends State<_GroupHeaderWidget> {
+  late TextEditingController repsController;
+  late FocusNode repsFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    repsController = TextEditingController(text: widget.block.stages.first.stageReps.toString());
+    repsFocusNode = FocusNode();
+    repsFocusNode.addListener(() {
+      if (!repsFocusNode.hasFocus) {
+        commitReps();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(_GroupHeaderWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.block.stages.first.stageReps != widget.block.stages.first.stageReps && !repsFocusNode.hasFocus) {
+      repsController.text = widget.block.stages.first.stageReps.toString();
+    }
+  }
+
+  @override
+  void dispose() {
+    repsController.dispose();
+    repsFocusNode.dispose();
+    super.dispose();
+  }
+
+  void commitReps() {
+    int val = int.tryParse(repsController.text) ?? widget.block.stages.first.stageReps;
+    val = val.clamp(1, 999);
+    repsController.text = val.toString();
+    widget.onRepsChanged(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String labelText = widget.translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.stage_reps") != ""
+        ? widget.translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.stage_reps")
+        : "Stage Reps";
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+      child: Row(
+        children: [
+          ReorderableDragStartListener(
+            index: widget.blockIndex,
+            child: Icon(Icons.drag_indicator, color: darkerblue.withOpacity(0.5), size: 28),
+          ),
+          const SizedBox(width: 8),
+
+          // Reps Label
+          Text(
+            labelText,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: darkerblue),
+          ),
+          const SizedBox(width: 8),
+
+          // Interactive Counter Box
+          Container(
+            height: 32,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: darkerblue.withOpacity(0.3), width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      int currentValue = int.tryParse(repsController.text) ?? 1;
+                      int newValue = (currentValue - 1).clamp(1, 999);
+                      repsController.text = newValue.toString();
+                      widget.onRepsChanged(newValue);
+                    },
+                    child: Container(width: 24, height: 32, alignment: Alignment.center, child: const Icon(Icons.remove, color: darkerblue, size: 14)),
+                  ),
+                ),
+                Container(
+                  width: 28,
+                  height: 32,
+                  alignment: Alignment.center,
+                  child: TextField(
+                    controller: repsController,
+                    focusNode: repsFocusNode,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero, isDense: true),
+                    style: const TextStyle(color: darkerblue, fontWeight: FontWeight.w600, fontSize: 13),
+                    onChanged: (value) {
+                      int? newReps = int.tryParse(value);
+                      if (newReps != null && newReps > 0) {
+                        widget.onRepsChanged(newReps.clamp(1, 999));
+                      }
+                    },
+                    onEditingComplete: commitReps,
+                    onTapOutside: (event) {
+                      FocusScope.of(context).unfocus();
+                      commitReps();
+                    },
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      int currentValue = int.tryParse(repsController.text) ?? 1;
+                      int newValue = (currentValue + 1).clamp(1, 999);
+                      repsController.text = newValue.toString();
+                      widget.onRepsChanged(newValue);
+                    },
+                    child: Container(width: 24, height: 32, alignment: Alignment.center, child: const Icon(Icons.add, color: darkerblue, size: 14)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Spacer(),
+          IconButton(
+            onPressed: widget.onUngroup,
+            icon: const Icon(Icons.link_off, color: darkerblue),
+            tooltip: "Ungroup",
+            splashRadius: 20,
+          )
+        ],
+      ),
+    );
+  }
 }
 
 class TrainingEditorPage extends StatefulWidget {
@@ -73,10 +234,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   TranslationProvider translationProvider = TranslationProvider();
 
-  // Color palette for grouping
   final List<Color> _groupColors = [
-    Colors.blue, Colors.green, Colors.orange,
-    Colors.purple, Colors.red, Colors.teal
+    const Color(0xFFAEC6CF), // Pastel Blue
+    const Color(0xFF77DD77), // Pastel Green
+    const Color(0xFFFFB347), // Pastel Orange
+    const Color(0xFFB39EB5), // Pastel Purple
+    const Color(0xFFFF6961), // Pastel Red (Soft Pinkish-Red)
+    const Color(0xFF84C5C6), // Pastel Teal
   ];
 
   @override
@@ -116,7 +280,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     if (selectedIndex == -1) selectedIndex = 0;
   }
 
-  // --- NEW: Block compiler to group contiguous stages for the UI ---
+  // --- Block compiler to group contiguous stages for the UI ---
   List<_TrainingBlock> _getBlocks() {
     List<_TrainingBlock> blocks = [];
     if (trainingStages.isEmpty) return blocks;
@@ -171,16 +335,16 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
     return blocks;
   }
 
-  // Helper to map color value if you store them in widget.training.colorValues
   Color _getGroupColor(int groupId) {
-    if (widget.training.colorValues.isNotEmpty) {
-      // Basic fallback logic: assign a color based on the modulo of the ID
-      return Color(widget.training.colorValues[groupId % widget.training.colorValues.length]);
+    // We use the groupId as a direct 1-based index to find the exact color
+    if (groupId > 0 && groupId <= widget.training.colorValues.length) {
+      return Color(widget.training.colorValues[groupId - 1]);
     }
+    // Fallback just in case
     return _groupColors[groupId % _groupColors.length];
   }
 
-  // --- NEW: Create Group Dialog ---
+  // --- Create Group Dialog ---
   void _showCreateGroupDialog() {
     if (trainingStages.isEmpty) return;
 
@@ -205,7 +369,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
-                "Group Stages",
+                translationProvider.getTranslation("TrainingEditorPage.TrainingTab.group_stages"),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: darkerblue),
               ),
               content: SizedBox(
@@ -213,9 +377,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // --- Group Reps Counter ---
                     Text(
-                      "Group Reps",
+                      translationProvider.getTranslation("TrainingEditorPage.TrainingTab.group_reps"),
                       style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue, fontSize: 14),
                     ),
                     SizedBox(height: 8),
@@ -271,9 +434,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                       ),
                     ),
                     SizedBox(height: 16),
-
-                    // --- Color Picker ---
-                    Text("Select Color", style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue)),
+                    Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.select_color"), style: TextStyle(fontWeight: FontWeight.bold, color: darkerblue)),
                     SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -296,13 +457,18 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                     ),
                     SizedBox(height: 16),
                     Divider(color: mediumblue),
-
                     // --- Stage Selection ---
                     Flexible(
                       child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: trainingStages.length,
                         itemBuilder: (context, index) {
+                          // If the stage is already in a group, hide it completely
+                          if (trainingStages[index].groupId != 0) {
+                            return const SizedBox.shrink();
+                          }
+
+                          // Otherwise, render the normal selectable checkbox
                           return CheckboxListTile(
                             contentPadding: EdgeInsets.zero,
                             title: Text(_getStageName(index), overflow: TextOverflow.ellipsis),
@@ -324,11 +490,15 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                   child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: darkerblue),
-                  onPressed: () {
-                    // Extract selected stages and group them
-                    int newGroupId = DateTime.now().millisecondsSinceEpoch;
-
+                  // --- THE FIX ---
+                  // Check if at least one stage is selected
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedStages.contains(true) ? darkerblue : Colors.grey,
+                  ),
+                  // If nothing is selected, onPressed is null, which disables the button
+                  onPressed: selectedStages.contains(true)
+                      ? () {
+                    int newGroupId = widget.training.colorValues.length + 1;
                     List<TrainingStage> pulledStages = [];
                     List<bool> pulledExpanded = [];
                     int firstInsertIndex = -1;
@@ -345,30 +515,24 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
                     if (pulledStages.isNotEmpty) {
                       setState(() {
-                        // Remove them from current positions
                         trainingStages.removeWhere((stage) => stage.groupId == newGroupId);
 
-                        // Safely remove the expanded states by looping backward
                         for (int i = selectedStages.length - 1; i >= 0; i--) {
                           if (selectedStages[i]) {
                             expandedStates.removeAt(i);
                           }
                         }
 
-                        // Insert them sequentially at the index of the first selected item
                         trainingStages.insertAll(firstInsertIndex, pulledStages);
                         expandedStates.insertAll(firstInsertIndex, pulledExpanded);
-
-                        // Save the chosen color integer to the model
-                        // Safely save the chosen color by creating a new mutable list
-                        widget.training.colorValues = List.from(widget.training.colorValues)..add(selectedColor.toARGB32());
-
+                        widget.training.colorValues = List.from(widget.training.colorValues)..add(selectedColor.value);
                         widget.training.trainingStages = trainingStages;
                       });
                     }
                     Navigator.of(context).pop();
-                  },
-                  child: Text("Create Group", style: TextStyle(color: Colors.white)),
+                  }
+                      : null,
+                  child: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.create_group"), style: const TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -383,13 +547,13 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       for (var stage in trainingStages) {
         if (stage.groupId == groupId) {
           stage.groupId = 0;
-          stage.stageReps = 1; // reset back to 1 if ungrouped
+          stage.stageReps = 1;
         }
       }
     });
   }
 
-  // --- NEW: Block-based Reordering ---
+  // --- Outer Block Reordering ---
   void reorderTrainingBlocks(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) newIndex -= 1;
@@ -398,7 +562,6 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
       final movedBlock = blocks.removeAt(oldIndex);
       blocks.insert(newIndex, movedBlock);
 
-      // Flatten blocks back into the data arrays
       trainingStages.clear();
       expandedStates.clear();
       for (var block in blocks) {
@@ -598,9 +761,11 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Generate Blocks for the UI
     final currentBlocks = _getBlocks();
 
+    bool hasUngroupedStages = trainingStages.any((stage) => stage.groupId == 0);
+
+    bool isAllExpanded = expandedStates.isNotEmpty && expandedStates.every((state) => state);
     return WillPopScope(
       onWillPop: () async {
         int emptyStages = widget.training.countEmptyStages();
@@ -690,26 +855,25 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton.icon(
-                        onPressed: trainingStages.isEmpty ? null : _showCreateGroupDialog,
-                        icon: Icon(Icons.dashboard_customize, color: trainingStages.isEmpty ? Colors.grey : darkerblue),
+                        // Disable the button if there are no ungrouped stages left
+                        onPressed: hasUngroupedStages ? _showCreateGroupDialog : null,
+                        icon: Icon(Icons.dashboard_customize, color: hasUngroupedStages ? darkerblue : Colors.grey),
                         label: Text(
-                          "Group Stages",
-                          style: TextStyle(color: trainingStages.isEmpty ? Colors.grey : darkerblue),
+                          translationProvider.getTranslation("TrainingEditorPage.TrainingTab.group_stages"),
+                          style: TextStyle(color: hasUngroupedStages ? darkerblue : Colors.grey),
                         ),
                       ),
-                      Row(
-                        children: [
-                          TextButton.icon(
-                            onPressed: expandAllStages,
-                            icon: Icon(Icons.unfold_more, color: darkerblue),
-                            label: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.expand_all"), style: TextStyle(color: darkerblue)),
-                          ),
-                          TextButton.icon(
-                            onPressed: collapseAllStages,
-                            icon: Icon(Icons.unfold_less, color: darkerblue),
-                            label: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.collapse_all"), style: TextStyle(color: darkerblue)),
-                          ),
-                        ],
+                      IconButton(
+                        onPressed: isAllExpanded ? collapseAllStages : expandAllStages,
+                        icon: Icon(
+                          isAllExpanded ? Icons.unfold_less : Icons.unfold_more,
+                          color: darkerblue,
+                          size: 28,
+                        ),
+                        tooltip: isAllExpanded
+                            ? translationProvider.getTranslation("TrainingEditorPage.TrainingTab.collapse_all")
+                            : translationProvider.getTranslation("TrainingEditorPage.TrainingTab.expand_all"),
+                        splashRadius: 20,
                       ),
                     ],
                   ),
@@ -718,10 +882,9 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 child: _selectedTab == 0
                     ? ReorderableListView(
                   scrollController: _scrollController,
-                  onReorder: reorderTrainingBlocks, // Use the new block reorder method
+                  onReorder: reorderTrainingBlocks,
                   proxyDecorator: (child, idx, anim) => Material(color: Colors.transparent, child: child),
                   padding: EdgeInsets.only(bottom: 80),
-                  // --- NEW: Map blocks to UI ---
                   children: currentBlocks.asMap().entries.map((entry) {
                     int blockIndex = entry.key;
                     _TrainingBlock block = entry.value;
@@ -741,52 +904,73 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                         ),
                       );
                     } else {
-                      // Grouped stage
+                      // Grouped stage container
                       return Container(
                         key: ValueKey('block_group_${block.groupId}'),
-                        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         decoration: BoxDecoration(
-                          color: block.groupColor!.withOpacity(0.15),
+                          color: Color.lerp(Colors.white, block.groupColor, 0.15),
                           border: Border.all(color: block.groupColor!, width: 2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           children: [
-                            // Group Header
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-                              child: Row(
-                                children: [
-                                  ReorderableDragStartListener(
-                                    index: blockIndex,
-                                    child: Icon(Icons.drag_indicator, color: block.groupColor!.withOpacity(0.8), size: 28),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    "Group Reps: ${block.stages.first.stageReps}",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: block.groupColor),
-                                  ),
-                                  Spacer(),
-                                  TextButton.icon(
-                                    onPressed: () => ungroup(block.groupId),
-                                    icon: Icon(Icons.link_off, size: 18, color: block.groupColor),
-                                    label: Text("Ungroup", style: TextStyle(color: block.groupColor, fontWeight: FontWeight.bold)),
-                                  )
-                                ],
-                              ),
+                            // --- NEW: Interactive Group Header ---
+                            _GroupHeaderWidget(
+                              block: block,
+                              blockIndex: blockIndex,
+                              translationProvider: translationProvider,
+                              onUngroup: () => ungroup(block.groupId),
+                              onRepsChanged: (newReps) {
+                                setState(() {
+                                  for (var stage in block.stages) {
+                                    stage.stageReps = newReps;
+                                  }
+                                  widget.training.trainingStages = trainingStages;
+                                });
+                              },
                             ),
-                            // The Stages inside the group
-                            ...block.stages.map((stage) {
-                              int actualIndex = trainingStages.indexOf(stage);
-                              return TrainingStageTile(
-                                trainingStage: stage,
-                                trainingStageIndex: actualIndex,
-                                isExpanded: expandedStates[actualIndex],
-                                onExpandedChanged: (value) => setState(() => expandedStates[actualIndex] = value),
-                                onDelete: () => removeTrainingStage(actualIndex),
-                                onUpdate: () => setState(() => widget.training.trainingStages = trainingStages),
-                              );
-                            }).toList()
+
+                            // --- Nested ReorderableListView for internal reordering ---
+                            ReorderableListView(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              proxyDecorator: (child, idx, anim) => Material(color: Colors.transparent, child: child),
+                              onReorder: (oldInnerIndex, newInnerIndex) {
+                                setState(() {
+                                  if (newInnerIndex > oldInnerIndex) newInnerIndex -= 1;
+
+                                  // Map the local group index back to the master list index
+                                  int actualStartIndex = trainingStages.indexOf(block.stages.first);
+                                  int absoluteOldIndex = actualStartIndex + oldInnerIndex;
+                                  int absoluteNewIndex = actualStartIndex + newInnerIndex;
+
+                                  final movedStage = trainingStages.removeAt(absoluteOldIndex);
+                                  trainingStages.insert(absoluteNewIndex, movedStage);
+
+                                  final movedExpanded = expandedStates.removeAt(absoluteOldIndex);
+                                  expandedStates.insert(absoluteNewIndex, movedExpanded);
+
+                                  widget.training.trainingStages = trainingStages;
+                                });
+                              },
+                              children: [
+                                for (int i = 0; i < block.stages.length; i++)
+                                  Container(
+                                    key: ValueKey('inner_stage_${block.stages[i].hashCode}'),
+                                    child: TrainingStageTile(
+                                      trainingStage: block.stages[i],
+                                      trainingStageIndex: trainingStages.indexOf(block.stages[i]),
+                                      isExpanded: expandedStates[trainingStages.indexOf(block.stages[i])],
+                                      onExpandedChanged: (value) => setState(() => expandedStates[trainingStages.indexOf(block.stages[i])] = value),
+                                      onDelete: () => removeTrainingStage(trainingStages.indexOf(block.stages[i])),
+                                      onUpdate: () => setState(() => widget.training.trainingStages = trainingStages),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            // --- End of inner ReorderableListView ---
+
                           ],
                         ),
                       );
@@ -795,12 +979,1268 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                 )
                     : SingleChildScrollView(
                     padding: EdgeInsets.all(16),
-                    // ... Rest of your UI for Sounds/Other Tabs remains EXACTLY the same ...
-                    // (I have omitted the identical code for Tabs 1 & 2 to save vertical space,
-                    // just paste your existing _selectedTab == 1 and == 2 code here)
                     child: _selectedTab == 1
-                        ? Text("Sounds Tab (Paste existing code here)")
-                        : Text("Other Tab (Paste existing code here)")
+                        ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding:
+                            EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.title"),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black, overflow: TextOverflow.ellipsis),
+                                ),
+                                SoundSelectionRow(
+                                  labelStyle: TextStyle(
+                                      color: darkerblue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis),
+                                  label: translationProvider
+                                      .getTranslation(
+                                      "TrainingEditorPage.SoundsTab.TrainingSounds.counting_sound"),
+                                  showSlider: true,
+                                  sliderValue: _sounds.countingFrequencyMs,
+                                  onSliderChanged: (v) => setState(() {
+                                    _sounds.countingFrequencyMs = v;
+                                  }),
+                                  selectedValue:
+                                  _sounds.countingSound,
+                                  soundListType:
+                                  SoundListType.countingSounds,
+                                  onChanged: (v) => setState(() {
+                                    _sounds.countingSound = v;
+                                  }),
+                                  includeVoiceOption: true,
+                                  blueBorder: true,
+                                  isSoundSelection: true,),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 4),
+                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: mediumblue,
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column (
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(child:
+                                          DropdownButton2<SoundScope>(
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 35,
+                                                elevation: 2,
+                                                width: MediaQuery.of(context).size.width,
+                                              ),
+                                              underline: SizedBox(),
+                                              iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
+                                              dropdownStyleData: DropdownStyleData(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(color: mediumblue),
+                                                ),
+                                              ),
+                                              isExpanded: true,
+                                              selectedItemBuilder: (context) {
+                                                return SoundScopeX.nextPhaseScopeValues.map((e) {
+                                                  return Container(
+                                                    alignment: Alignment.centerLeft,
+                                                    child: Text(
+                                                      translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.title")+e.name,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      softWrap: false,
+                                                      style: TextStyle(fontSize: 14, color: darkerblue, fontWeight: FontWeight.bold),
+                                                    ),
+                                                  );
+                                                }).toList();
+                                              },
+                                              value: _sounds.nextSoundScope,
+                                              items: SoundScopeX.nextPhaseScopeValues.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis))).toList(),
+                                              onChanged: (v) => setState(() => _sounds.nextSoundScope = v!))),
+                                        ],
+                                      ),
+                                      if (_sounds.nextSoundScope != SoundScope.none)...[
+                                        Column(
+                                          children: [
+                                            if(_sounds.nextSoundScope == SoundScope.global)
+                                              ((){
+                                                return SoundSelectionRow(
+                                                    labelStyle: TextStyle(
+                                                        overflow: TextOverflow.ellipsis),
+                                                    label: translationProvider
+                                                        .getTranslation(
+                                                        "TrainingEditorPage.SoundsTab.TrainingSounds.NextBreathingPhaseSounds.global"),
+                                                    selectedValue:
+                                                    _sounds.nextSound,
+                                                    soundListType:
+                                                    SoundListType
+                                                        .shortSounds,
+                                                    onChanged: (v) =>
+                                                        setState(() {
+                                                          _sounds.nextSound =
+                                                              v;
+                                                        }),
+                                                    includeNoneOption: false,
+                                                    includeVoiceOption:
+                                                    true,
+                                                    isSoundSelection: true);
+                                              })()
+                                            else if (_sounds.nextSoundScope == SoundScope.perPhase)
+                                              ...buildPhaseSoundRows(SoundListType.shortSounds, true)
+                                            else if (_sounds.nextSoundScope == SoundScope.perEveryPhaseInEveryStage)
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  child: StagePhaseSoundEditor(
+                                                    stages: trainingStages,
+                                                    stagePhaseSounds: _sounds.perEveryPhaseBreathingPhaseCues,
+                                                    soundListType: SoundListType.shortSounds,
+                                                    onChanged: (newMap) {
+                                                      setState(() {
+                                                        _sounds.perEveryPhaseBreathingPhaseCues = newMap;
+                                                      });
+                                                    },
+                                                  ),
+                                                )
+                                          ],
+                                        ),
+                                      ]
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 4),
+                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: mediumblue, width: 1),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: DropdownButton2<String>(
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 35,
+                                                elevation: 2,
+                                                width: MediaQuery.of(context).size.width,
+                                              ),
+                                              underline: SizedBox(),
+                                              iconStyleData: IconStyleData(
+                                                  icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
+                                              dropdownStyleData: DropdownStyleData(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(color: mediumblue),
+                                                ),
+                                              ),
+                                              isExpanded: true,
+                                              selectedItemBuilder: (context) {
+                                                return ['none', 'stage', 'cycle', 'stage_and_cycle'].map((e) {
+                                                  return Container(
+                                                    alignment: Alignment.centerLeft,
+                                                    child: Text(
+                                                      translationProvider.getTranslation(
+                                                          "TrainingEditorPage.SoundsTab.TrainingSounds.change_sounds_title") +
+                                                          translationProvider.getTranslation(
+                                                              "TrainingEditorPage.SoundsTab.TrainingSounds.change_sounds_scope.$e"),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      softWrap: false,
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: darkerblue,
+                                                          fontWeight: FontWeight.bold),
+                                                    ),
+                                                  );
+                                                }).toList();
+                                              },
+                                              value: _sounds.changeSoundScope,
+                                              items: ['none', 'stage', 'cycle', 'stage_and_cycle']
+                                                  .map((e) => DropdownMenuItem(
+                                                value: e,
+                                                child: Text(
+                                                  translationProvider.getTranslation(
+                                                      "TrainingEditorPage.SoundsTab.TrainingSounds.change_sounds_scope.$e"),
+                                                  style: TextStyle(fontSize: 14),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ))
+                                                  .toList(),
+                                              onChanged: (v) {
+                                                if (v == null) return;
+                                                setState(() {
+                                                  _sounds.changeSoundScope = v;
+                                                  // reset sounds that are no longer in scope to none
+                                                  if (v != 'stage' && v != 'stage_and_cycle') {
+                                                    _sounds.stageChangeSound = SoundAsset(name: 'Brak',type: SoundType.none );
+                                                  }
+                                                  if (v != 'cycle' && v != 'stage_and_cycle') {
+                                                    _sounds.cycleChangeSound = SoundAsset(name: 'Brak',type: SoundType.none );
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (_sounds.changeSoundScope == 'stage' || _sounds.changeSoundScope == 'stage_and_cycle')
+                                        SoundSelectionRow(
+                                          labelStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              overflow: TextOverflow.ellipsis),
+                                          label: translationProvider.getTranslation(
+                                              "TrainingEditorPage.SoundsTab.TrainingSounds.stage_change_sound"),
+                                          selectedValue: _sounds.stageChangeSound,
+                                          soundListType: SoundListType.shortSounds,
+                                          onChanged: (v) => setState(() {
+                                            _sounds.stageChangeSound = v;
+                                          }),
+                                          includeVoiceOption: false,
+                                          blueBorder: false,
+                                          isSoundSelection: true,
+                                        ),
+                                      if (_sounds.changeSoundScope == 'cycle' || _sounds.changeSoundScope == 'stage_and_cycle')
+                                        SoundSelectionRow(
+                                          labelStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              overflow: TextOverflow.ellipsis),
+                                          label: translationProvider.getTranslation(
+                                              "TrainingEditorPage.SoundsTab.TrainingSounds.cycle_change_sound"),
+                                          selectedValue: _sounds.cycleChangeSound,
+                                          soundListType: SoundListType.shortSounds,
+                                          onChanged: (v) => setState(() {
+                                            _sounds.cycleChangeSound = v;
+                                          }),
+                                          includeVoiceOption: false,
+                                          blueBorder: false,
+                                          isSoundSelection: true,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.title"),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black, overflow: TextOverflow.ellipsis),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 4),
+                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white ,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: widget.training.settings.binauralBeatsEnabled ? mediumblue.withOpacity(0.2) : mediumblue,
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(child:
+                                          Opacity(opacity: widget.training.settings.binauralBeatsEnabled ? 0.3 : 1.0,
+                                              child:
+                                              DropdownButton2<SoundScope>(
+                                                  buttonStyleData: ButtonStyleData(
+                                                    height:35,
+                                                    elevation: 2,
+                                                    width: MediaQuery.of(context).size.width,
+                                                  ),
+                                                  underline: SizedBox(),
+                                                  iconStyleData: IconStyleData(icon: Icon(Icons.arrow_drop_down, color: darkerblue)),
+                                                  dropdownStyleData: DropdownStyleData(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      border: Border.all(color: mediumblue),
+                                                    ),
+                                                  ),
+                                                  isExpanded: true,
+                                                  selectedItemBuilder: (context) {
+                                                    return SoundScope.values.map((e) {
+                                                      return Container(
+                                                        alignment: Alignment.centerLeft,
+                                                        child: Text(
+                                                          translationProvider.getTranslation("TrainingEditorPage.SoundsTab.TrainingMusic.Background_music.title")+e.name,
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                          softWrap: false,
+                                                          style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold, fontSize: 14, overflow: TextOverflow.ellipsis),
+                                                        ),
+                                                      );
+                                                    }).toList();
+                                                  },
+                                                  value: _sounds.backgroundSoundScope,
+                                                  items: SoundScope.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis))).toList(),
+                                                  onChanged: widget.training.settings.binauralBeatsEnabled ? null :(v) => setState(() => _sounds.backgroundSoundScope = v!))),
+                                          )],
+                                      ),
+                                      if (_sounds.backgroundSoundScope != SoundScope.none)...[
+                                        Column(
+                                          children: [
+                                            if (_sounds.backgroundSoundScope == SoundScope.global) ...[
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                                child: PlaylistEditor(
+                                                  playlist: _sounds.trainingBackgroundPlaylist,
+                                                  onChanged: (newPlaylist) {
+                                                    setState(() {
+                                                      _sounds.trainingBackgroundPlaylist = newPlaylist;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            ] else if (_sounds.backgroundSoundScope == SoundScope.perPhase)
+                                              ...buildPhaseSoundRows(SoundListType.longSounds, false)
+                                            else if (_sounds.backgroundSoundScope == SoundScope.perStage) ...[
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  child: StagePlaylistsEditor(
+                                                    stages: trainingStages,
+                                                    stagePlaylists: _sounds.stagePlaylists,
+                                                    onChanged: (newStagePlaylists) {
+                                                      setState(() {
+                                                        _sounds.stagePlaylists = newStagePlaylists;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ] else if (_sounds.backgroundSoundScope == SoundScope.perEveryPhaseInEveryStage) ...[
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  child: StagePhaseSoundEditor(
+                                                    stages: trainingStages,
+                                                    stagePhaseSounds: _sounds.perEveryPhaseBreathingPhaseBackgrounds,
+                                                    soundListType: SoundListType.longSounds,
+                                                    onChanged: (newMap) {
+                                                      setState(() {
+                                                        _sounds.perEveryPhaseBreathingPhaseBackgrounds = newMap;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ]
+                                          ],
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    children: [Text(
+                                      translationProvider.getTranslation(
+                                          "TrainingEditorPage.SoundsTab.BinauralBeats.binaural_beats_label"),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: darkblue),
+                                    ),
+                                      if (!widget.training.settings.binauralBeatsEnabled) ...[
+                                        SizedBox(height: 4),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 16, right: 16),
+                                          child: Text(
+                                            TextUtils.addNoBreakingSpaces(translationProvider.getTranslation(
+                                              "TrainingEditorPage.SoundsTab.BinauralBeats.warning",
+                                            )),
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                SwitchListTile(
+                                  title: Text(translationProvider
+                                      .getTranslation(
+                                      "TrainingEditorPage.SoundsTab.BinauralBeats.binaural_beats_enabled")),
+                                  value: widget.training.settings
+                                      .binauralBeatsEnabled,
+                                  activeColor: darkerblue,
+                                  inactiveTrackColor: Colors.white,
+                                  inactiveThumbColor: Colors.grey,
+                                  trackOutlineColor:
+                                  WidgetStateProperty.resolveWith<
+                                      Color?>(
+                                          (Set<WidgetState> states) {
+                                        if (!states.contains(
+                                            WidgetState.selected) &&
+                                            !states.contains(
+                                                WidgetState.disabled)) {
+                                          return mediumblue;
+                                        }
+                                        return null;
+                                      }),
+                                  onChanged: (v) => toggleBinauralBeats(v),
+                                ),
+                                if (widget.training.settings
+                                    .binauralBeatsEnabled) ...[
+                                  SizedBox(height: 12),
+                                  ListTile(
+                                    title: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          translationProvider
+                                              .getTranslation(
+                                              "TrainingEditorPage.SoundsTab.BinauralBeats.left_frequency_label"),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight:
+                                              FontWeight.w500),
+                                        ),
+                                        Text(
+                                          '${widget.training.settings.binauralBaseFrequency.toStringAsFixed(0)} Hz',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                              Colors.grey[600]),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: Slider(
+                                      value: selectedIndex.toDouble(),
+                                      min: 0,
+                                      max: (solfeggioFrequencies.length - 1).toDouble(),
+                                      divisions: solfeggioFrequencies.length - 1,
+                                      activeColor: darkerblue,
+                                      inactiveColor: Colors.grey[300],
+                                      //label: "${solfeggioFrequencies[selectedIndex].toInt()} Hz",
+                                      onChanged: (v) {
+                                        setState(() {
+                                          int index = v.round();
+                                          widget.training.settings.binauralBaseFrequency =
+                                          solfeggioFrequencies[index];
+                                          selectedIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          translationProvider
+                                              .getTranslation(
+                                              "TrainingEditorPage.SoundsTab.BinauralBeats.right_frequency_label"),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight:
+                                              FontWeight.w500),
+                                        ),
+                                        Text(
+                                          '${(widget.training.settings.binauralBeatFrequency).toStringAsFixed(0)} Hz',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color:
+                                              Colors.grey[600]),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: Slider(
+                                      value: widget.training.settings
+                                          .binauralBeatFrequency,
+                                      min: 1,
+                                      max: 30,
+                                      divisions: 29,
+                                      activeColor: darkerblue,
+                                      inactiveColor: Colors.grey[300],
+                                      onChanged: (v) => setState(() =>
+                                      widget.training.settings
+                                          .binauralBeatFrequency = v),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Text(
+                                      '${translationProvider.getTranslation("TrainingEditorPage.SoundsTab.BinauralBeats.beat_frequency_label")}: ${getBrainwaveState(widget.training.settings.binauralBeatFrequency)}',
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: darkerblue,
+                                          fontWeight:
+                                          FontWeight.bold),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                        : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        //Preparation
+                        Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                // Description field
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      translationProvider.getTranslation(
+                                          "TrainingEditorPage.OtherTab.training_description_label"),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black)),
+                                ),
+                                SizedBox(height: 5),
+                                TextField(
+                                  controller: descriptionController,
+                                  focusNode: _descriptionFocusNode,
+                                  minLines: 3,
+                                  maxLines: null,
+                                  decoration: InputDecoration(
+                                    hintText: translationProvider
+                                        .getTranslation(
+                                        "TrainingEditorPage.OtherTab.training_description_hint"),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                        color: darkgrey,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                        color: darkerblue,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    widget.training.description =
+                                        value;
+                                  },
+                                ),
+                                SizedBox(height: 6),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    translationProvider.getTranslation(
+                                        "TrainingEditorPage.OtherTab.training_preparation_label"),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              translationProvider.getTranslation(
+                                                  "TrainingEditorPage.OtherTab.preparation_duration_label"),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (widget.training.settings.preparationDuration == 0 &&
+                                              _sounds.preparationTrack.type != SoundType.none)
+                                            Tooltip(
+                                              message: translationProvider.getTranslation(
+                                                  "TrainingEditorPage.OtherTab.preparation_sound_warning"),
+                                              decoration: BoxDecoration(
+                                                color: mediumblue,
+                                                borderRadius: BorderRadius.circular(16),
+                                                border: Border.all(color: darkerblue, width: 2),
+                                              ),
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: MediaQuery.of(context).size.width * 0.07,
+                                                  vertical: 0),
+                                              triggerMode: TooltipTriggerMode.tap,
+                                              showDuration: Duration(seconds: 10),
+                                              textStyle: const TextStyle(
+                                                  color: darkblue, fontWeight: FontWeight.w500),
+                                              textAlign: TextAlign.center,
+                                              child: const Icon(
+                                                Icons.warning,
+                                                color: Colors.amber,
+                                                size: 22,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Container(
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(color: darkerblue, width: 2),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(18),
+                                              onTap: () {
+                                                int currentValue =
+                                                    int.tryParse(preparationController.text) ?? 1;
+                                                int newValue = (currentValue - 1).clamp(0, 999);
+                                                preparationController.text = newValue.toString();
+                                                setState(() {
+                                                  widget.training.settings.preparationDuration = newValue;
+                                                });
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(8),
+                                                child: Icon(Icons.remove, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: TextField(
+                                                key: ValueKey('preparation_${widget.training.hashCode}'),
+                                                controller: preparationController,
+                                                focusNode: preparationFocusNode,
+                                                keyboardType: TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.digitsOnly,
+                                                ],
+                                                onChanged: (value) {
+                                                  int newValue = int.tryParse(value) ?? 0;
+                                                  setState(() {
+                                                    widget.training.settings.preparationDuration = newValue;
+                                                  });
+                                                },
+                                                onTapOutside: (event) {
+                                                  FocusManager.instance.primaryFocus?.unfocus();
+                                                  if (preparationController.text.isEmpty) {
+                                                    setState(() {
+                                                      widget.training.settings.preparationDuration = 0;
+                                                      preparationController.text = "0";
+                                                    });
+                                                  }
+                                                },
+                                                onEditingComplete: () => {
+                                                  FocusManager.instance.primaryFocus?.unfocus(),
+                                                  if (preparationController.text.isEmpty)
+                                                    {
+                                                      setState(() {
+                                                        widget.training.settings.preparationDuration = 0;
+                                                        preparationController.text = "0";
+                                                      })
+                                                    }
+                                                },
+                                                decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  contentPadding: EdgeInsets.zero,
+                                                  isDense: true,
+                                                ),
+                                                style: const TextStyle(
+                                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                          Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(18),
+                                              onTap: () {
+                                                int currentValue =
+                                                    int.tryParse(preparationController.text) ?? 1;
+                                                int newValue = (currentValue + 1).clamp(1, 999);
+                                                preparationController.text = newValue.toString();
+                                                setState(() {
+                                                  widget.training.settings.preparationDuration = newValue;
+                                                });
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(8),
+                                                child: Icon(Icons.add, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                SoundSelectionRow(
+                                  labelStyle: TextStyle(
+                                      color: darkerblue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis),
+                                  label: translationProvider.getTranslation(
+                                      "TrainingEditorPage.SoundsTab.TrainingMusic.preparation_music"),
+                                  selectedValue: _sounds.preparationTrack,
+                                  soundListType: SoundListType.longSounds,
+                                  onChanged: (v) => setState(() {
+                                    _sounds.preparationTrack = v;
+                                  }),
+                                  includeVoiceOption: false,
+                                  blueBorder: true,
+                                  isSoundSelection: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        //Ending
+                        SizedBox(height: 12),
+                        Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    translationProvider.getTranslation(
+                                        "TrainingEditorPage.OtherTab.training_ending_label"),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              translationProvider.getTranslation(
+                                                  "TrainingEditorPage.OtherTab.ending_duration_label"),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (widget.training.settings.endingDuration == 0 &&
+                                              _sounds.endingTrack.type != SoundType.none)
+                                            Tooltip(
+                                              message: translationProvider.getTranslation(
+                                                  "TrainingEditorPage.OtherTab.ending_sound_warning"),
+                                              decoration: BoxDecoration(
+                                                color: mediumblue,
+                                                borderRadius: BorderRadius.circular(16),
+                                                border: Border.all(color: darkerblue, width: 2),
+                                              ),
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: MediaQuery.of(context).size.width * 0.07,
+                                                  vertical: 0),
+                                              triggerMode: TooltipTriggerMode.tap,
+                                              showDuration: Duration(seconds: 10),
+                                              textStyle: const TextStyle(
+                                                  color: darkblue, fontWeight: FontWeight.w500),
+                                              textAlign: TextAlign.center,
+                                              child: const Icon(
+                                                Icons.warning,
+                                                color: Colors.amber,
+                                                size: 22,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Container(
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(color: darkerblue, width: 2),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(18),
+                                              onTap: () {
+                                                int currentValue =
+                                                    int.tryParse(endingController.text) ?? 1;
+                                                int newValue = (currentValue - 1).clamp(0, 999);
+                                                endingController.text = newValue.toString();
+                                                setState(() {
+                                                  widget.training.settings.endingDuration = newValue;
+                                                });
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(8),
+                                                child: Icon(Icons.remove, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: TextField(
+                                                key: ValueKey('ending_${widget.training.hashCode}'),
+                                                controller: endingController,
+                                                focusNode: endingFocusNode,
+                                                keyboardType: TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters: [
+                                                  FilteringTextInputFormatter.digitsOnly,
+                                                ],
+                                                onChanged: (value) {
+                                                  int newValue = int.tryParse(value) ?? 0;
+                                                  setState(() {
+                                                    widget.training.settings.endingDuration = newValue;
+                                                  });
+                                                },
+                                                onTapOutside: (event) {
+                                                  FocusManager.instance.primaryFocus?.unfocus();
+                                                  if (endingController.text.isEmpty) {
+                                                    setState(() {
+                                                      widget.training.settings.endingDuration = 0;
+                                                      endingController.text = "0";
+                                                    });
+                                                  }
+                                                },
+                                                onEditingComplete: () => {
+                                                  FocusManager.instance.primaryFocus?.unfocus(),
+                                                  if (endingController.text.isEmpty)
+                                                    {
+                                                      setState(() {
+                                                        widget.training.settings.endingDuration = 0;
+                                                        endingController.text = "0";
+                                                      })
+                                                    }
+                                                },
+                                                decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  contentPadding: EdgeInsets.zero,
+                                                  isDense: true,
+                                                ),
+                                                style: const TextStyle(
+                                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                          Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(18),
+                                              onTap: () {
+                                                int currentValue =
+                                                    int.tryParse(endingController.text) ?? 1;
+                                                int newValue = (currentValue + 1).clamp(1, 999);
+                                                endingController.text = newValue.toString();
+                                                setState(() {
+                                                  widget.training.settings.endingDuration = newValue;
+                                                });
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(8),
+                                                child: Icon(Icons.add, size: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                SoundSelectionRow(
+                                  labelStyle: TextStyle(
+                                      color: darkerblue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis),
+                                  label: translationProvider.getTranslation(
+                                      "TrainingEditorPage.SoundsTab.TrainingMusic.ending_music"),
+                                  selectedValue: _sounds.endingTrack,
+                                  soundListType: SoundListType.longSounds,
+                                  onChanged: (v) => setState(() {
+                                    _sounds.endingTrack = v;
+                                  }),
+                                  includeVoiceOption: false,
+                                  blueBorder: true,
+                                  isSoundSelection: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(12)),
+                            elevation: 2,
+                            color: Colors.white,
+                            child: Padding(
+                                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                child: Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                            translationProvider.getTranslation(
+                                                "TrainingEditorPage.OtherTab.dim_screen_label"),
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black)),
+                                      ),
+                                      SizedBox(height: 8),
+                                      CheckboxListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(
+                                          translationProvider.getTranslation(
+                                              "TrainingEditorPage.OtherTab.dim_screen_during_training"),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        value: widget.training.settings.dimScreenEnabled,
+                                        activeColor: darkerblue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            widget.training.settings.dimScreenEnabled = value ?? false;
+                                          });
+                                        },
+                                      ),
+
+                                      if (widget.training.settings.dimScreenEnabled)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  translationProvider.getTranslation(
+                                                      "TrainingEditorPage.OtherTab.dim_screen_after"),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(fontSize: 14),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 90,
+                                                height: 35,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(18),
+                                                  border: Border.all(color: darkerblue, width: 2),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    // minus
+                                                    InkWell(
+                                                      borderRadius: BorderRadius.circular(18),
+                                                      onTap: () {
+                                                        int v = widget.training.settings.dimScreenAfterSeconds;
+                                                        v = (v - 1).clamp(1, 999);
+                                                        setState(() {
+                                                          widget.training.settings.dimScreenAfterSeconds = v;
+                                                          dimAfterController.text = v.toString();
+                                                        });
+                                                      },
+                                                      child: const Padding(
+                                                        padding: EdgeInsets.all(8),
+                                                        child: Icon(Icons.remove, size: 16),
+                                                      ),
+                                                    ),
+
+                                                    // value
+                                                    Expanded(
+                                                      child: TextField(
+                                                        controller: dimAfterController,
+                                                        focusNode: dimAfterFocusNode,
+                                                        keyboardType: TextInputType.number,
+                                                        textAlign: TextAlign.center,
+                                                        inputFormatters: [
+                                                          FilteringTextInputFormatter.digitsOnly,
+                                                        ],
+                                                        onChanged: (value) {
+                                                          int v = int.tryParse(value) ?? 1;
+                                                          setState(() {
+                                                            widget.training.settings.dimScreenAfterSeconds = v;
+                                                          });
+                                                        },
+                                                        decoration: const InputDecoration(
+                                                          border: InputBorder.none,
+                                                          isDense: true,
+                                                        ),
+                                                        style: const TextStyle(
+                                                            fontSize: 14, fontWeight: FontWeight.w500),
+                                                      ),
+                                                    ),
+
+                                                    // plus
+                                                    InkWell(
+                                                      borderRadius: BorderRadius.circular(18),
+                                                      onTap: () {
+                                                        int v = widget.training.settings.dimScreenAfterSeconds;
+                                                        v = (v + 1).clamp(1, 999);
+                                                        setState(() {
+                                                          widget.training.settings.dimScreenAfterSeconds = v;
+                                                          dimAfterController.text = v.toString();
+                                                        });
+                                                      },
+                                                      child: const Padding(
+                                                        padding: EdgeInsets.all(8),
+                                                        child: Icon(Icons.add, size: 16),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ]
+                                )
+                            )
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(12)),
+                            elevation: 2,
+                            color: Colors.white,
+                            child: Padding(
+                                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                child: Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                            translationProvider.getTranslation(
+                                                "TrainingEditorPage.OtherTab.visual_style_label"),
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black)),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Card(
+                                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                            side: BorderSide(color: mediumblue, width: 1),
+                                          ),
+                                          color: Colors.white,
+                                          child: Padding(
+                                            padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.visual_style"), style: TextStyle(fontSize: 16)),
+                                                DropdownButton2<VisualStyle>(
+                                                  underline: SizedBox(),
+                                                  value: widget.training.settings.visualStyle,
+                                                  onChanged: (value) async {
+                                                    if(value == VisualStyle.ring) {
+                                                      widget.training.settings
+                                                          .breathingSoundEnabled =
+                                                      false;
+                                                    }
+                                                    widget.training.settings.setVisualStyle(value!.name);
+                                                    setState(() {});
+                                                  },
+                                                  items: VisualStyle.availableStyles
+                                                      .map((style) => DropdownMenuItem<VisualStyle>(
+                                                    value: style,
+                                                    child: Text(translationProvider.getTranslation("TrainingEditorPage.OtherTab.${style.name}")),
+                                                  ))
+                                                      .toList(),
+                                                  iconStyleData: IconStyleData(
+                                                    icon: Icon(Icons.arrow_drop_down, color: darkerblue),
+                                                  ),
+                                                  dropdownStyleData: DropdownStyleData(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                      ),
+                                      if((widget.training.settings.visualStyle == VisualStyle.timeline)) ... [
+                                        SizedBox(height: 4),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 16, right: 16),
+                                          child: Text(
+                                            TextUtils.addNoBreakingSpaces(translationProvider.getTranslation(
+                                              "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_warning",
+                                            )),
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        Card(
+                                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              side: BorderSide(color: mediumblue, width: 1),
+                                            ),
+                                            color: Colors.white,
+                                            child: Padding(
+                                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      translationProvider.getTranslation(
+                                                        "TrainingEditorPage.SoundsTab.TrainingSounds.breathing_sound_enabled",
+                                                      ),
+                                                      style: TextStyle(fontSize: 16),
+                                                    ),
+                                                  ),
+                                                  Switch(
+                                                    value: widget.training.settings.breathingSoundEnabled,
+                                                    activeColor: darkerblue,
+                                                    inactiveTrackColor: Colors.white,
+                                                    inactiveThumbColor: Colors.grey,
+                                                    trackOutlineColor:
+                                                    WidgetStateProperty.resolveWith<
+                                                        Color?>(
+                                                            (Set<WidgetState> states) {
+                                                          if (!states.contains(
+                                                              WidgetState.selected) &&
+                                                              !states.contains(
+                                                                  WidgetState.disabled)) {
+                                                            return mediumblue;
+                                                          }
+                                                          return null;
+                                                        }),
+                                                    onChanged: (v) {
+                                                      setState(() {
+                                                        widget.training.settings.breathingSoundEnabled = v;
+                                                        if (v) {
+                                                          widget.training.settings
+                                                              .binauralBeatsEnabled =
+                                                          false;
+                                                        }
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                        ),
+                                      ]
+                                    ]
+                                )
+                            )
+                        )
+                      ],
+                    ),
                 ),
               ),
             ],

@@ -77,12 +77,16 @@
             "bulk_reps_button": "Select stages",
             "bulk_reps_title": "Select stages to modify",
             "select_all": "Select all",
+            "group_stages": "Group stages",
+            "group_reps": "Reps",
+            "select_color": "Colour",
+            "create_group": "Create group",
 
             "TrainingStageTile":{
                 "name":"Training stage name",
                 "name_placeholder":"Enter training stage name",
                 "reps":"Phases reps",
-                "stage_reps":"Stage reps",
+                "stage_reps":"Group reps",
                 "increment":"Increment (s)",
                 "add_breathing_phase_button_label":"Add breathing phase",
                 "characters":"characters"

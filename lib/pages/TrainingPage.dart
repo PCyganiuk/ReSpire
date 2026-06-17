@@ -8,8 +8,19 @@ import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/services/TrainingImportExportService.dart';
 import 'package:respire/theme/Colors.dart';
 import 'package:respire/utils/TextUtils.dart';
-import 'package:lottie/lottie.dart';
-import 'dart:math';
+
+// --- NEW: Helper class to manage list blocks for the UI ---
+class _TrainingBlock {
+  final int groupId;
+  final List<TrainingStage> stages;
+  final Color groupColor;
+
+  _TrainingBlock({
+    required this.groupId,
+    required this.stages,
+    required this.groupColor,
+  });
+}
 
 class TrainingPage extends StatefulWidget {
   final int index;
@@ -30,11 +41,78 @@ class _TrainingPageState extends State<TrainingPage> {
   bool _expanded = true;
   TranslationProvider translationProvider = TranslationProvider();
 
+  // Color palette to match the editor
+  final List<Color> _groupColors = [
+    const Color(0xFFAEC6CF), // Pastel Blue
+    const Color(0xFF77DD77), // Pastel Green
+    const Color(0xFFFFB347), // Pastel Orange
+    const Color(0xFFB39EB5), // Pastel Purple
+    const Color(0xFFFF6961), // Pastel Red (Soft Pinkish-Red)
+    const Color(0xFF84C5C6), // Pastel Teal
+  ];
+
   @override
   void initState() {
     super.initState();
     training = widget.db.presetList[widget.index];
     trainingStages = training.trainingStages;
+  }
+
+  // --- NEW: Block logic identical to TrainingEditorPage ---
+  Color _getGroupColor(int groupId) {
+    // We use the groupId as a direct 1-based index to find the exact color
+    if (groupId > 0 && groupId <= training.colorValues.length) {
+      return Color(training.colorValues[groupId - 1]);
+    }
+    // Fallback just in case
+    return _groupColors[groupId % _groupColors.length];
+  }
+
+  List<_TrainingBlock> _getBlocks() {
+    List<_TrainingBlock> blocks = [];
+    if (trainingStages.isEmpty) return blocks;
+
+    int currentGroupId = trainingStages[0].groupId;
+    List<TrainingStage> currentStages = [];
+
+    for (int i = 0; i < trainingStages.length; i++) {
+      if (trainingStages[i].groupId == currentGroupId && currentGroupId != 0) {
+        currentStages.add(trainingStages[i]);
+      } else if (trainingStages[i].groupId == 0) {
+        if (currentStages.isNotEmpty) {
+          blocks.add(_TrainingBlock(
+            groupId: currentGroupId,
+            stages: currentStages,
+            groupColor: _getGroupColor(currentGroupId),
+          ));
+          currentStages = [];
+        }
+        blocks.add(_TrainingBlock(
+          groupId: 0,
+          stages: [trainingStages[i]],
+          groupColor: Colors.transparent, // Standalone stages don't use this
+        ));
+        currentGroupId = 0;
+      } else {
+        if (currentStages.isNotEmpty) {
+          blocks.add(_TrainingBlock(
+            groupId: currentGroupId,
+            stages: currentStages,
+            groupColor: _getGroupColor(currentGroupId),
+          ));
+        }
+        currentGroupId = trainingStages[i].groupId;
+        currentStages = [trainingStages[i]];
+      }
+    }
+    if (currentStages.isNotEmpty) {
+      blocks.add(_TrainingBlock(
+        groupId: currentGroupId,
+        stages: currentStages,
+        groupColor: _getGroupColor(currentGroupId),
+      ));
+    }
+    return blocks;
   }
 
   Widget shareButton() {
@@ -68,6 +146,9 @@ class _TrainingPageState extends State<TrainingPage> {
               updatedTraining.updateSounds();
               widget.db.presetList[widget.index] = updatedTraining;
               widget.db.updateDataBase();
+
+              // Refresh trainingStages list in case stages were deleted/added in editor
+              trainingStages = updatedTraining.trainingStages;
             });
           }
         },
@@ -193,84 +274,133 @@ class _TrainingPageState extends State<TrainingPage> {
     );
   }
 
+  // --- NEW: Extracted Stage Card UI for reusability ---
+  Widget _buildStageCard(TrainingStage trainingStage, int actualIndex, bool isGrouped) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 4),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 2,
+        color: lightblue,
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _trainingStageDisplayName(trainingStage, actualIndex),
+                style: TextStyle(color: greenblue, fontWeight: FontWeight.w700, fontSize: 16),
+              ),
+              SizedBox(height: 6),
+              Text(
+                '${trainingStage.reps} X',
+                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Column(
+                children: trainingStage.breathingPhases.map((breathingPhase) {
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                translationProvider.getTranslation(
+                                    "BreathingPhaseType.${breathingPhase.breathingPhaseType.name}"),
+                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
+                              ),
+                              Spacer(),
+                              Text(
+                                breathingPhase.increment != null && breathingPhase.increment!.value > 0
+                                    ? '${breathingPhase.duration} s + ${breathingPhase.increment!.value} s'
+                                    : '${breathingPhase.duration} s',
+                                style: TextStyle(
+                                  color: darkerblue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- NEW: Grouped Visualization Mapping ---
   Widget trainingOverviewInsides() {
+    final blocks = _getBlocks();
+
     return AnimatedSize(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       child: ClipRect(
         child: _expanded
-              ? Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                child: Column(
-                  children: trainingStages.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final trainingStage = entry.value;
-                    return Container(
-                      margin: EdgeInsets.symmetric(vertical: 6),
-                      child: Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 2,
-                        color: lightblue,
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _trainingStageDisplayName(trainingStage, index),
-                                style: TextStyle(color: greenblue, fontWeight: FontWeight.w700, fontSize: 16),
+            ? Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          child: Column(
+            children: blocks.map((block) {
+
+              if (block.groupId == 0) {
+                // Standalone stage
+                int actualIndex = trainingStages.indexOf(block.stages.first);
+                return _buildStageCard(block.stages.first, actualIndex, false);
+              } else {
+                // Grouped stages container
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Color.lerp(Colors.white, block.groupColor, 0.15),
+                    border: Border.all(color: block.groupColor, width: 2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      // Group Header
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${block.stages.first.stageReps} X",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: darkerblue
                               ),
-                              SizedBox(height: 6),
-                              Text(
-                                '${translationProvider.getTranslation("TrainingPage.TrainingOverview.reps")}: ${trainingStage.stageReps} X ${trainingStage.reps} ',
-                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Column(
-                                children: trainingStage.breathingPhases.map((breathingPhase) {
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(vertical: 4),
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                translationProvider.getTranslation(
-                                                    "BreathingPhaseType.${breathingPhase.breathingPhaseType.name}"),
-                                                style: TextStyle(color: darkerblue, fontWeight: FontWeight.bold),
-                                              ),
-                                              Spacer(),
-                                              Text(
-                                                breathingPhase.increment != null && breathingPhase.increment!.value > 0
-                                                    ? '${breathingPhase.duration} s + ${breathingPhase.increment!.value} s'
-                                                    : '${breathingPhase.duration} s',
-                                                style: TextStyle(
-                                                  color: darkerblue,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-              )
+                      // List of stages inside the group
+                      Column(
+                        children: block.stages.map((stage) {
+                          int actualIndex = trainingStages.indexOf(stage);
+                          return _buildStageCard(stage, actualIndex, true);
+                        }).toList(),
+                      )
+                    ],
+                  ),
+                );
+              }
+            }).toList(),
+          ),
+        )
             : SizedBox.shrink(),
       ),
     );
@@ -394,7 +524,7 @@ class _TrainingPageState extends State<TrainingPage> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(translationProvider.getTranslation('TrainingPage.export_success'), 
+            content: Text(translationProvider.getTranslation('TrainingPage.export_success'),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16, color: Colors.white),),
             backgroundColor: Colors.green,
