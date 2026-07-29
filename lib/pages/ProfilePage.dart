@@ -203,12 +203,18 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: Colors.white,
         ),
         backgroundColor: mediumblue,
-        body: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _firstBox(screenWidth),
-            SizedBox(height: 20),
-            _secondBox(screenWidth)
-          ]),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Center(
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _firstBox(screenWidth),
+                SizedBox(height: 20),
+                _secondBox(screenWidth),
+                SizedBox(height: 100),
+              ]),
+            ),
+          ),
         ));
   }
 }

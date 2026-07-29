@@ -460,6 +460,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                     // --- Stage Selection ---
                     Flexible(
                       child: ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 20),
                         shrinkWrap: true,
                         itemCount: trainingStages.length,
                         itemBuilder: (context, index) {
@@ -884,7 +885,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                   scrollController: _scrollController,
                   onReorder: reorderTrainingBlocks,
                   proxyDecorator: (child, idx, anim) => Material(color: Colors.transparent, child: child),
-                  padding: EdgeInsets.only(bottom: 80),
+                  padding: EdgeInsets.only(bottom: 100),
                   children: currentBlocks.asMap().entries.map((entry) {
                     int blockIndex = entry.key;
                     _TrainingBlock block = entry.value;
@@ -1545,6 +1546,7 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 100),
                       ],
                     )
                         : Column(
@@ -2116,6 +2118,49 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                         alignment: Alignment.center,
                                         child: Text(
                                             translationProvider.getTranslation(
+                                                "TrainingEditorPage.OtherTab.breath_monitoring_label") != "" ? translationProvider.getTranslation(
+                                                "TrainingEditorPage.OtherTab.breath_monitoring_label") : "Breath Monitoring",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black)),
+                                      ),
+                                      SizedBox(height: 8),
+                                      SwitchListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(
+                                          translationProvider.getTranslation(
+                                              "TrainingEditorPage.OtherTab.breath_monitoring_enabled") != "" ? translationProvider.getTranslation(
+                                              "TrainingEditorPage.OtherTab.breath_monitoring_enabled") : "Enable breath monitoring",
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        value: widget.training.settings.breathMonitoringEnabled,
+                                        activeColor: darkerblue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            widget.training.settings.breathMonitoringEnabled = value;
+                                          });
+                                        },
+                                      ),
+                                    ]
+                                )
+                            )
+                        ),
+                        SizedBox(height: 12),
+                        Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(12)),
+                            elevation: 2,
+                            color: Colors.white,
+                            child: Padding(
+                                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                child: Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                            translationProvider.getTranslation(
                                                 "TrainingEditorPage.OtherTab.visual_style_label"),
                                             style: TextStyle(
                                                 fontSize: 16,
@@ -2238,7 +2283,8 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                                     ]
                                 )
                             )
-                        )
+                        ),
+                        SizedBox(height: 100),
                       ],
                     ),
                 ),

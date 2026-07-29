@@ -82,6 +82,7 @@ class _AudioSelectionPopupState extends State<AudioSelectionPopup>{
             thickness: 3,
             thumbVisibility: false,
             child: ListView.builder(
+              padding: EdgeInsets.only(bottom: 40),
               shrinkWrap: true,
               itemCount: combinedLength,
               itemBuilder: (context, index) {

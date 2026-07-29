@@ -5,7 +5,8 @@
         "yes":"Yes",
         "no":"No",
         "remove":"Remove",
-        "delete":"Delete"
+        "delete":"Delete",
+        "close": "Finish"
     },
 
         "HomePage":{
@@ -190,7 +191,9 @@
             "visual_style_label": "Breath visualization",
             "visual_style": "Visual style",
             "ring": "Ring",
-            "timeline": "Timeline"
+            "timeline": "Timeline",
+            "breath_monitoring_label": "Breath monitoring",
+            "breath_monitoring_enabled": "Breathing cycle counting"
         },
 
                     
@@ -210,6 +213,8 @@
         "circle_paused_text":"Resume",
         "current_training_stage_label":"Current training stage",
         "default_training_stage_name":"Training stage {number}",
+        "summary_complete": "Training summary",
+        "summary_subtitle": "Number of complete cycles",
 
         "PreloadingScreen":{
             "title":"Loading Audio",

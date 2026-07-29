@@ -33,6 +33,9 @@ class Settings {
   @HiveField(8)
   bool breathingSoundEnabled = true;
 
+  @HiveField(9)
+  bool breathMonitoringEnabled = false;
+
   Settings();
 
   Future<void> setVisualStyle(String newVisualStyle) async {

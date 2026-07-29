@@ -179,6 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _firstBox(screenWidth),
               SizedBox(height: 20),
               _secondBox(screenWidth),
+              SizedBox(height: 100),
             ],
           ),
         ),

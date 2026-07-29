@@ -5,7 +5,8 @@
         "yes":"Tak",
         "no":"Nie",
         "remove":"Usuń",
-        "delete":"Usuń"
+        "delete":"Usuń",
+        "close": "Zakończ"
     },
 
     "HomePage":{
@@ -190,7 +191,9 @@
             "visual_style_label": "Styl widoku oddechu",
             "visual_style": "Widok oddechu",
             "ring": "Pierścień",
-            "timeline": "Oś czasu"
+            "timeline": "Oś czasu",
+            "breath_monitoring_label": "Monitorowanie oddechu",
+            "breath_monitoring_enabled": "Zliczanie cykli oddechowych"
         },
 
         "Alert":{
@@ -209,6 +212,8 @@
         "circle_paused_text":"Wznów",
         "current_training_stage_label":"Aktualny etap treningu",
         "default_training_stage_name":"Etap treningu {number}",
+        "summary_complete": "Podsumowanie treningu",
+        "summary_subtitle": "Ukończone cykle oddechowe",
         
         "PreloadingScreen":{
             "title":"Ładowanie audio",
