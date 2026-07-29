@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - 1.9-exhale-detection
 
 permissions:
   contents: write
@@ -34,6 +35,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "TAG_NAME=v${{ env.APP_VERSION }}-rc" >> $GITHUB_ENV
             echo "IS_PRERELEASE=false" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=v${{ env.APP_VERSION }}-${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           fi
 
       - name: Create and Push Tag
