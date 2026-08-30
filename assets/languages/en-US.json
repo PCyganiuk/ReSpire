@@ -34,7 +34,12 @@
         "language_label":"Language",
         "app_second_section_title":"About ReSpire",
         "app_description":"ReSpire offers full control over breath training. It is an app designed to help all users, regardless of their skill level. You can start your journey with ready-made exercises or quickly and conveniently create your own trainings tailored to your needs. \nSit back, relax and ReSpire.",
-        "copyright":"All rights reserved"
+        "copyright":"All rights reserved",
+        "monitoring_section_title": "Breath Monitoring",
+        "threshold_label": "Exhale Threshold",
+        "test_button_label": "Test Breath Detection",
+        "stop_test_label": "Stop Test",
+        "test_hint": "Breathe/Blow into mic to test"
     },
 
     "TrainingPage":{

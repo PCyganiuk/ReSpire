@@ -11,6 +11,7 @@ import 'package:respire/components/Global/BreathingPhase.dart' as breathing_phas
 import 'package:respire/services/SoundManagers/SoundManager.dart';
 import 'package:respire/services/TrainingController.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'package:respire/services/SettingsProvider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:respire/services/VisualStyle.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -781,13 +782,21 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
           ),
           // ── Isolated Monitor Component ──
           if (controller != null && widget.training.settings.breathMonitoringEnabled)
-            BreathMonitorIndicator(
-              isPaused: controller!.isPaused,
-              onCycleComplete: () {
-                setState(() {
-                  _completedCycles++;
-                });
-              },
+            Positioned(
+              bottom: 285,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: BreathMonitorIndicator(
+                  isPaused: controller!.isPaused,
+                  threshold: SettingsProvider().settings.breathThreshold,
+                  onCycleComplete: () {
+                    setState(() {
+                      _completedCycles++;
+                    });
+                  },
+                ),
+              ),
             ),
         ],
       ),

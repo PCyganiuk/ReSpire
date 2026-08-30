@@ -34,7 +34,12 @@
         "language_label":"Język",
         "app_second_section_title":"O ReSpire",
         "app_description":"ReSpire oferuje pełną kontrolę nad treningiem oddechowym. To aplikacja, która została zaprojektowana, aby pomóc wszystkim użytkownikom, niezależnie od ich poziomu zaawansowania. Można rozpocząć swoją przygodę z gotowymi ćwiczeniami lub szybko i wygodnie stworzyć własne treningi, dostosowane do swoich potrzeb. \nUsiądź wygodnie, zrelaksuj się i ReSpire.",
-        "copyright":"Wszelkie prawa zastrzeżone"
+        "copyright":"Wszelkie prawa zastrzeżone",
+        "monitoring_section_title": "Monitorowanie oddechu",
+        "threshold_label": "Czułość wydechu",
+        "test_button_label": "Testuj wykrywanie oddechu",
+        "stop_test_label": "Zatrzymaj test",
+        "test_hint": "Oddychaj do mikrofonu, aby przetestować"
     },
 
     "TrainingPage":{

@@ -11,6 +11,7 @@ import 'package:respire/components/Global/Training.dart';
 import 'package:respire/pages/HomePage.dart';
 import 'package:respire/services/TextToSpeechService.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
+import 'package:respire/services/SettingsProvider.dart';
 import 'package:respire/services/UserSoundsDataBase.dart';
 import 'package:respire/components/Global/BreathingPhaseSounds.dart';
 import 'package:respire/services/VisualStyle.dart';
@@ -48,6 +49,7 @@ Future<void> initialize() async
   await Hive.openBox('userLongSounds');
   await Hive.openBox('userCountingSounds');
   await TextToSpeechService().init();
+  await SettingsProvider().init();
   UserSoundsDatabase().loadData();
   TranslationProvider();
 }

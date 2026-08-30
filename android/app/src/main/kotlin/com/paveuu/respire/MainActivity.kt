@@ -39,6 +39,7 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
                 "classifyAudio" -> {
                     val bytes = call.argument<ByteArray>("audioData")
+                    val threshold = call.argument<Double>("threshold")?.toFloat() ?: 0.6f
                     if (bytes == null) {
                         result.error("INVALID_ARGS", "audioData is null", null)
                         return@setMethodCallHandler
@@ -49,7 +50,7 @@ class MainActivity : FlutterActivity() {
                         return@setMethodCallHandler
                     }
                     try {
-                        val classIndex = currentClassifier.classify(bytes)
+                        val classIndex = currentClassifier.classify(bytes, threshold)
                         result.success(classIndex)
                     } catch (e: Exception) {
                         result.error("CLASSIFICATION_ERROR", e.message, null)
@@ -98,9 +99,10 @@ class BreathClassifierWrapper(private val context: Context) {
 
     /**
      * @param audioBytes Raw little-endian Int16 PCM, exactly BUFFER_SIZE samples.
+     * @param threshold Probability threshold for exhale detection.
      * @return Class index: 0 = Everything else, 1 = Exhale
      */
-    fun classify(audioBytes: ByteArray): Int {
+    fun classify(audioBytes: ByteArray, threshold: Float): Int {
         try {
             // 1. PCM Int16 → Float32 in [-1, 1]
             val shortBuf = ByteBuffer
@@ -170,7 +172,7 @@ class BreathClassifierWrapper(private val context: Context) {
 
                     Log.d("BreathClassifier", "MaxAmp: ${String.format("%.4f", maxAmp)}, Prob: Exhale=${String.format("%.3f", avgProb[0])}, Other=${String.format("%.3f", avgProb[1])}")
 
-                    return if (avgProb[0] > 0.6f) 0 else 1
+                    return if (avgProb[0] > threshold) 0 else 1
                 }
             }
         } catch (e: Exception) {

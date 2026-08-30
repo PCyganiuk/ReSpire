@@ -5,16 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:record/record.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:respire/theme/Colors.dart';
+import 'package:respire/services/SettingsProvider.dart';
 
 // ─── Floating Indicator Widget (Microphone Version) ──────────────────────────
 class BreathMonitorIndicator extends StatefulWidget {
   final ValueNotifier<bool> isPaused;
   final VoidCallback? onCycleComplete;
+  final double? threshold;
 
   const BreathMonitorIndicator({
     super.key,
     required this.isPaused,
     this.onCycleComplete,
+    this.threshold,
   });
 
   @override
@@ -125,6 +128,7 @@ class _BreathMonitorIndicatorState extends State<BreathMonitorIndicator> {
       
       final result = await _channel.invokeMethod<int>('classifyAudio', {
         'audioData': pcmBytes,
+        'threshold': widget.threshold ?? SettingsProvider().settings.breathThreshold,
       });
 
       if (mounted && result != null && result != _currentClass) {
@@ -171,37 +175,30 @@ class _BreathMonitorIndicatorState extends State<BreathMonitorIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 300,
-      left: 0,
-      right: 0,
-      child: Center(
-        child: AnimatedOpacity(
-          opacity: _isMonitoring ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 300),
-          child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _showCycleComplete
-                ? Colors.green         // Green for completion
-                : _currentClass == 0
-                    ? mediumblue     // Coherent Blue for Exhale
-                    : Colors.black.withOpacity(0.6),   // Black for Idle/Other
-            shape: BoxShape.circle,
-            boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
-            ],
-          ),
-          child: Icon(
-            _showCycleComplete
-                ? Icons.check_circle
-                : (_currentClass == 0 ? Icons.air : Icons.mic),
-            color: Colors.white,
-            size: 24,
-          ),
+    return AnimatedOpacity(
+      opacity: _isMonitoring ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 300),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _showCycleComplete
+              ? Colors.green // Green for completion
+              : _currentClass == 0
+                  ? mediumblue // Coherent Blue for Exhale
+                  : Colors.black.withOpacity(0.6), // Black for Idle/Other
+          shape: BoxShape.circle,
+          boxShadow: const [
+            BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+          ],
+        ),
+        child: Icon(
+          _showCycleComplete
+              ? Icons.check_circle
+              : (_currentClass == 0 ? Icons.air : Icons.mic),
+          color: Colors.white,
+          size: 24,
         ),
       ),
-    ),
     );
   }
 }
