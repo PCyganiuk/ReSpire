@@ -25,13 +25,15 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..dimScreenEnabled = fields[5] as bool
       ..dimScreenAfterSeconds = fields[6] as int
       ..visualStyle = fields[7] as VisualStyle
-      ..breathingSoundEnabled = fields[8] as bool;
+      ..breathingSoundEnabled = fields[8] as bool
+      ..breathMonitoringEnabled = fields[9] == null ? false : fields[9] as bool
+      ..breathThreshold = fields[10] == null ? 0.6 : fields[10] as double;
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.preparationDuration)
       ..writeByte(1)
@@ -49,7 +51,11 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(7)
       ..write(obj.visualStyle)
       ..writeByte(8)
-      ..write(obj.breathingSoundEnabled);
+      ..write(obj.breathingSoundEnabled)
+      ..writeByte(9)
+      ..write(obj.breathMonitoringEnabled)
+      ..writeByte(10)
+      ..write(obj.breathThreshold);
   }
 
   @override

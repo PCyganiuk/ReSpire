@@ -413,7 +413,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             backgroundColor: mediumblue,
             edgeOffset: 16,
             child: ListView.builder(
-              padding: EdgeInsets.only(top: size * 0.022),
+              padding: EdgeInsets.only(top: size * 0.022, bottom: 100),
               itemCount: db.presetList.length + 1,
               itemBuilder: (context, index) {
                 final isSelected = _isSelectionMode && _selectedIndices.contains(index);
