@@ -77,20 +77,30 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 SizedBox(height: 10),
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: () {
                     setState(() {
                       _isTestingBreath = !_isTestingBreath;
                       _isPausedNotifier.value = !_isTestingBreath;
                     });
                   },
-                  icon: Icon(_isTestingBreath ? Icons.stop : Icons.play_arrow),
-                  label: Text(_isTestingBreath ? "" : translationProvider.getTranslation("SettingsPage.test_button_label")),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isTestingBreath ? Colors.red.shade400 : mediumblue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: _isTestingBreath ? EdgeInsets.zero : null,
+                    fixedSize: _isTestingBreath ? const Size(48, 48) : null,
                   ),
+                  child: _isTestingBreath
+                      ? const Icon(Icons.stop)
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.play_arrow),
+                            const SizedBox(width: 8),
+                            Text(translationProvider.getTranslation("SettingsPage.test_button_label")),
+                          ],
+                        ),
                 ),
                 if (_isTestingBreath) ...[
                   SizedBox(height: 20),
