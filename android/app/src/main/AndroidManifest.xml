@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="ReSpire_EXPERIMENTAL"
+        android:label="ReSpire_EXPERIMENTAL_MONITOR"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
