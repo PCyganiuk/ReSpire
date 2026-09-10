@@ -63,6 +63,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo_biale_tlo.jpg"
-  adaptive_icon_foreground: "assets/logo_bez_tla.png"
+  image_path: "assets/logo_biale_tlo.png"
+  adaptive_icon_foreground: "assets/logo_biale_tlo.png"
   adaptive_icon_background: "#ffffff"
