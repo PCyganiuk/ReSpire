@@ -1,7 +1,7 @@
 name: respire
 description: "Application for breathing exercise"
 publish_to: 'none'
-version: 1.9.3
+version: 1.7.8
 
 environment:
   sdk: ^3.6.0
@@ -31,8 +31,6 @@ dependencies:
   change_app_package_name: ^1.5.0
   just_audio: ^0.9.36
   archive: ^3.4.0
-  record: ^6.0.0
-  permission_handler: ^11.3.1
 
 
 dev_dependencies:
@@ -63,6 +61,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo_biale_tlo.png"
-  adaptive_icon_foreground: "assets/logo_biale_tlo.png"
+  image_path: "assets/logo_biale_tlo.jpg"
+  adaptive_icon_foreground: "assets/logo_bez_tla.png"
   adaptive_icon_background: "#ffffff"

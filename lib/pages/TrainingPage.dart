@@ -474,7 +474,6 @@ class _TrainingPageState extends State<TrainingPage> {
                         descriptionBox(screenWidth),
                         trainingOverview(screenWidth),
                         startTrainingButton(),
-                        SizedBox(height: 100),
                       ],
                     ),
                   ),

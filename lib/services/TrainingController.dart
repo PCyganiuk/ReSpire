@@ -70,11 +70,10 @@ class TrainingController {
   bool _endingInitiated = false;
 
   late BuildContext _context;
-  final VoidCallback? onTrainingEnd;
 
   TranslationProvider translationProvider = TranslationProvider();
 
-  TrainingController(this.parser, {this.onTrainingEnd}) {
+  TrainingController(this.parser) {
     soundManager = SoundManager();
     soundManager.stopAllSounds();
     playlistManager = PlaylistManager();
@@ -518,14 +517,9 @@ class TrainingController {
 
         if (_remainingTime == 0) {
           if (_endingInitiated){
-                _timer?.cancel();
                 second.value = 0;
                 end = true;
-                if (onTrainingEnd != null) {
-                  onTrainingEnd!();
-                } else {
-                  Navigator.pop(_context);
-                }
+                Navigator.pop(_context);
           }
           if (_finishedLoadingBreathingPhases) {
             tryUpdateStageCounter(); // try removing the last stage if needed

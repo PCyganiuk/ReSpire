@@ -5,8 +5,7 @@
         "yes":"Tak",
         "no":"Nie",
         "remove":"Usuń",
-        "delete":"Usuń",
-        "close": "Zakończ"
+        "delete":"Usuń"
     },
 
     "HomePage":{
@@ -34,12 +33,7 @@
         "language_label":"Język",
         "app_second_section_title":"O ReSpire",
         "app_description":"ReSpire oferuje pełną kontrolę nad treningiem oddechowym. To aplikacja, która została zaprojektowana, aby pomóc wszystkim użytkownikom, niezależnie od ich poziomu zaawansowania. Można rozpocząć swoją przygodę z gotowymi ćwiczeniami lub szybko i wygodnie stworzyć własne treningi, dostosowane do swoich potrzeb. \nUsiądź wygodnie, zrelaksuj się i ReSpire.",
-        "copyright":"Wszelkie prawa zastrzeżone",
-        "monitoring_section_title": "Monitorowanie oddechu",
-        "threshold_label": "Czułość wydechu",
-        "test_button_label": "Testuj wykrywanie oddechu",
-        "stop_test_label": "Zatrzymaj test",
-        "test_hint": "Oddychaj do mikrofonu, aby przetestować"
+        "copyright":"Wszelkie prawa zastrzeżone"
     },
 
     "TrainingPage":{
@@ -196,9 +190,7 @@
             "visual_style_label": "Styl widoku oddechu",
             "visual_style": "Widok oddechu",
             "ring": "Pierścień",
-            "timeline": "Oś czasu",
-            "breath_monitoring_label": "Monitorowanie oddechu",
-            "breath_monitoring_enabled": "Zliczanie cykli oddechowych"
+            "timeline": "Oś czasu"
         },
 
         "Alert":{
@@ -217,8 +209,6 @@
         "circle_paused_text":"Wznów",
         "current_training_stage_label":"Aktualny etap treningu",
         "default_training_stage_name":"Etap treningu {number}",
-        "summary_complete": "Podsumowanie treningu",
-        "summary_subtitle": "Ukończone cykle oddechowe",
         
         "PreloadingScreen":{
             "title":"Ładowanie audio",
