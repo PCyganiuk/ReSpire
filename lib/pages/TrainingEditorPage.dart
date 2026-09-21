@@ -463,19 +463,44 @@ class _TrainingEditorPageState extends State<TrainingEditorPage> {
                         shrinkWrap: true,
                         itemCount: trainingStages.length,
                         itemBuilder: (context, index) {
-                          // If the stage is already in a group, hide it completely
-                          if (trainingStages[index].groupId != 0) {
-                            return const SizedBox.shrink();
+                          final stage = trainingStages[index];
+                          final isInGroup = stage.groupId != 0;
+
+                          if (isInGroup) {
+                            final groupColor = _getGroupColor(stage.groupId);
+                            final disabledGroupColor = Color.lerp(
+                              groupColor,
+                              Colors.grey,
+                              0.45,
+                            )!;
+
+                            return IgnorePointer(
+                              child: CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  _getStageName(index),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                value: true,
+                                activeColor: disabledGroupColor,
+                                checkColor: Colors.white,
+                                onChanged: (_) {},
+                              ),
+                            );
                           }
 
-                          // Otherwise, render the normal selectable checkbox
                           return CheckboxListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: Text(_getStageName(index), overflow: TextOverflow.ellipsis),
+                            title: Text(
+                              _getStageName(index),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             value: selectedStages[index],
                             activeColor: darkerblue,
                             onChanged: (val) {
-                              setStateDialog(() => selectedStages[index] = val ?? false);
+                              setStateDialog(() {
+                                selectedStages[index] = val ?? false;
+                              });
                             },
                           );
                         },

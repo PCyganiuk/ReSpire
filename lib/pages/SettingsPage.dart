@@ -5,6 +5,7 @@ import 'package:respire/theme/Colors.dart';
 import 'package:respire/services/TranslationProvider/AppLanguage.dart';
 import 'package:respire/services/SettingsProvider.dart';
 import 'package:respire/utils/TextUtils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -15,7 +16,25 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   TranslationProvider translationProvider = TranslationProvider();
-  bool photoAdded = false;
+
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final PackageInfo packageInfo =
+    await PackageInfo.fromPlatform();
+
+    if (!mounted) return;
+
+    setState(() {
+      _appVersion = packageInfo.version;
+    });
+  }
 
   Widget _firstBox(double screenWidth) {
     return Container(
@@ -25,52 +44,91 @@ class _SettingsPageState extends State<SettingsPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 6,
-          offset: Offset(0, 3),)
-        ]
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            translationProvider.getTranslation("SettingsPage.app_section_title"),
-            style: TextStyle(fontSize: 26, fontFamily: 'Glacial', fontWeight: FontWeight.w300, color: Colors.black),
+            translationProvider.getTranslation(
+              "SettingsPage.app_section_title",
+            ),
+            style: const TextStyle(
+              fontSize: 26,
+              fontFamily: 'Glacial',
+              fontWeight: FontWeight.w300,
+              color: Colors.black,
+            ),
           ),
           Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: mediumblue, width: 1),
+              side: BorderSide(
+                color: mediumblue,
+                width: 1,
+              ),
             ),
             color: Colors.white,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                0,
+                16,
+                0,
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(translationProvider.getTranslation("SettingsPage.language_label"), style: TextStyle(fontSize: 16)),
+                  Text(
+                    translationProvider.getTranslation(
+                      "SettingsPage.language_label",
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
                   DropdownButton2<AppLanguage>(
-                    underline: SizedBox(),
+                    underline: const SizedBox(),
                     value: SettingsProvider().currentLanguage,
                     onChanged: (value) async {
                       SettingsProvider().setLanguage(value!);
-                      await translationProvider.loadLanguage(value);
-                      setState(() {});
+                      await translationProvider.loadLanguage(
+                        value,
+                      );
+
+                      if (mounted) {
+                        setState(() {});
+                      }
                     },
                     items: AppLanguage.supportedLanguages
-                        .map((lang) => DropdownMenuItem<AppLanguage>(
-                              value: lang,
-                              child: Text(lang.name),
-                            ))
+                        .map(
+                          (lang) =>
+                          DropdownMenuItem<AppLanguage>(
+                            value: lang,
+                            child: Text(lang.name),
+                          ),
+                    )
                         .toList(),
                     iconStyleData: IconStyleData(
-                      icon: Icon(Icons.arrow_drop_down, color: darkerblue),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: darkerblue,
+                      ),
                     ),
                     dropdownStyleData: DropdownStyleData(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius:
+                        BorderRadius.circular(12),
                       ),
                     ),
                   ),
@@ -78,88 +136,121 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-
         ],
       ),
     );
   }
 
   Widget _secondBox(double screenWidth) {
-  return Container(
-    width: screenWidth * 0.9,
-    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 6,
-          offset: Offset(0, 3),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-        Text(
-          translationProvider.getTranslation("SettingsPage.app_second_section_title"),
-          style: TextStyle(
-            fontSize: 26,
-            fontFamily: 'Glacial',
-            fontWeight: FontWeight.w300,
-            color: Colors.black,
+    return Container(
+      width: screenWidth * 0.9,
+      padding: const EdgeInsets.symmetric(
+        vertical: 16,
+        horizontal: 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child:
-            Text(
-            TextUtils.addNoBreakingSpaces(translationProvider.getTranslation("SettingsPage.app_description")),
-            style: TextStyle(
-              fontSize: 16,
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            translationProvider.getTranslation(
+              "SettingsPage.app_second_section_title",
+            ),
+            style: const TextStyle(
+              fontSize: 26,
+              fontFamily: 'Glacial',
+              fontWeight: FontWeight.w300,
               color: Colors.black,
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: Text(
+              TextUtils.addNoBreakingSpaces(
+                translationProvider.getTranslation(
+                  "SettingsPage.app_description",
+                ),
+              ),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-        SizedBox(height: 20),
-        Image(image:
-        AssetImage('assets/group_logo.png'),
-          fit: BoxFit.contain,
-          height: 75,
-        ),
-        SizedBox(height: 20),
-        Text(
-          "© ${DateTime.now().year} ${translationProvider.getTranslation("SettingsPage.copyright")}",
-          style: TextStyle(
-            color: Colors.black54,
-            fontSize: 12,
+          const SizedBox(height: 20),
+          const Image(
+            image: AssetImage(
+              'assets/group_logo.png',
+            ),
+            fit: BoxFit.contain,
+            height: 75,
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 20),
+
+          // App version
+          if (_appVersion.isNotEmpty)
+            Text(
+              "${translationProvider.getTranslation(
+                "SettingsPage.version",
+              )} $_appVersion",
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            "© ${DateTime.now().year} "
+                "${translationProvider.getTranslation(
+              "SettingsPage.copyright",
+            )}",
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth =
+        MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         title: Text(
-          translationProvider.getTranslation("SettingsPage.page_title"),
-          style: TextStyle(
+          translationProvider.getTranslation(
+            "SettingsPage.page_title",
+          ),
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontFamily: 'Glacial',
           ),
@@ -170,20 +261,25 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: mediumblue,
       body: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.only(top: 20.0, bottom: 20.0), 
-        child: 
-          Center(child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center, 
-            children: [
-              _firstBox(screenWidth),
-              SizedBox(height: 20),
-              _secondBox(screenWidth),
-            ],
+          padding: const EdgeInsets.only(
+            top: 20.0,
+            bottom: 20.0,
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment:
+              MainAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.center,
+              children: [
+                _firstBox(screenWidth),
+                const SizedBox(height: 20),
+                _secondBox(screenWidth),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
