@@ -7,9 +7,22 @@ plugins {
 
 android {
     namespace = "com.paveuu.respire"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
+    flavorDimensions "version"
+
+    productFlavors {
+        production {
+            dimension "version"
+            applicationId "com.paveuu.respire"
+        }
+
+        experimental {
+            dimension "version"
+            applicationId "com.paveuu.respire.experimental"
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

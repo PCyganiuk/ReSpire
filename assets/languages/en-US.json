@@ -35,6 +35,7 @@
         "app_second_section_title":"About ReSpire",
         "app_description":"ReSpire offers full control over breath training. It is an app designed to help all users, regardless of their skill level. You can start your journey with ready-made exercises or quickly and conveniently create your own trainings tailored to your needs. \nSit back, relax and ReSpire.",
         "copyright":"All rights reserved",
+        "version":"Version",
         "monitoring_section_title": "Breath Monitoring",
         "threshold_label": "Exhale Threshold",
         "test_button_label": "Test Breath Detection",
@@ -91,7 +92,7 @@
             "TrainingStageTile":{
                 "name":"Training stage name",
                 "name_placeholder":"Enter training stage name",
-                "reps":"Phases reps",
+                "reps":"Stage reps",
                 "stage_reps":"Group reps",
                 "increment":"Increment (s)",
                 "add_breathing_phase_button_label":"Add breathing phase",

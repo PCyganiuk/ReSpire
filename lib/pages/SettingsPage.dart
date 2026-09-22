@@ -7,6 +7,7 @@ import 'package:respire/services/SettingsProvider.dart';
 import 'package:respire/utils/TextUtils.dart';
 import 'package:respire/components/BreathingPage/BreathMonitorIndicator.dart';
 import 'dart:async';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,9 +18,28 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   TranslationProvider translationProvider = TranslationProvider();
+
   bool photoAdded = false;
   bool _isTestingBreath = false;
   final ValueNotifier<bool> _isPausedNotifier = ValueNotifier<bool>(true);
+
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    if (!mounted) return;
+
+    setState(() {
+      _appVersion = packageInfo.version;
+    });
+  }
 
   Widget _monitoringBox(double screenWidth) {
     return Container(
@@ -31,35 +51,60 @@ class _SettingsPageState extends State<SettingsPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 6,
-            offset: Offset(0, 3),
-          )
-        ]
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            translationProvider.getTranslation("SettingsPage.monitoring_section_title") != "" 
-              ? translationProvider.getTranslation("SettingsPage.monitoring_section_title") 
-              : "Breath Monitoring",
-            style: TextStyle(fontSize: 26, fontFamily: 'Glacial', fontWeight: FontWeight.w300, color: Colors.black),
+            translationProvider.getTranslation(
+              "SettingsPage.monitoring_section_title",
+            ) !=
+                ""
+                ? translationProvider.getTranslation(
+              "SettingsPage.monitoring_section_title",
+            )
+                : "Breath Monitoring",
+            style: const TextStyle(
+              fontSize: 26,
+              fontFamily: 'Glacial',
+              fontWeight: FontWeight.w300,
+              color: Colors.black,
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      translationProvider.getTranslation("SettingsPage.threshold_label") != "" 
-                        ? translationProvider.getTranslation("SettingsPage.threshold_label") 
-                        : "Exhale Threshold",
-                      style: TextStyle(fontSize: 16)
+                      translationProvider.getTranslation(
+                        "SettingsPage.threshold_label",
+                      ) !=
+                          ""
+                          ? translationProvider.getTranslation(
+                        "SettingsPage.threshold_label",
+                      )
+                          : "Exhale Threshold",
+                      style: const TextStyle(fontSize: 16),
                     ),
                     Text(
-                      SettingsProvider().settings.breathThreshold.toStringAsFixed(2),
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkerblue)
+                      SettingsProvider()
+                          .settings
+                          .breathThreshold
+                          .toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: darkerblue,
+                      ),
                     ),
                   ],
                 ),
@@ -76,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
@@ -85,52 +130,76 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isTestingBreath ? Colors.red.shade400 : mediumblue,
+                    backgroundColor: _isTestingBreath
+                        ? Colors.red.shade400
+                        : mediumblue,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     padding: _isTestingBreath ? EdgeInsets.zero : null,
-                    fixedSize: _isTestingBreath ? const Size(48, 48) : null,
+                    fixedSize: _isTestingBreath
+                        ? const Size(48, 48)
+                        : null,
                   ),
                   child: _isTestingBreath
                       ? const Icon(Icons.stop)
                       : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.play_arrow),
-                            const SizedBox(width: 8),
-                            Text(translationProvider.getTranslation("SettingsPage.test_button_label")),
-                          ],
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.play_arrow),
+                      const SizedBox(width: 8),
+                      Text(
+                        translationProvider.getTranslation(
+                          "SettingsPage.test_button_label",
                         ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (_isTestingBreath) ...[
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
                     height: 100,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                      ),
                     ),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         BreathMonitorIndicator(
                           isPaused: _isPausedNotifier,
-                          threshold: SettingsProvider().settings.breathThreshold,
+                          threshold: SettingsProvider()
+                              .settings
+                              .breathThreshold,
                         ),
                         Positioned(
                           top: 8,
                           child: Text(
-                            translationProvider.getTranslation("SettingsPage.test_hint") != "" ? translationProvider.getTranslation("SettingsPage.test_hint") : "Breathe/Blow into mic to test",
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                            translationProvider.getTranslation(
+                              "SettingsPage.test_hint",
+                            ) !=
+                                ""
+                                ? translationProvider.getTranslation(
+                              "SettingsPage.test_hint",
+                            )
+                                : "Breathe/Blow into mic to test",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ],
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -147,47 +216,81 @@ class _SettingsPageState extends State<SettingsPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 6,
-          offset: Offset(0, 3),)
-        ]
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            translationProvider.getTranslation("SettingsPage.app_section_title"),
-            style: TextStyle(fontSize: 26, fontFamily: 'Glacial', fontWeight: FontWeight.w300, color: Colors.black),
+            translationProvider.getTranslation(
+              "SettingsPage.app_section_title",
+            ),
+            style: const TextStyle(
+              fontSize: 26,
+              fontFamily: 'Glacial',
+              fontWeight: FontWeight.w300,
+              color: Colors.black,
+            ),
           ),
           Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: mediumblue, width: 1),
+              side: BorderSide(
+                color: mediumblue,
+                width: 1,
+              ),
             ),
             color: Colors.white,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                0,
+                16,
+                0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(translationProvider.getTranslation("SettingsPage.language_label"), style: TextStyle(fontSize: 16)),
+                  Text(
+                    translationProvider.getTranslation(
+                      "SettingsPage.language_label",
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
                   DropdownButton2<AppLanguage>(
-                    underline: SizedBox(),
+                    underline: const SizedBox(),
                     value: SettingsProvider().currentLanguage,
                     onChanged: (value) async {
                       SettingsProvider().setLanguage(value!);
                       await translationProvider.loadLanguage(value);
-                      setState(() {});
+
+                      if (mounted) {
+                        setState(() {});
+                      }
                     },
                     items: AppLanguage.supportedLanguages
-                        .map((lang) => DropdownMenuItem<AppLanguage>(
-                              value: lang,
-                              child: Text(lang.name),
-                            ))
+                        .map(
+                          (lang) => DropdownMenuItem<AppLanguage>(
+                        value: lang,
+                        child: Text(lang.name),
+                      ),
+                    )
                         .toList(),
                     iconStyleData: IconStyleData(
-                      icon: Icon(Icons.arrow_drop_down, color: darkerblue),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: darkerblue,
+                      ),
                     ),
                     dropdownStyleData: DropdownStyleData(
                       decoration: BoxDecoration(
@@ -200,88 +303,121 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-
         ],
       ),
     );
   }
 
   Widget _secondBox(double screenWidth) {
-  return Container(
-    width: screenWidth * 0.9,
-    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 6,
-          offset: Offset(0, 3),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-        Text(
-          translationProvider.getTranslation("SettingsPage.app_second_section_title"),
-          style: TextStyle(
-            fontSize: 26,
-            fontFamily: 'Glacial',
-            fontWeight: FontWeight.w300,
-            color: Colors.black,
+    return Container(
+      width: screenWidth * 0.9,
+      padding: const EdgeInsets.symmetric(
+        vertical: 16,
+        horizontal: 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child:
-            Text(
-            TextUtils.addNoBreakingSpaces(translationProvider.getTranslation("SettingsPage.app_description")),
-            style: TextStyle(
-              fontSize: 16,
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            translationProvider.getTranslation(
+              "SettingsPage.app_second_section_title",
+            ),
+            style: const TextStyle(
+              fontSize: 26,
+              fontFamily: 'Glacial',
+              fontWeight: FontWeight.w300,
               color: Colors.black,
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
+            child: Text(
+              TextUtils.addNoBreakingSpaces(
+                translationProvider.getTranslation(
+                  "SettingsPage.app_description",
+                ),
+              ),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-        SizedBox(height: 20),
-        Image(image:
-        AssetImage('assets/group_logo.png'),
-          fit: BoxFit.contain,
-          height: 75,
-        ),
-        SizedBox(height: 20),
-        Text(
-          "© ${DateTime.now().year} ${translationProvider.getTranslation("SettingsPage.copyright")}",
-          style: TextStyle(
-            color: Colors.black54,
-            fontSize: 12,
+          const SizedBox(height: 20),
+          const Image(
+            image: AssetImage(
+              'assets/group_logo.png',
+            ),
+            fit: BoxFit.contain,
+            height: 75,
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 20),
+
+          // App version
+          if (_appVersion.isNotEmpty)
+            Text(
+              "${translationProvider.getTranslation(
+                "SettingsPage.version",
+              )} $_appVersion",
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            "© ${DateTime.now().year} "
+                "${translationProvider.getTranslation(
+              "SettingsPage.copyright",
+            )}",
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth =
+        MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         title: Text(
-          translationProvider.getTranslation("SettingsPage.page_title"),
-          style: TextStyle(
+          translationProvider.getTranslation(
+            "SettingsPage.page_title",
+          ),
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontFamily: 'Glacial',
           ),
@@ -292,23 +428,26 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: mediumblue,
       body: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.only(top: 20.0, bottom: 20.0), 
-        child: 
-          Center(child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center, 
-            children: [
-              _firstBox(screenWidth),
-              SizedBox(height: 20),
-              _monitoringBox(screenWidth),
-              SizedBox(height: 20),
-              _secondBox(screenWidth),
-              SizedBox(height: 100),
-            ],
+          padding: const EdgeInsets.only(
+            top: 20.0,
+            bottom: 20.0,
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _firstBox(screenWidth),
+                const SizedBox(height: 20),
+                _monitoringBox(screenWidth),
+                const SizedBox(height: 20),
+                _secondBox(screenWidth),
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

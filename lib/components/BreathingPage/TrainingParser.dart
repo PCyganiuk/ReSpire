@@ -8,156 +8,369 @@ import 'package:respire/components/Global/Training.dart';
 class TrainingParser {
   int trainingStageID = 0;
   int breathingPhaseID = -1;
-  int doneReps = 0;
-  late List<int> stagesDoneReps; // Track stage reps for EACH stage
 
-  Training training;
+  // Repetition of the current stage.
+  int doneReps = 0;
+
+  // Repetition of the current group.
+  int doneGroupReps = 0;
+
+  late List<int> stagesDoneReps;
+
   late TrainingStage currentTrainingStage;
   late breathing_phase.BreathingPhase currentBreathingPhase;
 
   TrainingParser({required this.training}) {
-    stagesDoneReps = List.filled(training.trainingStages.length, 0);
+    stagesDoneReps =
+        List.filled(training.trainingStages.length, 0);
 
-    // Safety check to ensure we start on a valid stage
+    if (training.trainingStages.isEmpty) {
+      trainingStageID = -1;
+      return;
+    }
+
+    // Find first stage belonging to a group that actually runs.
     for (int i = 0; i < training.trainingStages.length; i++) {
       if (training.trainingStages[i].stageReps > 0) {
         trainingStageID = i;
+        currentTrainingStage =
+        training.trainingStages[i];
         break;
       }
     }
 
-    if (training.trainingStages.isEmpty || training.trainingStages[trainingStageID].stageReps == 0) {
+    if (trainingStageID == 0 &&
+        training.trainingStages[0].stageReps == 0) {
       trainingStageID = -1;
-    } else {
-      currentTrainingStage = training.trainingStages[trainingStageID];
     }
   }
 
-  Map<String, dynamic>? nextInstruction() {
-    if (trainingStageID == -1) return null; // Training is finished
+  final Training training;
 
-    if (breathingPhaseID == currentTrainingStage.breathingPhases.length - 1) {
+  Map<String, dynamic>? nextInstruction() {
+    if (trainingStageID == -1) {
+      return null;
+    }
+
+    currentTrainingStage =
+    training.trainingStages[trainingStageID];
+
+    /*
+     * Move to the next breathing phase.
+     */
+    if (breathingPhaseID <
+        currentTrainingStage.breathingPhases.length - 1) {
+      breathingPhaseID++;
+    } else {
+      /*
+       * We finished the current breathing cycle.
+       */
       breathingPhaseID = 0;
       doneReps++;
 
-      if (doneReps == currentTrainingStage.reps) {
-        // We finished one pass of this stage.
-        stagesDoneReps[trainingStageID]++;
-        doneReps = 0;
-
-        // Move to the next stage in the "Big Loop"
-        bool foundNextStage = false;
-        int nextID = trainingStageID + 1;
-
-        for (int i = 0; i < training.trainingStages.length; i++) {
-          if (nextID >= training.trainingStages.length) {
-            nextID = 0; // Wrap around to the start of the stages list!
-          }
-          if (stagesDoneReps[nextID] < training.trainingStages[nextID].stageReps) {
-            trainingStageID = nextID;
-            currentTrainingStage = training.trainingStages[trainingStageID];
-            foundNextStage = true;
-            break;
-          }
-          nextID++;
-        }
-
-        if (!foundNextStage) {
-          trainingStageID = -1; // All stages have reached their stageReps limits
-          return null;
-        }
+      /*
+       * We still have repetitions of the current stage.
+       */
+      if (doneReps < currentTrainingStage.reps) {
+        return _buildInstruction();
       }
-    } else {
-      breathingPhaseID++;
+
+      /*
+       * Current stage is finished.
+       */
+      doneReps = 0;
+
+      stagesDoneReps[trainingStageID]++;
+
+      /*
+       * Check whether another stage belongs to
+       * the current group.
+       */
+      final nextStageID = trainingStageID + 1;
+
+      if (nextStageID < training.trainingStages.length &&
+          training.trainingStages[nextStageID].groupId ==
+              currentTrainingStage.groupId) {
+        /*
+         * Continue with the next stage in this group.
+         */
+        trainingStageID = nextStageID;
+        currentTrainingStage =
+        training.trainingStages[trainingStageID];
+
+        return _buildInstruction();
+      }
+
+      /*
+       * We reached the end of the current group.
+       */
+      doneGroupReps++;
+
+      /*
+       * Repeat the whole group.
+       */
+      if (doneGroupReps < currentTrainingStage.stageReps) {
+        final firstStageID =
+        _findFirstStageOfGroup(
+          currentTrainingStage.groupId,
+        );
+
+        trainingStageID = firstStageID;
+
+        currentTrainingStage =
+        training.trainingStages[trainingStageID];
+
+        return _buildInstruction();
+      }
+
+      /*
+       * The group is completely finished.
+       *
+       * Find the first stage of the next group.
+       */
+      doneGroupReps = 0;
+
+      final nextGroupStageID =
+      _findFirstStageOfNextGroup(
+        currentTrainingStage.groupId,
+      );
+
+      if (nextGroupStageID == -1) {
+        /*
+         * No more groups.
+         */
+        trainingStageID = -1;
+        return null;
+      }
+
+      trainingStageID = nextGroupStageID;
+
+      currentTrainingStage =
+      training.trainingStages[trainingStageID];
+
+      return _buildInstruction();
     }
 
-    currentBreathingPhase = currentTrainingStage.breathingPhases[breathingPhaseID];
+    return _buildInstruction();
+  }
 
-    double durationSeconds = currentBreathingPhase.duration;
-    if (currentBreathingPhase.increment != null && doneReps > 0) {
-      final increment = currentBreathingPhase.increment!;
+  int _findFirstStageOfGroup(int groupId) {
+    for (int i = 0;
+    i < training.trainingStages.length;
+    i++) {
+      if (training.trainingStages[i].groupId == groupId) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  int _findFirstStageOfNextGroup(int currentGroupId) {
+    bool foundCurrentGroup = false;
+
+    for (int i = 0;
+    i < training.trainingStages.length;
+    i++) {
+      final stage =
+      training.trainingStages[i];
+
+      if (stage.groupId == currentGroupId) {
+        foundCurrentGroup = true;
+        continue;
+      }
+
+      if (foundCurrentGroup) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  Map<String, dynamic> _buildInstruction() {
+    currentBreathingPhase =
+    currentTrainingStage
+        .breathingPhases[breathingPhaseID];
+
+    double durationSeconds =
+        currentBreathingPhase.duration;
+
+    /*
+     * Increment applies to repetitions INSIDE
+     * the current stage.
+     */
+    if (currentBreathingPhase.increment != null &&
+        doneReps > 0) {
+      final increment =
+      currentBreathingPhase.increment!;
+
       durationSeconds =
-          currentBreathingPhase.duration + (doneReps * increment.value);
+          currentBreathingPhase.duration +
+              (doneReps * increment.value);
     }
 
-    final progressedBreathingPhase = breathing_phase.BreathingPhase(
+    final progressedBreathingPhase =
+    breathing_phase.BreathingPhase(
       duration: durationSeconds,
-      breathingPhaseType: currentBreathingPhase.breathingPhaseType,
+      breathingPhaseType:
+      currentBreathingPhase.breathingPhaseType,
       sounds: currentBreathingPhase.sounds,
     );
 
-    log('preBreathingPhase: ${progressedBreathingPhase.sounds.preBreathingPhase}, background: ${progressedBreathingPhase.sounds.background}');
+    log(
+      'preBreathingPhase: '
+          '${progressedBreathingPhase.sounds.preBreathingPhase}, '
+          'background: '
+          '${progressedBreathingPhase.sounds.background}',
+    );
 
     return {
       "breathingPhase": progressedBreathingPhase,
-      "remainingTime": (durationSeconds * 1000).truncate(),
-      "trainingStageName": currentTrainingStage.name,
+      "remainingTime":
+      (durationSeconds * 1000).truncate(),
+      "trainingStageName":
+      currentTrainingStage.name,
       "doneReps": doneReps,
-      "doneStageReps": stagesDoneReps[trainingStageID], // Return specific stage's count
+      "doneStageReps": doneGroupReps,
     };
   }
 
-  // NOTE: countBreathingPhases() and calculateTotalDuration() math remain EXACTLY the same!
-  // Order of addition (A+B+A vs A+A+B) doesn't change the mathematical total, so those functions
-  // do not require structural updates and can remain as they are.
-
   int countBreathingPhases() {
     int result = 0;
-    for (int i = 0; i < training.trainingStages.length; i++) {
-      result += (training.trainingStages[i].breathingPhases.length *
-          training.trainingStages[i].reps *
-          training.trainingStages[i].stageReps);
+
+    final groups = <int, List<TrainingStage>>{};
+
+    for (final stage in training.trainingStages) {
+      groups
+          .putIfAbsent(stage.groupId, () => [])
+          .add(stage);
     }
+
+    for (final group in groups.values) {
+      if (group.isEmpty) continue;
+
+      final groupReps = group.first.stageReps;
+
+      for (final stage in group) {
+        result +=
+            stage.breathingPhases.length *
+                stage.reps *
+                groupReps;
+      }
+    }
+
     return result;
   }
 
-  double calculateTotalDuration({double breathingPhaseDelaySeconds = 0.6}) {
-    double totalSeconds = training.settings.preparationDuration.toDouble();
+  double calculateTotalDuration({
+    double breathingPhaseDelaySeconds = 0.6,
+  }) {
+    double totalSeconds =
+    training.settings.preparationDuration.toDouble();
+
     int totalBreathingPhases = 0;
 
-    for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
-      final stage = training.trainingStages[stageIdx];
-      for (int sr = 0; sr < stage.stageReps; sr++) {
-        for (int rep = 0; rep < stage.reps; rep++) {
-          for (int phaseIdx = 0; phaseIdx < stage.breathingPhases.length; phaseIdx++) {
-            final phase = stage.breathingPhases[phaseIdx];
-            double phaseDuration = phase.duration;
-            if (phase.increment != null && rep > 0) {
-              final increment = phase.increment!;
-              phaseDuration = phase.duration + (rep * increment.value);
+    final groups = <int, List<TrainingStage>>{};
+
+    for (final stage in training.trainingStages) {
+      groups
+          .putIfAbsent(stage.groupId, () => [])
+          .add(stage);
+    }
+
+    for (final group in groups.values) {
+      if (group.isEmpty) continue;
+
+      final groupReps = group.first.stageReps;
+
+      for (final stage in group) {
+        for (int rep = 0;
+        rep < stage.reps;
+        rep++) {
+          for (final phase in stage.breathingPhases) {
+            double phaseDuration =
+                phase.duration;
+
+            if (phase.increment != null &&
+                rep > 0) {
+              final increment =
+              phase.increment!;
+
+              phaseDuration =
+                  phase.duration +
+                      (rep * increment.value);
             }
-            totalSeconds += phaseDuration;
-            totalBreathingPhases++;
+
+            totalSeconds +=
+                phaseDuration * groupReps;
+
+            totalBreathingPhases +=
+                groupReps;
           }
         }
       }
     }
-    totalSeconds += totalBreathingPhases * breathingPhaseDelaySeconds;
+
+    totalSeconds +=
+        totalBreathingPhases *
+            breathingPhaseDelaySeconds;
+
     return totalSeconds;
   }
 
-  double calculateTrainingDurationWithoutPreparation({double breathingPhaseDelaySeconds = 0.6}) {
+  double calculateTrainingDurationWithoutPreparation({
+    double breathingPhaseDelaySeconds = 0.6,
+  }) {
     double totalSeconds = 0.0;
+
     int totalBreathingPhases = 0;
 
-    for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
-      final stage = training.trainingStages[stageIdx];
-      for (int sr = 0; sr < stage.stageReps; sr++) {
-        for (int rep = 0; rep < stage.reps; rep++) {
-          for (int phaseIdx = 0; phaseIdx < stage.breathingPhases.length; phaseIdx++) {
-            final phase = stage.breathingPhases[phaseIdx];
-            double phaseDuration = phase.duration;
-            if (phase.increment != null && rep > 0) {
-              final increment = phase.increment!;
-              phaseDuration = phase.duration + (rep * increment.value);
+    final groups = <int, List<TrainingStage>>{};
+
+    for (final stage in training.trainingStages) {
+      groups
+          .putIfAbsent(stage.groupId, () => [])
+          .add(stage);
+    }
+
+    for (final group in groups.values) {
+      if (group.isEmpty) continue;
+
+      final groupReps = group.first.stageReps;
+
+      for (final stage in group) {
+        for (int rep = 0;
+        rep < stage.reps;
+        rep++) {
+          for (final phase in stage.breathingPhases) {
+            double phaseDuration =
+                phase.duration;
+
+            if (phase.increment != null &&
+                rep > 0) {
+              final increment =
+              phase.increment!;
+
+              phaseDuration =
+                  phase.duration +
+                      (rep * increment.value);
             }
-            totalSeconds += phaseDuration;
-            totalBreathingPhases++;
+
+            totalSeconds +=
+                phaseDuration * groupReps;
+
+            totalBreathingPhases +=
+                groupReps;
           }
         }
       }
     }
-    totalSeconds += totalBreathingPhases * breathingPhaseDelaySeconds;
+
+    totalSeconds +=
+        totalBreathingPhases *
+            breathingPhaseDelaySeconds;
+
     return totalSeconds;
   }
 }

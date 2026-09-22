@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - 1.9-exhale-detection
+      - 1.9.x-mic-monitor
 
 permissions:
   contents: write
@@ -21,24 +21,28 @@ jobs:
       - name: Read version from pubspec.yaml
         id: version
         run: |
-          # Extract version from pubspec.yaml (assumes format "version: X.Y.Z")
           VERSION=$(sed -n 's/^version: //p' pubspec.yaml | tr -d '\r')
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Detected version: $VERSION"
 
-      - name: Determine Tag Name
-        id: tag
+      - name: Determine Build Configuration
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "FLAVOR=production" >> $GITHUB_ENV
             echo "TAG_NAME=v${{ env.APP_VERSION }}" >> $GITHUB_ENV
             echo "IS_PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "FLAVOR=experimental" >> $GITHUB_ENV
             echo "TAG_NAME=v${{ env.APP_VERSION }}-rc" >> $GITHUB_ENV
-            echo "IS_PRERELEASE=false" >> $GITHUB_ENV
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           else
+            echo "FLAVOR=experimental" >> $GITHUB_ENV
             echo "TAG_NAME=v${{ env.APP_VERSION }}-${{ github.ref_name }}" >> $GITHUB_ENV
             echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           fi
+
+          echo "Flavor: $FLAVOR"
+          echo "Tag: $TAG_NAME"
 
       - name: Create and Push Tag
         env:
@@ -46,13 +50,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
             echo "Error: Tag $TAG_NAME already exists."
             exit 1
           else
-            git tag ${{ env.TAG_NAME }}
-            git push origin ${{ env.TAG_NAME }}
+            git tag "$TAG_NAME"
+            git push origin "$TAG_NAME"
           fi
 
       - name: Setup Java
@@ -70,10 +74,12 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --flavor ${{ env.FLAVOR }}
 
       - name: Rename APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk ReSpire-${{ env.TAG_NAME }}.apk
+        run: |
+          mv build/app/outputs/flutter-apk/app-${{ env.FLAVOR }}-release.apk \
+             ReSpire-${{ env.TAG_NAME }}.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v1

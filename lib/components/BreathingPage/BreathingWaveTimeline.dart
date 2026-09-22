@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:respire/components/Global/BreathingPhase.dart';
 import 'package:respire/services/TrainingController.dart';
+import 'package:respire/components/Global/TrainingStage.dart';
 
 class BreathingWaveTimeline extends StatefulWidget {
   final TrainingController controller;
@@ -100,33 +101,45 @@ class _BreathingWavePainter extends CustomPainter {
       phaseIncrements.add(0.0);
     }
 
-    // --- BIG LOOP LOGIC ---
-    List<int> stagesDoneReps = List.filled(training.trainingStages.length, 0);
-    bool stagesRemaining = true;
+// --- GROUP LOOP LOGIC ---
 
-    while (stagesRemaining) {
-      stagesRemaining = false; // Assume we are done unless proven otherwise
+    final groups = <int, List<TrainingStage>>{};
 
-      for (int stageIdx = 0; stageIdx < training.trainingStages.length; stageIdx++) {
-        final stage = training.trainingStages[stageIdx];
+    for (final stage in training.trainingStages) {
+      if (stage.stageReps <= 0) {
+        continue;
+      }
 
-        if (stagesDoneReps[stageIdx] < stage.stageReps) {
-          stagesRemaining = true; // We still have stages to process in future passes!
+      groups.putIfAbsent(stage.groupId, () => []).add(stage);
+    }
 
+    for (final group in groups.values) {
+      if (group.isEmpty) {
+        continue;
+      }
+
+      // Number of repetitions of the WHOLE group.
+      final groupReps = group.first.stageReps;
+
+      for (int groupRep = 0;
+      groupRep < groupReps;
+      groupRep++) {
+
+        for (final stage in group) {
           for (int i = 0; i < stage.reps; i++) {
-            for (int j = 0; j < stage.breathingPhases.length; j++) {
-              if (stage.breathingPhases[j].increment != null) {
-                double tmp = i * stage.breathingPhases[j].increment!.value;
-                phaseIncrements.add(tmp);
+
+            for (final phase in stage.breathingPhases) {
+              if (phase.increment != null) {
+                phaseIncrements.add(
+                  i * phase.increment!.value,
+                );
               } else {
                 phaseIncrements.add(0.0);
               }
             }
+
             phases.addAll(stage.breathingPhases);
           }
-
-          // Mark this pass as completed for this specific stage
-          stagesDoneReps[stageIdx]++;
         }
       }
     }

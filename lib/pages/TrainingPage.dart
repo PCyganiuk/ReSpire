@@ -471,6 +471,7 @@ class _TrainingPageState extends State<TrainingPage> {
                     child: Column(
                       children: [
                         Row(children: [shareButton(), Spacer(), editButton(), deleteButton()]),
+                        startTrainingButton(),
                         descriptionBox(screenWidth),
                         trainingOverview(screenWidth),
                         startTrainingButton(),
