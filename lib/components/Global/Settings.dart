@@ -28,10 +28,10 @@ class Settings {
   int dimScreenAfterSeconds = 3; //in seconds
 
   @HiveField(7)
-  VisualStyle visualStyle = VisualStyle.timeline; // true - timeline, false - ring
+  VisualStyle visualStyle = VisualStyle.ring; // true - timeline, false - ring
 
   @HiveField(8)
-  bool breathingSoundEnabled = true;
+  bool breathingSoundEnabled = false;
 
   @HiveField(9)
   bool breathMonitoringEnabled = false;

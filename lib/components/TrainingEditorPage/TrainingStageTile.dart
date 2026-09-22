@@ -1,7 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:respire/components/Global/TrainingStage.dart';
 import 'package:respire/components/Global/BreathingPhase.dart' as respire;
+import 'package:respire/components/Global/BreathingPhaseIncrement.dart';
 import 'package:respire/components/TrainingEditorPage/BreathingPhaseTile.dart';
 import 'package:respire/services/TranslationProvider/TranslationProvider.dart';
 import 'package:respire/theme/Colors.dart';
@@ -33,17 +35,29 @@ class TrainingStageTile extends StatefulWidget {
 class _TrainingStageTileState extends State<TrainingStageTile> {
   late TextEditingController repsController;
   late TextEditingController nameController;
+  late TextEditingController incrementController;
 
   FocusNode? repsFocusNode;
   FocusNode? nameFocusNode;
+  FocusNode incrementFocusNode = FocusNode();
 
   TranslationProvider translationProvider = TranslationProvider();
 
   @override
   void initState() {
     super.initState();
-    repsController = TextEditingController(text: widget.trainingStage.reps.toString());
-    nameController = TextEditingController(text: _getInitialName());
+
+    repsController = TextEditingController(
+      text: widget.trainingStage.reps.toString(),
+    );
+
+    nameController = TextEditingController(
+      text: _getInitialName(),
+    );
+
+    incrementController = TextEditingController(
+      text: _getStageIncrementText(),
+    );
 
     repsFocusNode = FocusNode();
     nameFocusNode = FocusNode();
@@ -51,16 +65,23 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
     repsFocusNode!.addListener(() {
       if (!(repsFocusNode?.hasFocus ?? true)) {
         final value = int.tryParse(repsController.text);
+
         if (value != null && value > 0) {
-          setState(() => widget.trainingStage.reps = value);
+          setState(() {
+            widget.trainingStage.reps = value;
+          });
         }
+
         widget.onUpdate();
       }
     });
 
     nameFocusNode!.addListener(() {
       if (!(nameFocusNode?.hasFocus ?? true)) {
-        setState(() => widget.trainingStage.name = nameController.text);
+        setState(() {
+          widget.trainingStage.name = nameController.text;
+        });
+
         widget.onUpdate();
       }
     });
@@ -70,16 +91,31 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   void didUpdateWidget(TrainingStageTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (repsController.text != widget.trainingStage.reps.toString() && !(repsFocusNode?.hasFocus ?? false)) {
-      repsController.text = widget.trainingStage.reps.toString();
+    if (repsController.text !=
+        widget.trainingStage.reps.toString() &&
+        !(repsFocusNode?.hasFocus ?? false)) {
+      repsController.text =
+          widget.trainingStage.reps.toString();
     }
 
-    if (nameController.text != widget.trainingStage.name && !(nameFocusNode?.hasFocus ?? false)) {
+    if (nameController.text != widget.trainingStage.name &&
+        !(nameFocusNode?.hasFocus ?? false)) {
       nameController.text = _getInitialName();
     }
 
-    if (oldWidget.trainingStageIndex != widget.trainingStageIndex && !(nameFocusNode?.hasFocus ?? false)) {
+    if (oldWidget.trainingStageIndex !=
+        widget.trainingStageIndex &&
+        !(nameFocusNode?.hasFocus ?? false)) {
       nameController.text = _getInitialName();
+    }
+
+    if (!incrementFocusNode.hasFocus) {
+      final newIncrementText =
+      _getStageIncrementText();
+
+      if (incrementController.text != newIncrementText) {
+        incrementController.text = newIncrementText;
+      }
     }
   }
 
@@ -87,52 +123,226 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
   void dispose() {
     repsController.dispose();
     nameController.dispose();
+    incrementController.dispose();
+
     repsFocusNode?.dispose();
     nameFocusNode?.dispose();
+    incrementFocusNode.dispose();
+
     super.dispose();
   }
 
+  // ========================================================================
+  // REPS
+  // ========================================================================
+
   void commitRepsDurationChange() {
-    int newReps = int.tryParse(repsController.text) ?? widget.trainingStage.reps;
+    int newReps =
+        int.tryParse(repsController.text) ??
+            widget.trainingStage.reps;
+
     newReps = newReps.clamp(1, 999);
+
     widget.trainingStage.reps = newReps;
     repsController.text = newReps.toString();
+
     widget.onUpdate();
   }
+
+  // ========================================================================
+  // STAGE INCREMENT
+  // ========================================================================
+
+  /// Returns the increment displayed for the whole stage.
+  ///
+  /// If every phase has the same increment:
+  ///
+  ///     1.0
+  ///
+  /// If phases have different increments:
+  ///
+  ///     -
+  ///
+  /// A null increment is treated as 1.0.
+  String _getStageIncrementText() {
+    final phases = widget.trainingStage.breathingPhases;
+
+    if (phases.isEmpty) {
+      return '0.0';
+    }
+
+    final firstValue = phases.first.increment?.value ?? 0.0;
+
+    final allEqual = phases.every((phase) {
+      final value = phase.increment?.value ?? 0.0;
+
+      return (value - firstValue).abs() < 0.000001;
+    });
+
+    if (!allEqual) {
+      return '-';
+    }
+
+    return firstValue.toStringAsFixed(1);
+  }
+
+  /// Sets the increment of every phase in this stage.
+  ///
+  /// IMPORTANT:
+  /// BreathingPhaseIncrement.value is final, so the existing
+  /// BreathingPhaseIncrement object cannot be modified.
+  /// We therefore replace it with a new object.
+  void _setStageIncrement(double value) {
+    final clampedValue =
+    value.clamp(0.0, 999.0).toDouble();
+
+    setState(() {
+      for (final phase
+      in widget.trainingStage.breathingPhases) {
+        phase.increment = BreathingPhaseIncrement(
+          value: clampedValue,
+          type: phase.increment?.type ??
+              BreathingPhaseIncrementType.value,
+        );
+      }
+
+      incrementController.text =
+          clampedValue.toStringAsFixed(1);
+    });
+
+    FocusScope.of(context).unfocus();
+
+    widget.onUpdate();
+  }
+
+  /// Changes the stage increment by [delta].
+  ///
+  /// When the stage currently displays "-", the first phase's
+  /// increment is used as the starting value.
+  void _changeStageIncrement(double delta) {
+    double currentValue;
+
+    final currentText =
+    _getStageIncrementText();
+
+    if (currentText == '-') {
+      if (widget
+          .trainingStage
+          .breathingPhases
+          .isNotEmpty) {
+        currentValue = widget
+            .trainingStage
+            .breathingPhases
+            .first
+            .increment
+            ?.value ??
+            1.0;
+      } else {
+        currentValue = 1.0;
+      }
+    } else {
+      currentValue =
+          double.tryParse(currentText) ?? 1.0;
+    }
+
+    final newValue =
+    (currentValue + delta).clamp(0.0, 999.0);
+
+    _setStageIncrement(
+      double.parse(
+        newValue.toStringAsFixed(1),
+      ),
+    );
+  }
+
+  /// Commits manually entered stage increment.
+  void _commitStageIncrement() {
+    final value =
+    double.tryParse(incrementController.text);
+
+    if (value != null && value >= 0) {
+      _setStageIncrement(
+        double.parse(
+          value.clamp(0.0, 999.0).toStringAsFixed(1),
+        ),
+      );
+    } else {
+      setState(() {
+        incrementController.text =
+            _getStageIncrementText();
+      });
+    }
+  }
+
+  // ========================================================================
+  // BREATHING PHASES
+  // ========================================================================
 
   void addBreathingPhase() {
     setState(() {
       widget.trainingStage.breathingPhases.add(
         respire.BreathingPhase(
           duration: 5.0,
-          breathingPhaseType: respire.BreathingPhaseType.inhale,
+          breathingPhaseType:
+          respire.BreathingPhaseType.inhale,
+          increment: const BreathingPhaseIncrement(
+            value: 0.0,
+            type: BreathingPhaseIncrementType.value,
+          ),
         ),
       );
+
+      incrementController.text =
+          _getStageIncrementText();
     });
+
     FocusScope.of(context).unfocus();
+
     widget.onUpdate();
   }
 
-  void removeBreathingPhase(int index) async{
+  void removeBreathingPhase(int index) async {
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_title")),
+          title: Text(
+            translationProvider.getTranslation(
+              "TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_title",
+            ),
+          ),
           backgroundColor: Colors.white,
-          content: Text(translationProvider.getTranslation("TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_content")),
+          content: Text(
+            translationProvider.getTranslation(
+              "TrainingEditorPage.TrainingTab.BreathingPhaseTile.remove_breathing_phase_dialog_content",
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(translationProvider.getTranslation("PopupButton.cancel"), style: TextStyle(color: darkerblue)),
+              child: Text(
+                translationProvider.getTranslation(
+                  "PopupButton.cancel",
+                ),
+                style: TextStyle(
+                  color: darkerblue,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(translationProvider.getTranslation("PopupButton.remove"), style: TextStyle(color: Colors.red)),
+              child: Text(
+                translationProvider.getTranslation(
+                  "PopupButton.remove",
+                ),
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
             ),
           ],
         );
@@ -141,39 +351,97 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
 
     if (confirmDelete ?? false) {
       setState(() {
-        widget.trainingStage.breathingPhases.removeAt(index);
+        widget.trainingStage.breathingPhases
+            .removeAt(index);
+
+        incrementController.text =
+            _getStageIncrementText();
       });
+
       widget.onUpdate();
     }
   }
 
-  void updateBreathingPhase(int index, respire.BreathingPhase newBreathingPhase) {
+  /// Called when one individual phase changes.
+  ///
+  /// Recalculating the stage increment here is what makes:
+  ///
+  ///     1.0 / 1.0 / 1.0 -> stage 1.0
+  ///
+  /// become:
+  ///
+  ///     1.0 / 2.0 / 1.0 -> stage -
+  ///
+  void updateBreathingPhase(
+      int index,
+      respire.BreathingPhase newBreathingPhase,
+      ) {
     setState(() {
-      widget.trainingStage.breathingPhases[index] = newBreathingPhase;
+      widget.trainingStage.breathingPhases[index] =
+          newBreathingPhase;
+
+      incrementController.text =
+          _getStageIncrementText();
     });
+
     widget.onUpdate();
   }
 
-  void reorderBreathingPhase(int oldIndex, int newIndex) {
+  void reorderBreathingPhase(
+      int oldIndex,
+      int newIndex,
+      ) {
     setState(() {
-      if (newIndex > oldIndex) newIndex -= 1;
-      final breathingPhase = widget.trainingStage.breathingPhases.removeAt(oldIndex);
-      widget.trainingStage.breathingPhases.insert(newIndex, breathingPhase);
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+
+      final breathingPhase =
+      widget.trainingStage.breathingPhases
+          .removeAt(oldIndex);
+
+      widget.trainingStage.breathingPhases.insert(
+        newIndex,
+        breathingPhase,
+      );
+
+      incrementController.text =
+          _getStageIncrementText();
     });
+
     widget.onUpdate();
   }
+
+  // ========================================================================
+  // STAGE NAME
+  // ========================================================================
 
   String _getInitialName() {
-    final trimmed = widget.trainingStage.name.trim();
+    final trimmed =
+    widget.trainingStage.name.trim();
+
     if (trimmed.isNotEmpty) {
       return trimmed;
     }
-    final template = translationProvider.getTranslation("TrainingEditorPage.TrainingTab.default_training_stage_name");
+
+    final template =
+    translationProvider.getTranslation(
+      "TrainingEditorPage.TrainingTab.default_training_stage_name",
+    );
+
     if (template.contains('{number}')) {
-      return template.replaceAll('{number}', (widget.trainingStageIndex + 1).toString());
+      return template.replaceAll(
+        '{number}',
+        (widget.trainingStageIndex + 1).toString(),
+      );
     }
+
     return 'Stage ${widget.trainingStageIndex + 1}';
   }
+
+  // ========================================================================
+  // BUILD
+  // ========================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -182,74 +450,128 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      color: const Color.fromARGB(255, 255, 255, 255),
+      color: const Color.fromARGB(
+        255,
+        255,
+        255,
+        255,
+      ),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
               children: [
+                // ==========================================================
+                // STAGE HEADER
+                // ==========================================================
+
                 Row(
                   children: [
                     ReorderableDragStartListener(
                       index: 0,
-                      child: Icon(Icons.drag_handle, color: darkerblue),
+                      child: Icon(
+                        Icons.drag_handle,
+                        color: darkerblue,
+                      ),
                     ),
+
                     SizedBox(width: 8),
+
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start,
                         children: [
                           Text(
-                            translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.name"),
+                            translationProvider
+                                .getTranslation(
+                              "TrainingEditorPage.TrainingTab.TrainingStageTile.name",
+                            ),
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight:
+                              FontWeight.bold,
                               color: darkerblue,
                               fontSize: 12,
                             ),
                           ),
+
                           SizedBox(height: 2),
+
                           Container(
                             height: 35,
-                            decoration: BoxDecoration(
+                            decoration:
+                            BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(color: darkerblue, width: 1),
+                              borderRadius:
+                              BorderRadius.circular(
+                                18,
+                              ),
+                              border: Border.all(
+                                color: darkerblue,
+                                width: 1,
+                              ),
                             ),
                             child: TextField(
-                              controller: nameController,
-                              focusNode: nameFocusNode,
-                              maxLength: widget.trainingStageNameMaxLength,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              controller:
+                              nameController,
+                              focusNode:
+                              nameFocusNode,
+                              maxLength: widget
+                                  .trainingStageNameMaxLength,
+                              decoration:
+                              InputDecoration(
+                                border:
+                                InputBorder.none,
+                                contentPadding:
+                                EdgeInsets
+                                    .symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 isDense: true,
                                 counterText: '',
                               ),
                               style: TextStyle(
                                 color: darkerblue,
-                                fontWeight: FontWeight.w600,
+                                fontWeight:
+                                FontWeight.w600,
                                 fontSize: 13,
                               ),
                               onChanged: (value) {
                                 setState(() {
-                                  widget.trainingStage.name = value;
+                                  widget.trainingStage
+                                      .name = value;
                                 });
                               },
                               onEditingComplete: () {
                                 widget.onUpdate();
                               },
                               onTapOutside: (event) {
-                                FocusScope.of(context).unfocus();
+                                FocusScope.of(context)
+                                    .unfocus();
+
                                 widget.onUpdate();
                               },
                             ),
                           ),
+
                           Padding(
-                            padding: const EdgeInsets.only(top: 4, left: 4),
+                            padding:
+                            const EdgeInsets.only(
+                              top: 4,
+                              left: 4,
+                            ),
                             child: Text(
-                              '${nameController.text.length}/${widget.trainingStageNameMaxLength} ${translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.characters")}',
+                              '${nameController.text.length}/${widget.trainingStageNameMaxLength} '
+                                  '${translationProvider.getTranslation(
+                                "TrainingEditorPage.TrainingTab.TrainingStageTile.characters",
+                              )}',
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 9,
@@ -259,204 +581,601 @@ class _TrainingStageTileState extends State<TrainingStageTile> {
                         ],
                       ),
                     ),
+
                     SizedBox(width: 8),
+
                     IconButton(
-                      padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
-                      icon: Icon(Icons.delete_outlined, color: darkerblue),
+                      padding: EdgeInsets.fromLTRB(
+                        0,
+                        3,
+                        0,
+                        0,
+                      ),
+                      icon: Icon(
+                        Icons.delete_outlined,
+                        color: darkerblue,
+                      ),
                       onPressed: widget.onDelete,
                     ),
+
                     IconButton(
-                      padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
-                      icon: Icon(widget.isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: darkerblue),
+                      padding: EdgeInsets.fromLTRB(
+                        0,
+                        3,
+                        0,
+                        0,
+                      ),
+                      icon: Icon(
+                        widget.isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: darkerblue,
+                      ),
                       onPressed: () {
-                        widget.onExpandedChanged(!widget.isExpanded);
+                        widget.onExpandedChanged(
+                          !widget.isExpanded,
+                        );
                       },
                     ),
                   ],
                 ),
+
                 SizedBox(height: 8),
 
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: darkerblue, width: 1),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // --- C. Phases Reps Column ---
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.reps"),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: darkerblue,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Container(
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: darkerblue.withOpacity(0.08),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(16),
-                                          onTap: () {
-                                            int currentValue = int.tryParse(repsController.text) ?? 1;
-                                            int newValue = (currentValue - 1).clamp(1, 999);
-                                            repsController.text = newValue.toString();
-                                            setState(() => widget.trainingStage.reps = newValue);
-                                            widget.onUpdate();
-                                          },
-                                          child: Container(width: 24, height: 32, child: Icon(Icons.remove, color: darkerblue, size: 14)),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 28,
-                                        height: 32,
-                                        alignment: Alignment.center,
-                                        child: TextField(
-                                          key: ValueKey('reps_${widget.trainingStage.hashCode}'),
-                                          controller: repsController,
-                                          focusNode: repsFocusNode,
-                                          keyboardType: TextInputType.number,
-                                          textAlign: TextAlign.center,
-                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                          decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero, isDense: true),
-                                          style: TextStyle(color: darkerblue, fontWeight: FontWeight.w600, fontSize: 13),
-                                          onChanged: (value) {
-                                            int? newReps = int.tryParse(value);
-                                            if (newReps != null && newReps > 0) {
-                                              setState(() => widget.trainingStage.reps = newReps.clamp(1, 999));
-                                            }
-                                          },
-                                          onEditingComplete: commitRepsDurationChange,
-                                          onTapOutside: (event) {
-                                            FocusScope.of(context).unfocus();
-                                            commitRepsDurationChange();
-                                          },
-                                        ),
-                                      ),
-                                      Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(16),
-                                          onTap: () {
-                                            int currentValue = int.tryParse(repsController.text) ?? 1;
-                                            int newValue = (currentValue + 1).clamp(1, 999);
-                                            repsController.text = newValue.toString();
-                                            setState(() => widget.trainingStage.reps = newValue);
-                                            widget.onUpdate();
-                                          },
-                                          child: Container(width: 24, height: 32, child: Icon(Icons.add, color: darkerblue, size: 14)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                // ==========================================================
+                // STAGE DETAILS CONTAINER
+                // ==========================================================
 
-                            Spacer(),
-
-                            // --- D. Duration Column ---
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  translationProvider.getTranslation("TrainingPage.TrainingOverview.stage_duration"),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: darkerblue,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Container(
-                                  height: 32,
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    widget.trainingStage.getTotalTimeFormatted(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: darkerblue,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                          ],
-                        ),
-                      ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                    BorderRadius.circular(18),
+                    border: Border.all(
+                      color: darkerblue,
+                      width: 1,
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AnimatedSize(
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            child: widget.isExpanded
-                ? Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: ReorderableListView(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    onReorder: reorderBreathingPhase,
-                    proxyDecorator: (Widget child, int index, Animation<double> animation) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: child,
-                      );
-                    },
+                  ),
+                  child: Column(
                     children: [
-                      for (int index = 0; index < widget.trainingStage.breathingPhases.length; index++)
-                        BreathingPhaseTile(
-                          key: ValueKey(widget.trainingStage.breathingPhases[index]),
-                          breathingPhase: widget.trainingStage.breathingPhases[index],
-                          onBreathingPhaseChanged: (newBreathingPhase) => updateBreathingPhase(index, newBreathingPhase),
-                          onDelete: () => removeBreathingPhase(index),
-                          onUpdate: widget.onUpdate,
+                      // ====================================================
+                      // REPS + INCREMENT + DURATION
+                      // ====================================================
+
+                      Row(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.end,
+                        children: [
+                          // ------------------------------------------------
+                          // REPS
+                          // ------------------------------------------------
+
+                          Column(
+                            mainAxisSize:
+                            MainAxisSize.min,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                translationProvider
+                                    .getTranslation(
+                                  "TrainingEditorPage.TrainingTab.TrainingStageTile.reps",
+                                ),
+                                style: TextStyle(
+                                  fontWeight:
+                                  FontWeight.bold,
+                                  color: darkerblue,
+                                  fontSize: 10,
+                                ),
+                              ),
+
+                              SizedBox(height: 4),
+
+                              Container(
+                                height: 32,
+                                decoration:
+                                BoxDecoration(
+                                  color: darkerblue
+                                      .withOpacity(0.08),
+                                  borderRadius:
+                                  BorderRadius
+                                      .circular(
+                                    16,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize:
+                                  MainAxisSize.min,
+                                  children: [
+                                    Material(
+                                      color: Colors
+                                          .transparent,
+                                      child: InkWell(
+                                        borderRadius:
+                                        BorderRadius
+                                            .circular(
+                                          16,
+                                        ),
+                                        onTap: () {
+                                          int currentValue =
+                                              int.tryParse(
+                                                repsController
+                                                    .text,
+                                              ) ??
+                                                  1;
+
+                                          int newValue =
+                                          (currentValue -
+                                              1)
+                                              .clamp(
+                                            1,
+                                            999,
+                                          );
+
+                                          repsController
+                                              .text =
+                                              newValue
+                                                  .toString();
+
+                                          setState(() {
+                                            widget
+                                                .trainingStage
+                                                .reps = newValue;
+                                          });
+
+                                          widget.onUpdate();
+                                        },
+                                        child: Container(
+                                          width: 24,
+                                          height: 32,
+                                          child: Icon(
+                                            Icons.remove,
+                                            color:
+                                            darkerblue,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    Container(
+                                      width: 28,
+                                      height: 32,
+                                      alignment:
+                                      Alignment.center,
+                                      child: TextField(
+                                        key: ValueKey(
+                                          'reps_${widget.trainingStage.hashCode}',
+                                        ),
+                                        controller:
+                                        repsController,
+                                        focusNode:
+                                        repsFocusNode,
+                                        keyboardType:
+                                        TextInputType
+                                            .number,
+                                        textAlign:
+                                        TextAlign.center,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
+                                        decoration:
+                                        InputDecoration(
+                                          border:
+                                          InputBorder
+                                              .none,
+                                          contentPadding:
+                                          EdgeInsets
+                                              .zero,
+                                          isDense: true,
+                                        ),
+                                        style: TextStyle(
+                                          color:
+                                          darkerblue,
+                                          fontWeight:
+                                          FontWeight
+                                              .w600,
+                                          fontSize: 13,
+                                        ),
+                                        onChanged:
+                                            (value) {
+                                          int? newReps =
+                                          int.tryParse(
+                                            value,
+                                          );
+
+                                          if (newReps !=
+                                              null &&
+                                              newReps > 0) {
+                                            setState(() {
+                                              widget
+                                                  .trainingStage
+                                                  .reps =
+                                                  newReps
+                                                      .clamp(
+                                                    1,
+                                                    999,
+                                                  );
+                                            });
+                                          }
+                                        },
+                                        onEditingComplete:
+                                        commitRepsDurationChange,
+                                        onTapOutside:
+                                            (event) {
+                                          FocusScope.of(
+                                            context,
+                                          ).unfocus();
+
+                                          commitRepsDurationChange();
+                                        },
+                                      ),
+                                    ),
+
+                                    Material(
+                                      color: Colors
+                                          .transparent,
+                                      child: InkWell(
+                                        borderRadius:
+                                        BorderRadius
+                                            .circular(
+                                          16,
+                                        ),
+                                        onTap: () {
+                                          int currentValue =
+                                              int.tryParse(
+                                                repsController
+                                                    .text,
+                                              ) ??
+                                                  1;
+
+                                          int newValue =
+                                          (currentValue +
+                                              1)
+                                              .clamp(
+                                            1,
+                                            999,
+                                          );
+
+                                          repsController
+                                              .text =
+                                              newValue
+                                                  .toString();
+
+                                          setState(() {
+                                            widget
+                                                .trainingStage
+                                                .reps = newValue;
+                                          });
+
+                                          widget.onUpdate();
+                                        },
+                                        child: Container(
+                                          width: 24,
+                                          height: 32,
+                                          child: Icon(
+                                            Icons.add,
+                                            color:
+                                            darkerblue,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(width: 12),
+
+                          // ------------------------------------------------
+                          // STAGE INCREMENT
+                          // ------------------------------------------------
+
+                          Column(
+                            mainAxisSize:
+                            MainAxisSize.min,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.increment"),
+                                style: TextStyle(
+                                  fontWeight:
+                                  FontWeight.bold,
+                                  color: darkerblue,
+                                  fontSize: 10,
+                                ),
+                              ),
+
+                              SizedBox(height: 4),
+
+                              Container(
+                                height: 32,
+                                decoration:
+                                BoxDecoration(
+                                  color: darkerblue
+                                      .withOpacity(0.08),
+                                  borderRadius:
+                                  BorderRadius
+                                      .circular(
+                                    16,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize:
+                                  MainAxisSize.min,
+                                  children: [
+                                    // --------------------------------------
+                                    // MINUS
+                                    // --------------------------------------
+
+                                    Material(
+                                      color: Colors
+                                          .transparent,
+                                      child: InkWell(
+                                        borderRadius:
+                                        BorderRadius
+                                            .circular(
+                                          16,
+                                        ),
+                                        onTap: () {
+                                          _changeStageIncrement(
+                                            -0.1,
+                                          );
+                                        },
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 32,
+                                          child: Icon(
+                                            Icons.remove,
+                                            color:
+                                            darkerblue,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // --------------------------------------
+                                    // VALUE
+                                    // --------------------------------------
+
+                                    Container(
+                                      width: 28,
+                                      height: 32,
+                                      alignment: Alignment.center,
+                                      child: TextField(
+                                        controller: incrementController,
+                                        focusNode: incrementFocusNode,
+                                        keyboardType: const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        textAlignVertical: TextAlignVertical.center,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d*\.?\d{0,1}'),
+                                          ),
+                                        ],
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                          isDense: true,
+                                        ),
+                                        style: TextStyle(
+                                          color: darkerblue,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                        onEditingComplete: _commitStageIncrement,
+                                        onTapOutside: (event) {
+                                          FocusScope.of(context).unfocus();
+                                          _commitStageIncrement();
+                                        },
+                                      ),
+                                    ),
+
+                                    // --------------------------------------
+                                    // PLUS
+                                    // --------------------------------------
+
+                                    Material(
+                                      color: Colors
+                                          .transparent,
+                                      child: InkWell(
+                                        borderRadius:
+                                        BorderRadius
+                                            .circular(
+                                          16,
+                                        ),
+                                        onTap: () {
+                                          _changeStageIncrement(
+                                            0.1,
+                                          );
+                                        },
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 32,
+                                          child: Icon(
+                                            Icons.add,
+                                            color:
+                                            darkerblue,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Spacer(),
+
+                          // ------------------------------------------------
+                          // DURATION
+                          // ------------------------------------------------
+
+                          Column(
+                            mainAxisSize:
+                            MainAxisSize.min,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                translationProvider
+                                    .getTranslation(
+                                  "TrainingPage.TrainingOverview.stage_duration",
+                                ),
+                                style: TextStyle(
+                                  fontWeight:
+                                  FontWeight.bold,
+                                  color: darkerblue,
+                                  fontSize: 10,
+                                ),
+                              ),
+
+                              SizedBox(height: 4),
+
+                              Container(
+                                height: 32,
+                                alignment:
+                                Alignment.centerRight,
+                                child: Text(
+                                  widget.trainingStage
+                                      .getTotalTimeFormatted(),
+                                  style: TextStyle(
+                                    fontWeight:
+                                    FontWeight.bold,
+                                    color: darkerblue,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      // ====================================================
+                      // BREATHING PHASES
+                      // ====================================================
+
+                      AnimatedSize(
+                        duration: Duration(
+                          milliseconds: 200,
                         ),
+                        curve: Curves.easeInOut,
+                        child: widget.isExpanded
+                            ? Column(
+                          children: [
+                            SizedBox(height: 8),
+
+                            ReorderableListView(
+                              shrinkWrap: true,
+                              physics:
+                              NeverScrollableScrollPhysics(),
+                              onReorder:
+                              reorderBreathingPhase,
+                              proxyDecorator: (
+                                  Widget child,
+                                  int index,
+                                  Animation<double>
+                                  animation,
+                                  ) {
+                                return Material(
+                                  color: Colors
+                                      .transparent,
+                                  child: child,
+                                );
+                              },
+                              children: [
+                                for (
+                                int index = 0;
+                                index <
+                                    widget
+                                        .trainingStage
+                                        .breathingPhases
+                                        .length;
+                                index++
+                                )
+                                  BreathingPhaseTile(
+                                    key: ValueKey(
+                                      '${widget.trainingStageIndex}_'
+                                          '${index}_'
+                                          '${widget.trainingStage.breathingPhases[index].increment?.value}_'
+                                          '${widget.trainingStage.breathingPhases[index].increment?.type}',
+                                    ),
+                                    breathingPhase:
+                                    widget
+                                        .trainingStage
+                                        .breathingPhases[
+                                    index
+                                    ],
+                                    onBreathingPhaseChanged:
+                                        (
+                                        newBreathingPhase,
+                                        ) =>
+                                        updateBreathingPhase(
+                                          index,
+                                          newBreathingPhase,
+                                        ),
+                                    onDelete: () =>
+                                        removeBreathingPhase(
+                                          index,
+                                        ),
+                                    onUpdate:
+                                    widget.onUpdate,
+                                  ),
+                              ],
+                            ),
+
+                            // ----------------------------------------
+                            // ADD BREATHING PHASE
+                            // ----------------------------------------
+
+                            TextButton.icon(
+                              onPressed:
+                              addBreathingPhase,
+                              icon: Icon(
+                                Icons.add,
+                                color:
+                                darkerblue,
+                              ),
+                              label: Text(
+                                translationProvider
+                                    .getTranslation(
+                                  "TrainingEditorPage.TrainingTab.TrainingStageTile.add_breathing_phase_button_label",
+                                ),
+                                style:
+                                TextStyle(
+                                  color:
+                                  darkerblue,
+                                  fontWeight:
+                                  FontWeight
+                                      .bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                            : SizedBox.shrink(),
+                      ),
                     ],
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: addBreathingPhase,
-                  icon: Icon(Icons.add, color: darkerblue),
-                  label: Text(
-                    translationProvider.getTranslation("TrainingEditorPage.TrainingTab.TrainingStageTile.add_breathing_phase_button_label"),
-                    style: TextStyle(
-                      color: darkerblue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
               ],
-            )
-                : SizedBox.shrink(),
+            ),
           ),
         ],
       ),
