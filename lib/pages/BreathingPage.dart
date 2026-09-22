@@ -52,6 +52,7 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     super.initState();
     WakelockPlus.enable();
     WidgetsBinding.instance.addObserver(this);
+    _getInitialBrightness();
     // Ensure sounds are properly propagated to breathing phases
     widget.training.updateSounds();
     parser = TrainingParser(training: widget.training);
@@ -65,37 +66,75 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     if (controller == null) return;
     if (state == AppLifecycleState.paused) {
       controller!.pause();
+      _wakeScreen();
+      _dimTimer?.cancel();
     } else if (state == AppLifecycleState.resumed) {
       controller!.resume();
+      _resetDimTimer();
+    }
+  }
+
+  Future<void> _getInitialBrightness() async {
+    try {
+      _originalBrightness ??= await ScreenBrightness().application;
+    } catch (_) {
+      try {
+        _originalBrightness ??= await ScreenBrightness().current;
+      } catch (_) {}
     }
   }
 
   Future<void> dimScreen() async {
-    _originalBrightness = await ScreenBrightness().current;
-    //await Future.delayed(const Duration(seconds: 3));
-    await ScreenBrightness().setScreenBrightness(0.00); // very dim
+    if (_screenDark) return;
+    if (_originalBrightness == null) {
+      await _getInitialBrightness();
+    }
+    try {
+      await ScreenBrightness().setApplicationScreenBrightness(0.01); // 1% dim
+    } catch (_) {
+      try {
+        await ScreenBrightness().setScreenBrightness(0.01);
+      } catch (_) {}
+    }
   }
 
   Future<void> restoreBrightness() async {
-    if (_originalBrightness != null) {
-      await ScreenBrightness().setScreenBrightness(_originalBrightness!);
+    try {
+      await ScreenBrightness().resetApplicationScreenBrightness();
+    } catch (_) {
+      try {
+        await ScreenBrightness().resetScreenBrightness();
+      } catch (_) {}
+    }
+    if (_originalBrightness != null && _originalBrightness! > 0.05) {
+      try {
+        await ScreenBrightness().setApplicationScreenBrightness(_originalBrightness!);
+      } catch (_) {
+        try {
+          await ScreenBrightness().setScreenBrightness(_originalBrightness!);
+        } catch (_) {}
+      }
     }
   }
 
   void goDark() {
-    dimScreen();
+    if (!_screenDark) {
+      dimScreen();
 
-    setState(() {
-      _screenDark = true;
-    });
+      setState(() {
+        _screenDark = true;
+      });
+    }
   }
 
   void _wakeScreen() {
-    setState(() {
-      _screenDark = false;
-    });
+    if (_screenDark) {
+      setState(() {
+        _screenDark = false;
+      });
 
-    restoreBrightness(); // optional
+      restoreBrightness();
+    }
   }
 
   void _resetDimTimer() {
@@ -105,7 +144,9 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
       _dimTimer = Timer(
         Duration(seconds: widget.training.settings.dimScreenAfterSeconds),
             () {
-          if (mounted) goDark();
+          if (mounted && controller != null && !controller!.isPaused.value) {
+            goDark();
+          }
         },
       );
     }
@@ -205,18 +246,24 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
     // All sounds loaded, create controller and show training
     if (mounted) {
       controller = TrainingController(parser);
-
-      //await dimScreen();
+      controller!.onEndingStarted = () {
+        if (mounted) {
+          _wakeScreen();
+          _dimTimer?.cancel();
+        }
+      };
+      controller!.onTrainingFinished = () {
+        if (mounted) {
+          _wakeScreen();
+          restoreBrightness();
+        }
+      };
 
       setState(() {
         _isPreloading = false;
       });
 
-      Future.delayed( Duration(seconds: widget.training.settings.dimScreenAfterSeconds), () {
-        if (mounted && !controller!.isPaused.value && widget.training.settings.dimScreenEnabled) {
-          goDark();
-        }
-      });
+      _resetDimTimer();
     }
   }
 
@@ -250,9 +297,9 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
 
   @override
   void dispose() {
+    _dimTimer?.cancel();
     restoreBrightness();
     WakelockPlus.disable();
-    _dimTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     controller?.dispose();
     super.dispose();
@@ -271,11 +318,14 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
               onPressed: () {
                 Navigator.pop(context);
                 controller!.resume();
+                _resetDimTimer();
               },
               child: Text(translationProvider.getTranslation("PopupButton.no")),
             ),
             TextButton(
               onPressed: () {
+                _wakeScreen();
+                restoreBrightness();
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
@@ -335,8 +385,12 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
               onPressed: () {
                 if (queue.isNotEmpty && queue.first != null) {
                   controller!.pause();
+                  _wakeScreen();
+                  _dimTimer?.cancel();
                   _showConfirmationDialog();
                 } else {
+                  _wakeScreen();
+                  restoreBrightness();
                   Navigator.pop(context);
                 }
               },
@@ -350,7 +404,14 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
               return IconButton(
                 icon: isPaused ? Icon(Icons.play_arrow, color: Colors.black,) : Icon(Icons.pause, color: Colors.black,),
                 onPressed: () {
-                  isPaused ? controller!.resume() : controller!.pause();
+                  if (isPaused) {
+                    controller!.resume();
+                    _resetDimTimer();
+                  } else {
+                    controller!.pause();
+                    _wakeScreen();
+                    _dimTimer?.cancel();
+                  }
                 },
               );
             },
@@ -571,8 +632,11 @@ class _BreathingPageState extends State<BreathingPage> with WidgetsBindingObserv
                       onTap: () async {
                         if (isPaused) {
                           controller!.resume();
+                          _resetDimTimer();
                         } else {
                           controller!.pause();
+                          _wakeScreen();
+                          _dimTimer?.cancel();
                         }
                       },
                       child: Stack(

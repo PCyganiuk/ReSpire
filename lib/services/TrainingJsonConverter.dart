@@ -61,6 +61,7 @@ class TrainingJsonConverter {
     return {
       'title': training.title,
       'description': training.description,
+      'colorValues': training.colorValues,
       'trainingStages': training.trainingStages.map(_stageToJson).toList(),
       'settings': _settingsToJson(training.settings),
       'sounds': _soundsToJson(training.sounds)
@@ -69,10 +70,15 @@ class TrainingJsonConverter {
 
   static Training _trainingFromMap(Map<String, dynamic> json) {
     final stages = (json['trainingStages'] as List?) ?? [];
+    final colorVals = (json['colorValues'] as List?)
+            ?.map((e) => (e as num).toInt())
+            .toList() ??
+        [];
 
     return Training(
       title: json['title'] ?? '',
       description: json['description'] ?? '',
+      colorValues: colorVals,
       trainingStages:
           stages.map((stage) => _stageFromJson(_ensureMap(stage))).toList(),
     )
@@ -97,6 +103,10 @@ class TrainingJsonConverter {
       'id': uuid,
       'name': stage.name,
       'reps': stage.reps,
+      'stageReps': stage.stageReps,
+      'stage_reps': stage.stageReps,
+      'groupId': stage.groupId,
+      'group_id': stage.groupId,
       'breathingPhases':
           stage.breathingPhases.map((phase) => _phaseToJson(phase)).toList(),
     };
@@ -105,10 +115,10 @@ class TrainingJsonConverter {
   static TrainingStage _stageFromJson(Map<String, dynamic> json) {
     final phases = (json['breathingPhases'] as List?) ?? [];
     return TrainingStage(
-      stageReps: json['reps'] ?? 1,
+      stageReps: json['stageReps'] ?? json['stage_reps'] ?? json['reps'] ?? 1,
       reps: json['reps'] ?? 1,
       name: json['name'] ?? '',
-      groupId: json['group_id'] ?? 0,
+      groupId: json['groupId'] ?? json['group_id'] ?? 0,
       breathingPhases:
           phases.map((phase) => _phaseFromJson(_ensureMap(phase))).toList(),
     )..id = json['id'] ?? Uuid().v4();

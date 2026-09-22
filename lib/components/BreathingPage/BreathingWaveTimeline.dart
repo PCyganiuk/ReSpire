@@ -1,3 +1,4 @@
+
 import 'dart:collection';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _BreathingWaveTimelineState extends State<BreathingWaveTimeline>
   @override
   void initState() {
     super.initState();
+
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -55,8 +57,10 @@ class _BreathingWaveTimelineState extends State<BreathingWaveTimeline>
                 controller: widget.controller,
                 elapsedMs: elapsedMs,
                 pulse: _pulse.value,
-                preparationDurationSecs: widget.preparationDuration,
-                endingDuration: widget.endingDuration,
+                preparationDurationSecs:
+                widget.preparationDuration,
+                endingDuration:
+                widget.endingDuration,
               ),
             );
           },
@@ -85,119 +89,277 @@ class _BreathingWavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final training = controller.parser.training;
 
-    List<double> phaseIncrements = [];
+    final List<double> phaseIncrements = [];
 
-    /// ---- BUILD FULL PHASE LIST (with preparation) ----
+    /// ----------------------------------------------------
+    /// BUILD FULL PHASE LIST
+    /// ----------------------------------------------------
+
     final phases = <BreathingPhase>[];
 
-    // Add preparation phase as a recovery phase at the start
+    /*
+     * Preparation is represented as a recovery phase.
+     */
     if (preparationDurationSecs > 0) {
       phases.add(
         BreathingPhase(
           duration: preparationDurationSecs,
-          breathingPhaseType: BreathingPhaseType.recovery,
+          breathingPhaseType:
+          BreathingPhaseType.recovery,
         ),
       );
+
       phaseIncrements.add(0.0);
     }
 
-// --- GROUP LOOP LOGIC ---
+    /*
+     * ----------------------------------------------------
+     * BUILD TRAINING PHASES
+     * ----------------------------------------------------
+     *
+     * Same semantics as TrainingParser:
+     *
+     * groupId == 0:
+     *     ungrouped stage
+     *     -> executed once
+     *
+     * groupId != 0:
+     *     grouped stages
+     *     -> entire group repeated stageReps times
+     *
+     * stage.reps:
+     *     repetitions inside the stage
+     *
+     * phase.increment:
+     *     applied according to the stage repetition
+     */
 
-    final groups = <int, List<TrainingStage>>{};
+    int stageIndex = 0;
 
-    for (final stage in training.trainingStages) {
-      if (stage.stageReps <= 0) {
+    while (stageIndex < training.trainingStages.length) {
+      final stage =
+      training.trainingStages[stageIndex];
+
+      /*
+       * --------------------------------------------------
+       * UNGROUPED STAGE
+       * --------------------------------------------------
+       *
+       * groupId == 0 means this stage is independent.
+       *
+       * Its stageReps value is completely ignored.
+       */
+      if (stage.groupId == 0) {
+        _addStagePhases(
+          stage: stage,
+          phases: phases,
+          phaseIncrements: phaseIncrements,
+          repetitions: 1,
+        );
+
+        stageIndex++;
         continue;
       }
 
-      groups.putIfAbsent(stage.groupId, () => []).add(stage);
-    }
+      /*
+       * --------------------------------------------------
+       * GROUPED STAGES
+       * --------------------------------------------------
+       *
+       * Find all consecutive stages belonging to the
+       * current group.
+       */
+      final groupId = stage.groupId;
+      final groupStages = <TrainingStage>[];
 
-    for (final group in groups.values) {
-      if (group.isEmpty) {
+      while (stageIndex <
+          training.trainingStages.length) {
+        final currentStage =
+        training.trainingStages[stageIndex];
+
+        if (currentStage.groupId != groupId) {
+          break;
+        }
+
+        groupStages.add(currentStage);
+        stageIndex++;
+      }
+
+      /*
+       * The number of repetitions of the whole group is
+       * defined by stageReps.
+       *
+       * All stages in the group should have the same value,
+       * as enforced by the training editor/model.
+       */
+      final groupReps = stage.stageReps;
+
+      if (groupReps <= 0) {
         continue;
       }
 
-      // Number of repetitions of the WHOLE group.
-      final groupReps = group.first.stageReps;
-
+      /*
+       * Repeat the complete group.
+       */
       for (int groupRep = 0;
       groupRep < groupReps;
       groupRep++) {
-
-        for (final stage in group) {
-          for (int i = 0; i < stage.reps; i++) {
-
-            for (final phase in stage.breathingPhases) {
-              if (phase.increment != null) {
-                phaseIncrements.add(
-                  i * phase.increment!.value,
-                );
-              } else {
-                phaseIncrements.add(0.0);
-              }
-            }
-
-            phases.addAll(stage.breathingPhases);
-          }
+        for (final groupStage in groupStages) {
+          _addStagePhases(
+            stage: groupStage,
+            phases: phases,
+            phaseIncrements: phaseIncrements,
+            repetitions: 1,
+          );
         }
       }
     }
 
+    /*
+     * Ending phase.
+     */
     if (endingDuration > 0) {
       phases.add(
         BreathingPhase(
           duration: endingDuration,
-          breathingPhaseType: BreathingPhaseType.recovery,
+          breathingPhaseType:
+          BreathingPhaseType.recovery,
         ),
       );
+
       phaseIncrements.add(0.0);
     }
 
-    if (phases.isEmpty) return;
+    if (phases.isEmpty) {
+      return;
+    }
 
-    final minPhaseSec = getMinNonZeroPhase(phases).clamp(0.3, double.infinity);
+    /// ----------------------------------------------------
+    /// PHASE WIDTH
+    /// ----------------------------------------------------
+
+    final minPhaseSec =
+    getMinNonZeroPhase(phases)
+        .clamp(0.3, double.infinity);
+
     const minPhasePx = 40.0;
-    final pxPerSecond = minPhasePx / minPhaseSec;
 
-    /// ---- BUILD TIME ENVELOPE ----
+    final pxPerSecond =
+        minPhasePx / minPhaseSec;
+
+    /// ----------------------------------------------------
+    /// BUILD TIME ENVELOPE
+    /// ----------------------------------------------------
+
     final keys = <_KeyPoint>[];
+
     int accMs = 0;
+
     bool prevWasInhale = false;
+
     for (int j = 0; j < phases.length; j++) {
       final phase = phases[j];
-      final bool nextIsInhale = (j + 1 < phases.length) && (phases[j + 1].breathingPhaseType == BreathingPhaseType.inhale);
-      final durMs = ((phase.duration + phaseIncrements[j]) * 1000).toInt();
-      final (from, to) = _phaseEnvelope(phase, nextIsInhale, prevWasInhale);
-      prevWasInhale = (j != 0) && (phase.breathingPhaseType == BreathingPhaseType.inhale);
-      keys.add(_KeyPoint(accMs, from));
-      accMs += durMs;
-      if (to == 0.5){
-        accMs -= 500;
-        keys.add(_KeyPoint(accMs, to));
 
-        keys.add(_KeyPoint(accMs, 0.5));
+      final bool nextIsInhale =
+          j + 1 < phases.length &&
+              phases[j + 1].breathingPhaseType ==
+                  BreathingPhaseType.inhale;
+
+      final durMs =
+      ((phase.duration +
+          phaseIncrements[j]) *
+          1000)
+          .toInt();
+
+      final (from, to) =
+      _phaseEnvelope(
+        phase,
+        nextIsInhale,
+        prevWasInhale,
+      );
+
+      prevWasInhale =
+          j != 0 &&
+              phase.breathingPhaseType ==
+                  BreathingPhaseType.inhale;
+
+      keys.add(
+        _KeyPoint(
+          accMs,
+          from,
+        ),
+      );
+
+      accMs += durMs;
+
+      /*
+       * Special inhale transition.
+       */
+      if (to == 0.5) {
+        accMs -= 500;
+
+        keys.add(
+          _KeyPoint(
+            accMs,
+            to,
+          ),
+        );
+
+        keys.add(
+          _KeyPoint(
+            accMs,
+            0.5,
+          ),
+        );
+
         accMs += 500;
-        keys.add(_KeyPoint(accMs, 0.5));
-      }
-      else {
-        keys.add(_KeyPoint(accMs, to));
+
+        keys.add(
+          _KeyPoint(
+            accMs,
+            0.5,
+          ),
+        );
+      } else {
+        keys.add(
+          _KeyPoint(
+            accMs,
+            to,
+          ),
+        );
       }
     }
 
     final totalMs = accMs;
-    // Clamp elapsed time to the total timeline (which now includes preparation)
-    final clampedElapsed = elapsedMs.clamp(0, totalMs);
 
-    /// ---- GEOMETRY ----
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
-    final waveHeight = size.height * 0.45;
+    final clampedElapsed =
+    elapsedMs.clamp(0, totalMs);
 
-    /// ---- SCROLL OFFSET ----
-    final scrollX = (clampedElapsed / 1000.0) * pxPerSecond;
+    /// ----------------------------------------------------
+    /// GEOMETRY
+    /// ----------------------------------------------------
 
-    /// ---- PAINT ----
+    final centerX =
+        size.width / 2;
+
+    final centerY =
+        size.height / 2;
+
+    final waveHeight =
+        size.height * 0.45;
+
+    /// ----------------------------------------------------
+    /// SCROLL OFFSET
+    /// ----------------------------------------------------
+
+    final scrollX =
+        (clampedElapsed / 1000.0) *
+            pxPerSecond;
+
+    /// ----------------------------------------------------
+    /// PAINT
+    /// ----------------------------------------------------
+
     final paint = Paint()
       ..color = const Color(0xFF2CADC4)
       ..style = PaintingStyle.stroke
@@ -206,18 +368,34 @@ class _BreathingWavePainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
+
     bool started = false;
 
     const stepMs = 30;
 
-    for (int t = 0; t <= totalMs; t += stepMs) {
-      final timeSec = t / 1000.0;
-      final x = centerX + timeSec * pxPerSecond - scrollX;
+    for (int t = 0;
+    t <= totalMs;
+    t += stepMs) {
+      final timeSec =
+          t / 1000.0;
 
-      if (x < -100 || x > size.width + 100) continue;
+      final x =
+          centerX +
+              timeSec * pxPerSecond -
+              scrollX;
 
-      final value = _interpolate(keys, t);
-      final y = centerY - (value - 0.5) * waveHeight;
+      if (x < -100 ||
+          x > size.width + 100) {
+        continue;
+      }
+
+      final value =
+      _interpolate(keys, t);
+
+      final y =
+          centerY -
+              (value - 0.5) *
+                  waveHeight;
 
       if (!started) {
         path.moveTo(x, y);
@@ -227,114 +405,259 @@ class _BreathingWavePainter extends CustomPainter {
       }
     }
 
-    // ---- DOT POSITION (DIRECT, TIME-BASED) ----
-    final dotValue = _interpolate(keys, clampedElapsed);
-    final dotY = centerY - (dotValue - 0.5) * waveHeight;
+    /// ----------------------------------------------------
+    /// DOT POSITION
+    /// ----------------------------------------------------
 
-    canvas.drawPath(path, paint);
+    final dotValue =
+    _interpolate(
+      keys,
+      clampedElapsed,
+    );
 
-    /// ---- DOT ----
-    final dotRadius = 20.0;
-    final dotCenter = Offset(centerX, dotY);
+    final dotY =
+        centerY -
+            (dotValue - 0.5) *
+                waveHeight;
+
+    canvas.drawPath(
+      path,
+      paint,
+    );
+
+    /// ----------------------------------------------------
+    /// DOT
+    /// ----------------------------------------------------
+
+    const dotRadius = 20.0;
+
+    final dotCenter =
+    Offset(
+      centerX,
+      dotY,
+    );
 
     canvas.drawCircle(
       dotCenter,
       dotRadius,
-      Paint()..color = const Color(0xFF2496A8),
+      Paint()
+        ..color =
+        const Color(0xFF2496A8),
     );
 
-    /// ---- CURRENT PHASE REMAINING TIME ----
+    /// ----------------------------------------------------
+    /// CURRENT PHASE REMAINING TIME
+    /// ----------------------------------------------------
+
     int remainingPhaseMs = 0;
 
-    for (int i = 1; i < keys.length; i += 2) {
-      final start = keys[i - 1].time;
-      final end = keys[i].time;
+    for (int i = 1;
+    i < keys.length;
+    i += 2) {
+      final start =
+          keys[i - 1].time;
 
-      if (clampedElapsed >= start && clampedElapsed < end) {
-        remainingPhaseMs = end - clampedElapsed;
+      final end =
+          keys[i].time;
+
+      if (clampedElapsed >= start &&
+          clampedElapsed < end) {
+        remainingPhaseMs =
+            end - clampedElapsed;
         break;
       }
     }
 
-    final remainingSeconds = (remainingPhaseMs / 1000);
+    final remainingSeconds =
+        remainingPhaseMs / 1000;
 
-    final textPainter = TextPainter(
+    final textPainter =
+    TextPainter(
       text: TextSpan(
-        text: remainingSeconds.toStringAsFixed(1),
+        text:
+        remainingSeconds
+            .toStringAsFixed(1),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
+      textAlign:
+      TextAlign.center,
+      textDirection:
+      TextDirection.ltr,
     );
 
     textPainter.layout();
 
-    final textOffset = dotCenter -
-        Offset(textPainter.width / 2, textPainter.height / 2);
+    final textOffset =
+        dotCenter -
+            Offset(
+              textPainter.width / 2,
+              textPainter.height / 2,
+            );
 
-    textPainter.paint(canvas, textOffset);
+    textPainter.paint(
+      canvas,
+      textOffset,
+    );
+  }
+
+  /*
+   * Adds one stage's phases to the timeline.
+   *
+   * `repetitions` is the number of times the stage itself
+   * should be executed.
+   *
+   * In normal use this is 1 because group repetition is
+   * handled outside this function.
+   */
+  void _addStagePhases({
+    required TrainingStage stage,
+    required List<BreathingPhase> phases,
+    required List<double> phaseIncrements,
+    required int repetitions,
+  }) {
+    if (stage.reps <= 0 ||
+        stage.breathingPhases.isEmpty ||
+        repetitions <= 0) {
+      return;
+    }
+
+    /*
+     * Repeat the stage itself.
+     */
+    for (int execution = 0;
+    execution < repetitions;
+    execution++) {
+      /*
+       * stage.reps controls repetitions INSIDE the stage.
+       */
+      for (int rep = 0;
+      rep < stage.reps;
+      rep++) {
+        for (final phase
+        in stage.breathingPhases) {
+          phases.add(phase);
+
+          /*
+           * Increment is based on the repetition
+           * inside the stage.
+           */
+          if (phase.increment != null) {
+            phaseIncrements.add(
+              rep *
+                  phase.increment!.value,
+            );
+          } else {
+            phaseIncrements.add(0.0);
+          }
+        }
+      }
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _BreathingWavePainter old) =>
-      old.elapsedMs != elapsedMs || old.pulse != pulse || old.preparationDurationSecs != preparationDurationSecs;
+  bool shouldRepaint(
+      covariant _BreathingWavePainter old,
+      ) =>
+      old.elapsedMs != elapsedMs ||
+          old.pulse != pulse ||
+          old.preparationDurationSecs !=
+              preparationDurationSecs ||
+          old.endingDuration != endingDuration;
 }
 
-/// ---- HELPERS ----
+/// --------------------------------------------------------
+/// HELPERS
+/// --------------------------------------------------------
 
-(double, double) _phaseEnvelope(BreathingPhase phase, bool nextIsInhale, bool prevWasInhale) {
+(double, double) _phaseEnvelope(
+    BreathingPhase phase,
+    bool nextIsInhale,
+    bool prevWasInhale,
+    ) {
   switch (phase.breathingPhaseType) {
     case BreathingPhaseType.inhale:
-      if(nextIsInhale) {
+      if (nextIsInhale) {
         return (0.0, 0.5);
+      } else if (prevWasInhale) {
+        return (0.5, 1.0);
       }
-      else if (prevWasInhale){
-        return(0.5, 1.0);
-      }
-      return (0.0, 1.0); // rise
+
+      return (0.0, 1.0);
+
     case BreathingPhaseType.retention:
-      return (1.0, 1.0); // stay high
+      return (1.0, 1.0);
+
     case BreathingPhaseType.exhale:
-      return (1.0, 0.0); // fall
+      return (1.0, 0.0);
+
     case BreathingPhaseType.recovery:
-      return (0.0, 0.0); // stay low
+      return (0.0, 0.0);
   }
 }
 
-double _interpolate(List<_KeyPoint> keys, int t) {
-  if (t <= keys.first.time) return keys.first.value;
-  if (t >= keys.last.time) return keys.last.value;
+double _interpolate(
+    List<_KeyPoint> keys,
+    int t,
+    ) {
+  if (t <= keys.first.time) {
+    return keys.first.value;
+  }
 
-  for (int i = 1; i < keys.length; i++) {
+  if (t >= keys.last.time) {
+    return keys.last.value;
+  }
+
+  for (int i = 1;
+  i < keys.length;
+  i++) {
     final a = keys[i - 1];
     final b = keys[i];
-    if (t >= a.time && t <= b.time) {
-      final f = (t - a.time) / (b.time - a.time);
-      return lerpDouble(a.value, b.value, f)!;
+
+    if (t >= a.time &&
+        t <= b.time) {
+      final f =
+          (t - a.time) /
+              (b.time - a.time);
+
+      return lerpDouble(
+        a.value,
+        b.value,
+        f,
+      )!;
     }
   }
+
   return 0.5;
 }
 
-double getMinNonZeroPhase(List<BreathingPhase> phases) {
+double getMinNonZeroPhase(
+    List<BreathingPhase> phases,
+    ) {
   double min = double.infinity;
 
   for (final p in phases) {
     final d = p.duration;
+
     if (d > 0 && d < min) {
       min = d;
     }
   }
 
-  return min == double.infinity ? 0.3 : min;
+  return min == double.infinity
+      ? 0.3
+      : min;
 }
 
 class _KeyPoint {
   final int time;
   final double value;
-  _KeyPoint(this.time, this.value);
+
+  _KeyPoint(
+      this.time,
+      this.value,
+      );
 }
