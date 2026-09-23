@@ -14,19 +14,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ------------------------------------------------------
+      # --------------------------------------------------
       # Checkout
-      # ------------------------------------------------------
+      # --------------------------------------------------
 
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ------------------------------------------------------
-      # Read version from pubspec.yaml
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Read version
+      # --------------------------------------------------
 
       - name: Read version from pubspec.yaml
-        id: version
         run: |
           VERSION=$(sed -n 's/^version: //p' pubspec.yaml | tr -d '\r')
 
@@ -39,26 +38,28 @@ jobs:
 
           echo "Detected version: $VERSION"
 
-      # ------------------------------------------------------
-      # Determine release type
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Determine tag
+      # --------------------------------------------------
 
       - name: Determine tag name
         run: |
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             echo "TAG_NAME=v${APP_VERSION}" >> "$GITHUB_ENV"
             echo "IS_PRERELEASE=false" >> "$GITHUB_ENV"
+
           elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
             echo "TAG_NAME=v${APP_VERSION}-rc" >> "$GITHUB_ENV"
             echo "IS_PRERELEASE=true" >> "$GITHUB_ENV"
+
           else
             echo "ERROR: Unsupported branch"
             exit 1
           fi
 
-      # ------------------------------------------------------
-      # Create and push Git tag
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Create tag
+      # --------------------------------------------------
 
       - name: Create and push tag
         env:
@@ -75,20 +76,20 @@ jobs:
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
 
-      # ------------------------------------------------------
+      # --------------------------------------------------
       # Java
-      # ------------------------------------------------------
+      # --------------------------------------------------
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "zulu"
+          distribution: zulu
           java-version: "17"
           cache: gradle
 
-      # ------------------------------------------------------
+      # --------------------------------------------------
       # Flutter
-      # ------------------------------------------------------
+      # --------------------------------------------------
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -96,16 +97,16 @@ jobs:
           channel: stable
           cache: true
 
-      # ------------------------------------------------------
-      # Flutter dependencies
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Dependencies
+      # --------------------------------------------------
 
       - name: Get dependencies
         run: flutter pub get
 
-      # ------------------------------------------------------
-      # Restore release keystore
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Restore keystore
+      # --------------------------------------------------
 
       - name: Restore release keystore
         env:
@@ -113,9 +114,12 @@ jobs:
         run: |
           echo "$RESPIRE_KEYSTORE_BASE64" | base64 --decode > android/respire-release.jks
 
-      # ------------------------------------------------------
+          echo "Keystore created:"
+          ls -lh android/respire-release.jks
+
+      # --------------------------------------------------
       # Create key.properties
-      # ------------------------------------------------------
+      # --------------------------------------------------
 
       - name: Create key.properties
         env:
@@ -130,17 +134,52 @@ jobs:
           storeFile=respire-release.jks
           EOF
 
-      # ------------------------------------------------------
-      # Build release APK
-      # ------------------------------------------------------
+          echo "key.properties created:"
+          cat android/key.properties | sed 's/storePassword=.*/storePassword=***/' | sed 's/keyPassword=.*/keyPassword=***/'
+
+      # --------------------------------------------------
+      # Verify signing files
+      # --------------------------------------------------
+
+      - name: Verify signing configuration
+        run: |
+          echo "Checking signing files..."
+
+          test -f android/respire-release.jks
+          test -f android/key.properties
+
+          echo "Keystore:"
+          ls -lh android/respire-release.jks
+
+          echo "key.properties:"
+          cat android/key.properties \
+            | sed 's/storePassword=.*/storePassword=***/' \
+            | sed 's/keyPassword=.*/keyPassword=***/'
+
+      # --------------------------------------------------
+      # Build
+      # --------------------------------------------------
 
       - name: Build APK
         run: |
           flutter build apk --release
 
-      # ------------------------------------------------------
-      # Rename APK
-      # ------------------------------------------------------
+      # --------------------------------------------------
+      # Verify APK signature
+      # --------------------------------------------------
+
+      - name: Verify APK signature
+        run: |
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+
+          "$BUILD_TOOLS/apksigner" verify \
+            --verbose \
+            --print-certs \
+            build/app/outputs/flutter-apk/app-release.apk
+
+      # --------------------------------------------------
+      # Rename
+      # --------------------------------------------------
 
       - name: Rename APK
         run: |
@@ -148,17 +187,9 @@ jobs:
             build/app/outputs/flutter-apk/app-release.apk \
             "ReSpire-${TAG_NAME}.apk"
 
-      # ------------------------------------------------------
-      # Show APK information
-      # ------------------------------------------------------
-
-      - name: Show APK information
-        run: |
-          ls -lh "ReSpire-${TAG_NAME}.apk"
-
-      # ------------------------------------------------------
+      # --------------------------------------------------
       # Create GitHub Release
-      # ------------------------------------------------------
+      # --------------------------------------------------
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
