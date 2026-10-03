@@ -30,6 +30,7 @@ class TrainingController {
   final Queue<String?> _trainingStageNameQueue = Queue<String?>();
   final Queue<String?> _trainingStageIdQueue = Queue<String?>();
   final Queue<int?> _cycleIndexQueue = Queue<int?>();
+  final Queue<int?> _stageExecutionIndexQueue = Queue<int?>();
 
   final ValueNotifier<int> second = ValueNotifier(3);
   final ValueNotifier<bool> isPaused = ValueNotifier(false);
@@ -81,6 +82,8 @@ class TrainingController {
 
   late BuildContext _context;
   final VoidCallback? onTrainingEnd;
+  VoidCallback? onEndingStarted;
+  VoidCallback? onTrainingFinished;
 
   TranslationProvider translationProvider = TranslationProvider();
 
@@ -127,7 +130,7 @@ class TrainingController {
           parser.training.trainingStages[0].id;
 
       totalStages.value =
-          parser.training.trainingStages.length;
+          parser.countTotalStages();
 
       trainingStages =
           parser.training.trainingStages;
@@ -198,6 +201,7 @@ class TrainingController {
 
     _trainingStageNameQueue.add(null);
     _trainingStageIdQueue.add(null);
+    _stageExecutionIndexQueue.add(null);
 
     _updateCurrentTrainingStageLabel();
 
@@ -263,6 +267,7 @@ class TrainingController {
 
       _trainingStageNameQueue.add(null);
       _trainingStageIdQueue.add(null);
+      _stageExecutionIndexQueue.add(null);
 
       dev.log(
         'TrainingController: No more phases to fetch',
@@ -273,6 +278,10 @@ class TrainingController {
 
     _cycleIndexQueue.add(
       instructionData["doneReps"],
+    );
+
+    _stageExecutionIndexQueue.add(
+      instructionData["stageExecutionIndex"] as int?,
     );
 
     breathingPhasesQueue.value.add(
@@ -777,10 +786,18 @@ class TrainingController {
               second.value = 0;
               end = true;
 
+              _timer?.cancel();
+
+              onTrainingFinished?.call();
+
               if (onTrainingEnd != null) {
                 onTrainingEnd!();
               } else {
-                Navigator.pop(_context);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (_context.mounted && Navigator.canPop(_context)) {
+                    Navigator.pop(_context);
+                  }
+                });
               }
 
               return;
@@ -815,6 +832,7 @@ class TrainingController {
 
               if (_stopTimer == 0) {
                 _endingInitiated = true;
+                onEndingStarted?.call();
 
                 soundManager.stopSound(
                   _currentSound,
@@ -903,6 +921,16 @@ class TrainingController {
   void tryUpdateStageCounter() {
     String? newStageId;
 
+    if (_stageExecutionIndexQueue.length > 1) {
+      final nextStageIndex = _stageExecutionIndexQueue.elementAt(1);
+      if (nextStageIndex != null) {
+        currentStageIndex.value = nextStageIndex;
+      }
+    }
+    if (_stageExecutionIndexQueue.isNotEmpty) {
+      _stageExecutionIndexQueue.removeFirst();
+    }
+
     if (_trainingStageIdQueue.length > 1) {
       newStageId =
           _trainingStageIdQueue.elementAt(1);
@@ -923,7 +951,8 @@ class TrainingController {
       i++) {
         if (parser.training.trainingStages[i].id ==
             newStageId) {
-          currentStageIndex.value = i + 1;
+          totalCycles.value =
+              parser.training.trainingStages[i].reps;
           break;
         }
       }
@@ -934,10 +963,6 @@ class TrainingController {
           _currentTrainingStageId!,
         );
       }
-
-      totalCycles.value =
-          parser.training.trainingStages[
-          currentStageIndex.value - 1].reps;
     }
 
     if (_currentTrainingStageId != null) {
