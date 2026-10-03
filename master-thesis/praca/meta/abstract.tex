@@ -1,0 +1,12 @@
+\chapter*{Abstract}
+
+\indent This thesis presents the development of ReSpire, a mobile application for personalised breathing training, and its integration with an experimental audio-based exhalation detection model. The aim was to support configurable breathing exercises and investigate the use of deep learning for monitoring breathing cycles through a microphone. The work builds on existing application and breath classification projects and draws on a review of breathing monitoring methods, mobile solutions, and visual guidance techniques.
+
+The Flutter application was further developed to support the configuration and delivery of breathing training, with its interaction design adapted to diverse user needs. Interface changes improved the presentation of training settings and expanded personalisation options. The detection component uses a CNN-Transformer model developed in PyTorch and exported to ONNX for native integration on Android. The updated breathing classification v3 (BCV3) model was trained on an expanded dataset with dropout regularisation and a weighted loss function.
+
+BCV3 and the baseline BCV2 were evaluated on the same test set of 11,705 audio samples. At a decision threshold of 0.5, the ONNX version of BCV3 achieved 85.89\% accuracy and 94.52\% exhalation recall, compared with 84.95\% and 92.05\% for BCV2. The improvement in recall was accompanied by an increase in false positive detections. Tests using an Android emulator and physical devices also indicated the need to adjust the decision threshold to the recording configuration.
+
+The outcome is a functionally complete breathing training application enhanced with a proof-of-concept detection module for automatic cycle counting. Further work may improve detection reliability, extend recognition to all breathing phases, and complete the native Swift integration of BCV3 for iOS, for which the application layer is already prepared.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} breathing training, mobile application, exhalation detection, deep learning, Flutter, ONNX \vspace{0.5cm}

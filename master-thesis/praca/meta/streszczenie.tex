@@ -1,0 +1,14 @@
+\chapter*{Streszczenie}
+
+\indent W pracy przedstawiono rozwój aplikacji mobilnej ReSpire do spersonalizowanego treningu oddechowego oraz jej integrację z eksperymentalnym modelem wykrywania wydechu na podstawie dźwięku. Celem było wspomaganie ćwiczeń o konfigurowalnym przebiegu, a także zbadanie możliwości wykorzystania uczenia głębokiego do monitorowania cykli oddechowych za pomocą mikrofonu. Praca stanowi kontynuację istniejących projektów aplikacji i klasyfikacji oddechu, a przyjęte rozwiązania oparto na przeglądzie metod monitorowania oddechu, aplikacji mobilnych oraz sposobów wizualnego prowadzenia ćwiczeń.
+
+Aplikację przygotowaną we Flutterze rozbudowano w zakresie konfiguracji i prowadzenia treningów oddechowych, dostosowując sposób jej obsługi do zróżnicowanych potrzeb użytkowników. Zmiany interfejsu uporządkowały prezentację ustawień, jak również zwiększyły możliwości personalizacji. Moduł detekcji wykorzystuje model CNN-Transformer rozwijany w PyTorch i wyeksportowany do formatu ONNX na potrzeby natywnej integracji z systemem Android. Udoskonalony model \textit{breathing classification v3} (BCV3) wytrenowano na rozszerzonym zbiorze danych, stosując regularyzację dropout oraz ważoną funkcję straty.
+
+Modele BCV3 i BCV2 oceniono na wspólnym zbiorze testowym zawierającym 11~705 próbek dźwięku. Przy progu decyzyjnym 0,5 wersja ONNX modelu BCV3 osiągnęła dokładność 85,89\% i czułość wykrywania wydechu 94,52\%, wobec odpowiednio 84,95\% i 92,05\% dla BCV2. Wzrostowi czułości towarzyszyło zwiększenie liczby fałszywych detekcji. Testy na emulatorze Androida i urządzeniach fizycznych wskazały również na potrzebę dostosowywania progu decyzyjnego do konfiguracji rejestracji dźwięku.
+
+Rezultatem pracy jest funkcjonalnie kompletna aplikacja do treningu oddechowego, wzbogacona o eksperymentalny moduł automatycznego zliczania cykli, stanowiący demonstrację wykonalności koncepcji (ang. \textit{proof of concept}). Dalsze prace mogą obejmować poprawę niezawodności detekcji, rozszerzenie rozpoznawania na wszystkie fazy oddechu oraz uzupełnienie natywnej integracji BCV3 w języku Swift dla systemu iOS, do którego warstwa aplikacyjna jest już przygotowana.
+
+\vspace{0.5cm}
+\noindent\textbf{Słowa kluczowe:} trening oddechowy, aplikacja mobilna, wykrywanie wydechu, uczenie głębokie, Flutter, ONNX\vspace{0.5cm}
+
+\noindent \textbf{Dziedzina nauki i techniki, zgodnie z wymogami OECD:} nauki inżynieryjne i techniczne, nauka o komputerach i informatyce

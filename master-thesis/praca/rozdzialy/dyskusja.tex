@@ -1,0 +1,31 @@
+\chapter{Dyskusja}
+
+Praca obejmowała rozwój aplikacji ReSpire oraz modelu wykrywania wydechu, a następnie połączenie obu elementów w system wspomagający trening oddechowy. Uzyskane rozwiązanie umożliwia personalizację ćwiczeń, prowadzenie sesji za pomocą wskazówek wizualnych lub dźwiękowych oraz zliczanie cykli na podstawie sygnału z mikrofonu. W niniejszym rozdziale odniesiono osiągnięte rezultaty do założonych celów, wskazano ograniczenia obecnej wersji i~przedstawiono kierunki dalszego rozwoju.
+
+\section{Realizacja założonych celów}
+
+Założony cel osiągnięto w zakresie stworzenia narzędzia łączącego personalizację treningu z podstawowym monitorowaniem jego przebiegu. Najważniejszym rezultatem nie jest jednak pojedyncza funkcja, lecz połączenie części aplikacyjnej oraz badawczej w rozwiązanie, które można sprawdzać podczas rzeczywistego ćwiczenia. Rozwój wcześniejszych projektów pozwolił skupić się na ich wzajemnym uzupełnieniu oraz dostosowaniu do wspólnego zastosowania.
+
+Aplikacja daje użytkownikowi swobodę definiowania ćwiczeń, natomiast możliwość sprawdzania ich wykonania pozostaje bardziej ograniczona. Jest to istotne rozróżnienie między gotowością narzędzia do prowadzenia treningu a dojrzałością jego funkcji monitorujących.
+
+\section{Interpretacja wyników i ograniczenia}
+
+Aplikacja ReSpire zapewnia pełny zestaw funkcji potrzebnych do konfigurowania i prowadzenia treningów oddechowych. Włączenie modelu BCV3 wzbogaca ją o możliwość automatycznego zliczania cykli, nadając projektowi również wymiar badawczy. Pozwala to sprawdzać, w jakim stopniu analiza dźwięku może uzupełniać prowadzenie ćwiczeń o informację zwrotną na temat ich przebiegu.
+
+Wyniki testów przeprowadzonych z udziałem użytkowników wskazują, że przydatność detekcji zależy przede wszystkim od tempa ćwiczenia. Dla wolniejszych wzorców liczba wykrytych wydechów była zbliżona do wartości referencyjnej, co potwierdza możliwość wykorzystania modelu do wspomagania typowych treningów oddechowych. Wyraźny spadek współczynnika DR dla faz trwających 1,5~s i 1~s pokazuje jednak, że obecne rozwiązanie nie reaguje dostatecznie niezawodnie podczas szybkich sekwencji. Krótki wydech może obejmować zbyt mało analizowanych fragmentów sygnału, a niewielki odstęp pomiędzy kolejnymi fazami dodatkowo utrudnia ich rozdzielenie.
+
+Różnice pomiędzy zestawami HyperX i Blackwire potwierdzają wpływ toru rejestracji dźwięku na działanie modelu. Wartość DR przekraczająca 100\% dla zestawu Blackwire w teście 4-2-4 oznacza, że zwiększenie czułości nie zawsze prowadzi do dokładniejszego zliczania, ponieważ może powodować wielokrotne lub fałszywe detekcje.
+
+Obecna wersja detekcji ma charakter eksperymentalny oraz stanowi demonstrację wykonalności koncepcji (ang. \textit{proof of concept}). Uzyskane wyniki wskazują, że model może skutecznie wspomagać zliczanie cykli podczas treningów wykorzystujących wolniejsze fazy oddechu. W przypadku szybszych sekwencji jego skuteczność jest jednak niewystarczająca, dlatego zastosowanie modelu w takich treningach wymaga dalszego usprawnienia sposobu detekcji.
+
+\section{Kierunki dalszego rozwoju}
+
+Istotnym kierunkiem dalszych prac jest uzupełnienie obsługi systemu iOS. Warstwa aplikacyjna została przygotowana do pracy na urządzeniach z tym systemem, jednak natywna integracja modelu BCV3 w kodzie Swift nie została przeprowadzona. Gotowości wspólnej warstwy aplikacji nie należy więc utożsamiać z pełnym działaniem detekcji wydechu na iOS. Dokończenie tego etapu wymaga przygotowania obsługi modelu w warstwie natywnej, połączenia jej z~kodem Flutter oraz sprawdzenia całego procesu na fizycznych urządzeniach. Testy powinny objąć zgodność przetwarzania sygnału, poprawność predykcji, a także działanie aplikacji podczas sesji treningowej.
+
+Drugim kierunkiem jest dalsze usprawnianie modelu BCV3. Warto rozszerzać zbiór danych o nagrania większej liczby użytkowników, różnych mikrofonów i warunków otoczenia, w tym dźwięków mogących powodować fałszywe detekcje. Kolejne eksperymenty mogą dotyczyć architektury sieci, sposobu przygotowania sygnału oraz parametrów uczenia. Poszczególne modyfikacje powinny być oceniane oddzielnie, aby ustalić ich rzeczywisty wpływ na wynik. Celem powinno być nie tylko zwiększanie czułości, lecz także ograniczanie błędnego zliczania cykli.
+
+W przyszłości model można również rozbudować o wykrywanie wszystkich faz oddechu. Pozwoliłoby to pełniej monitorować przebieg ćwiczenia, jak również odnosić go do zaplanowanego wzorca. Aby takie rozwiązanie działało niezawodnie, konieczne będzie jednak zwiększenie skuteczności rozpoznawania poszczególnych faz. Rozszerzenie zakresu detekcji powinno zatem iść w parze z~poprawą jakości predykcji, tak aby przekazywana użytkownikowi informacja zwrotna była wiarygodna.
+
+\section{Wnioski końcowe}
+
+Rezultatem pracy jest funkcjonalnie kompletna aplikacja do personalizacji i prowadzenia treningów oddechowych, rozszerzona o eksperymentalny moduł wykrywania wydechu. Zrealizowana na Androidzie integracja BCV3 stanowi podstawę dalszych badań nad automatycznym monitorowaniem ćwiczeń. Dalsze prace mogą koncentrować się na poprawie skuteczności tego dodatku oraz jego natywnej integracji na iOS, przy zachowaniu niezależności podstawowych funkcji treningowych od modelu detekcji.
